@@ -1,0 +1,13 @@
+diff --git a/scripts/train_darpatc.py b/scripts/train_darpatc.py
+index 2b1717d..a595a2a 100644
+--- a/scripts/train_darpatc.py
++++ b/scripts/train_darpatc.py
+@@ -6,7 +6,7 @@ import time
+ import torch.nn.functional as F
+ import numpy as np
+ from torch_geometric.datasets import Reddit
+-from torch_geometric.data import NeighborSampler, DataLoader
++from torch_geometric.loader import NeighborSampler
+ from torch_geometric.nn import SAGEConv, GATConv
+ from data_process_train import *
+ from data_process_test import *

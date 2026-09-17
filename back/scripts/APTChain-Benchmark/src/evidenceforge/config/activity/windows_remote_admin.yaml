@@ -1,0 +1,25 @@
+# Command lines used when a Windows explicit-credential event needs the
+# generator to materialize its caller process. Keep the target account and
+# target host in the command so the process evidence explains the 4648 event
+# instead of degrading to a bare executable name.
+explicit_credential_caller_commands:
+  powershell.exe:
+    - >-
+      powershell.exe -NoLogo -NoProfile -Command
+      "$credential = Get-Credential -UserName '{target_username}';
+      Invoke-Command -ComputerName '{target_server}' -Credential $credential
+      -ScriptBlock { Get-Service }"
+    - >-
+      powershell.exe -NoLogo -NoProfile -Command
+      "$credential = Get-Credential -UserName '{target_username}';
+      Enter-PSSession -ComputerName '{target_server}' -Credential $credential"
+  runas.exe:
+    - >-
+      runas.exe /netonly /user:{target_username}
+      "mmc.exe compmgmt.msc /computer:{target_server}"
+    - >-
+      runas.exe /netonly /user:{target_username}
+      "cmd.exe /d /q /k title Admin session - {target_server}"
+  mmc.exe:
+    - 'mmc.exe compmgmt.msc /computer:{target_server}'
+    - 'mmc.exe eventvwr.msc /computer:{target_server}'

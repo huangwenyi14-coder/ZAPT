@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-07-21",
+  "sources": [
+    {
+      "id": "threatrace",
+      "url": "https://github.com/threaTrace-detector/threaTrace.git",
+      "ref": "2229474a8b37888bd987e9dc59ba17071e096d80",
+      "license": "MIT"
+    },
+    {
+      "id": "magic",
+      "url": "https://github.com/FDUDSDE/MAGIC.git",
+      "ref": "aa0b647eea74b6faa0e52eb444370c4411a32cbe",
+      "license": "MIT"
+    },
+    {
+      "id": "shadewatcher",
+      "url": "https://github.com/jun-zeng/ShadeWatcher.git",
+      "ref": "8abdfb41bd16df9b283e38b6832cda63dcb27c64",
+      "license": "GPL-3.0"
+    },
+    {
+      "id": "nodlink",
+      "url": "https://github.com/PKU-ASAL/Simulated-Data.git",
+      "ref": "434dbe2d0be88bd034c4af0c819aed641d2b3758",
+      "license": "Research-Only MIT"
+    },
+    {
+      "id": "kairos",
+      "url": "https://github.com/ubc-provenance/kairos.git",
+      "ref": "0e0b633beb46a1117c0a6d63be5d2481b59ac0dc",
+      "license": "NOASSERTION"
+    },
+    {
+      "id": "pidsmaker",
+      "url": "https://github.com/ubc-provenance/PIDSMaker.git",
+      "ref": "32602734bc9f896be5fc0f03f0a185c967cd6624",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "orthrus",
+      "url": "https://github.com/ubc-provenance/orthrus.git",
+      "ref": "e7f25dfee1ddd182a955b88f8a90a8cbd4a8e543",
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "provfusion",
+      "url": "https://github.com/Joney-Yf/ProvFusion.git",
+      "ref": "9364b16d6915ca7d48555c5405f1d4fb97215e9a",
+      "license": "NOASSERTION"
+    }
+  ],
+  "large_artifacts": [
+    {
+      "id": "tapas",
+      "url": "https://zenodo.org/api/records/15610687/files/TAPAS-artifact.rar/content",
+      "sha256": null,
+      "md5": "3821cee140ca6ebda91deebd4e26eae4",
+      "size_bytes": 24330707000,
+      "download_by_default": false
+    }
+  ]
+}

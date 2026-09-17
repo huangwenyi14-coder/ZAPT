@@ -1,0 +1,22 @@
+diff --git a/model/autoencoder.py b/model/autoencoder.py
+index 0ce446c..7ec31d9 100644
+--- a/model/autoencoder.py
++++ b/model/autoencoder.py
+@@ -77,6 +77,8 @@ class GMAEModel(nn.Module):
+ 
+     def encoding_mask_noise(self, g, mask_rate=0.3):
+         new_g = g.clone()
++        new_g.ndata["attr"] = g.ndata["attr"].clone()
++        new_g.edata["attr"] = g.edata["attr"].clone()
+         num_nodes = g.num_nodes()
+         perm = torch.randperm(num_nodes, device=g.device)
+ 
+@@ -103,7 +103,7 @@ class GMAEModel(nn.Module):
+         loss = self.criterion(x_rec, x_init)
+ 
+         # Structural Reconstruction
+-        threshold = min(10000, g.num_nodes())
++        threshold = min(10000, g.num_nodes(), g.num_edges())
+ 
+         negative_edge_pairs = dgl.sampling.global_uniform_negative_sampling(g, threshold)
+         positive_edge_pairs = random.sample(range(g.number_of_edges()), threshold)

@@ -1,0 +1,2620 @@
+[
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00001",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8765,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在263475.3秒内产生138条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4529c13b630f49e8c95e6bee",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 81,
+      "timestamp": "2023-12-29T18:15:15.190000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00002",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.7826,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=user32.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在264802.2秒内产生1860条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.707，传播分=0.707；边关系惊异度=0.580, 主机内行为稀有度=0.136。"
+    },
+    "location": {
+      "physical_record_id": "pr-a69ca763b126d033229a7103",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 192,
+      "timestamp": "2023-12-29T18:32:43.824000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00003",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6924,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\lucas.martinez\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在215887.4秒内产生30条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.691，传播分=0.691；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-88aebf58feebd68108279334",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 1333,
+      "timestamp": "2023-12-29T19:12:21.0720000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00004",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7136,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在264868.1秒内产生257条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.599，传播分=0.599；边关系惊异度=0.690, 主机内行为稀有度=0.100。"
+    },
+    "location": {
+      "physical_record_id": "pr-fd998fd6961dbd0a78fe7570",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 1786,
+      "timestamp": "2023-12-29T19:57:54.860000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00005",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7453,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "9.20.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在261856.5秒内产生49条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.745，传播分=0.745；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8ea1a9ad77e75cea7eaf2f3b",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 285,
+      "timestamp": "2023-12-29T21:48:26.8886065Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00006",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-c0bfa0500678dc9566a48f51",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 769,
+      "timestamp": "2023-12-30T01:48:42.2140906Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00007",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-dec5a08a1c9bcbb6fc66f3ac",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1642,
+      "timestamp": "2023-12-30T01:48:42.287000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00008",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-c77f6a7c9978bbecc23d0767",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 1167,
+      "timestamp": "2023-12-30T01:48:42.3810001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00009",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-bd0933672e2ae7886f6a1e60",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 931,
+      "timestamp": "2023-12-30T03:29:12.3170005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00010",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-4688290203eee17d0d38086f",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 588,
+      "timestamp": "2023-12-30T03:29:12.7361551Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00011",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-a370c3d0b0b3bd8aa9900b38",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1449,
+      "timestamp": "2023-12-30T03:29:12.803000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00012",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8625,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=endpoint class=private_ip port=3389（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在229046.2秒内产生428条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.832，传播分=0.832；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8d8e872f46a961e8c9a5367e",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 1702,
+      "timestamp": "2023-12-30T03:55:39.610000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00013",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8765,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在248430.7秒内产生40条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8a62ce8f5a4c3cbcbfee328e",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1858,
+      "timestamp": "2023-12-30T06:23:01.955000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00014",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7213,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在222006.5秒内产生107条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.611，传播分=0.611；边关系惊异度=0.690, 主机内行为稀有度=0.143。"
+    },
+    "location": {
+      "physical_record_id": "pr-a5da78d27c8d51ebb7145507",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 4444,
+      "timestamp": "2023-12-30T07:31:54.750000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00015",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-17621832e1f4a6b8440f483a",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 9442,
+      "timestamp": "2023-12-30T08:40:05.034000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00016",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-4fcdab0949629fead6cfa021",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 10812,
+      "timestamp": "2023-12-30T08:40:05.7830000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00017",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-b9f0f8473ef80b43ae71cdab",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2078,
+      "timestamp": "2023-12-30T08:40:05.8341467Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00018",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6825,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在259840.6秒内产生29条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.660，传播分=0.660；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-6fe805586147fcec9e0cb017",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1130,
+      "timestamp": "2023-12-30T09:03:18.8340304Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00019",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7379,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "52.127.45.23.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在264599.3秒内产生80条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.738，传播分=0.738；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-70590dc57abb48ef4a942bab",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1478,
+      "timestamp": "2023-12-30T09:35:55.3973213Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00020",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAA1ADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-caf2e5974e77b6ac42a1d0fe",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 990,
+      "timestamp": "2023-12-30T10:10:57.5762290Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00021",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAA1ADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1230ffd77a35f9c50765090f",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2371,
+      "timestamp": "2023-12-30T10:10:57.755000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00022",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAA1ADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-234cb5e33c3d30f7e148d94b",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1492,
+      "timestamp": "2023-12-30T10:10:57.8430006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00023",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6309,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在211420.4秒内产生13条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.580，传播分=0.580；边关系惊异度=0.760, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-a5745c443c24f3d12b535e64",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1078,
+      "timestamp": "2023-12-30T10:45:47.4707860Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00024",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcARABpAHMAYQBiAGwAZQBkACcAfQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-60b502f26fb3c34e0f36223f",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1185,
+      "timestamp": "2023-12-30T12:32:27.4924109Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00025",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcARABpAHMAYQBiAGwAZQBkACcAfQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4437c05cab3cdbe3e61e4b7c",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2874,
+      "timestamp": "2023-12-30T12:32:27.624000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00026",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcARABpAHMAYQBiAGwAZQBkACcAfQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a11b7814097c309d4d15cb7c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 1836,
+      "timestamp": "2023-12-30T12:32:27.6360008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00027",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAbwB1AHQAbABvAG8AawA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e50c99973f2cc45200fe4add",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1954,
+      "timestamp": "2023-12-30T15:19:15.1890009Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00028",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAbwB1AHQAbABvAG8AawA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-355068ce226d75382b7fbaca",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 3116,
+      "timestamp": "2023-12-30T15:19:15.297000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00029",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAbwB1AHQAbABvAG8AawA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f45d9e4f7600a2d8a5094ab1",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1318,
+      "timestamp": "2023-12-30T15:19:16.0244463Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00030",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-37500765f72a1533d9c7750d",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 13691,
+      "timestamp": "2023-12-30T15:56:50.070000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00031",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-713338183d65c94aefa53a82",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3104,
+      "timestamp": "2023-12-30T15:56:50.0743388Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00032",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f825bf6350abc696aa762b72",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 15745,
+      "timestamp": "2023-12-30T15:56:50.4430008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00033",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5397,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在75587.4秒内产生12条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.436，传播分=0.540；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-5b8c89d7b0f6c846976a1156",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 3267,
+      "timestamp": "2023-12-30T16:27:47.408000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00034",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7545,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在170133.8秒内产生11条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.754，传播分=0.754；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-bd22aeaefc4c8bec599062a1",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1392,
+      "timestamp": "2023-12-30T16:38:01.4685804Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00035",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-e53bcdf8bf379caa9a6da7ad",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1799,
+      "timestamp": "2023-12-30T17:03:54.1350542Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00036",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-fb3729b4013f8315977b6f52",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 7342,
+      "timestamp": "2023-12-30T17:03:54.705000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00037",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-15a526016e5a6e1a9776f3f5",
+      "relative_path": "FS-01.example.local/windows_event_security.xml",
+      "record_index": 4461,
+      "timestamp": "2023-12-30T17:03:54.7610000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00038",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-d35f898a6a453c2bfb2ded86",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 3404,
+      "timestamp": "2023-12-30T17:41:00.459000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00039",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-0337b2b5688c61107151bebd",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 2131,
+      "timestamp": "2023-12-30T17:41:00.8120005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00040",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-e9cb67394c119fb272afe732",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1438,
+      "timestamp": "2023-12-30T17:41:00.9234566Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00041",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7386,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "14.20.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在264614.5秒内产生173条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.739，传播分=0.739；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-81c14792ecc36826959dc482",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2371,
+      "timestamp": "2023-12-30T20:05:49.2838216Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00042",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7557,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在226178.3秒内产生33条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.665，传播分=0.665；边关系惊异度=0.690, 主机内行为稀有度=0.333。"
+    },
+    "location": {
+      "physical_record_id": "pr-0f3491faf61027e89fbf72db",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5223,
+      "timestamp": "2023-12-30T21:15:42.194000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00043",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-86d0a038cf9a7f623cd60732",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5513,
+      "timestamp": "2023-12-30T22:47:05.254000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00044",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-74a7582409b77f5d18784dd4",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3605,
+      "timestamp": "2023-12-30T22:47:05.8140007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00045",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-ebbd55c8547d514751aa649c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2605,
+      "timestamp": "2023-12-30T22:47:05.8802048Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00046",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5428,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c netstat -an | findstr LISTENING"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在247665.8秒内产生24条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.488，传播分=0.543；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-053958c8484b98598039278f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3630,
+      "timestamp": "2023-12-30T23:01:03.1820008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00047",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6059,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在212200.5秒内产生23条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.540，传播分=0.540；边关系惊异度=0.760, 主机内行为稀有度=0.378。"
+    },
+    "location": {
+      "physical_record_id": "pr-9d7938bed048083782720f82",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2819,
+      "timestamp": "2023-12-30T23:55:04.7100736Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00048",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-7d4666561bfb562cf8b3eb8f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4157,
+      "timestamp": "2023-12-31T03:42:15.1540001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00049",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-226013b4e05bc96611e98d11",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 6423,
+      "timestamp": "2023-12-31T03:42:15.431000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00050",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-e9e457fb55e1d06ca1bbd4ec",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 3050,
+      "timestamp": "2023-12-31T03:42:15.4594939Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00051",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-fce137dc5d446490b6bf4a2f",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 5070,
+      "timestamp": "2023-12-31T04:03:52.103000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00052",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-d366d7001483992bf7855eb0",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3151,
+      "timestamp": "2023-12-31T04:03:52.5520008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00053",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-00fc79081e6601e7ce535e15",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 2119,
+      "timestamp": "2023-12-31T04:03:52.5851902Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00054",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c9f6e7ee07bb273247771ee3",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 21239,
+      "timestamp": "2023-12-31T04:11:42.103000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00055",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ac3b3a43c7dd27a2aa862d32",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 24323,
+      "timestamp": "2023-12-31T04:11:42.6970009Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00056",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c9f88f23d3e62ed52b3cdd5c",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4773,
+      "timestamp": "2023-12-31T04:11:42.8791144Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00057",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABkAGMAMAAxACAALQBQAG8AcgB0ACAAMwAzADgAOQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fe992c68382c93c5f13f70d6",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 2290,
+      "timestamp": "2023-12-31T07:50:20.0743755Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00058",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABkAGMAMAAxACAALQBQAG8AcgB0ACAAMwAzADgAOQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1029e895695fbf8c204d2b0c",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 5379,
+      "timestamp": "2023-12-31T07:50:20.490000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00059",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABkAGMAMAAxACAALQBQAG8AcgB0ACAAMwAzADgAOQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0e4e282215f629c02e4cdf0c",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 3399,
+      "timestamp": "2023-12-31T07:50:20.5610000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00060",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-01c91a98250f8663e576189f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 3584,
+      "timestamp": "2023-12-31T09:48:35.1932808Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00061",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-cf6555384729704afcd902d6",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4825,
+      "timestamp": "2023-12-31T09:48:35.7240002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00062",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-254dfecf91f1456e5e0da50f",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 7547,
+      "timestamp": "2023-12-31T09:48:35.797000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00063",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6470,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在204757.6秒内产生9条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.605，传播分=0.605；边关系惊异度=0.760, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-5c91e7830bf2e4fc3e0c0d61",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 3702,
+      "timestamp": "2023-12-31T10:55:12.4385175Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00064",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-b40b666c4c434f375c1f6d2b",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 2589,
+      "timestamp": "2023-12-31T11:37:28.1232053Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00065",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-bb55c7da21dd06c31c509c66",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3798,
+      "timestamp": "2023-12-31T11:37:28.7430007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00066",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-2a09d1c3755393e3989e5826",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 6137,
+      "timestamp": "2023-12-31T11:37:28.851000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00067",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7379,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.10.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在224824.5秒内产生53条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.738，传播分=0.738；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8cde6f47ee08b41e9bf83b5c",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3182,
+      "timestamp": "2023-12-31T11:42:19.2188060Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00068",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6825,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在261641.4秒内产生103条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.660，传播分=0.660；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-738e5998269925b2eb9bcb15",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 5982,
+      "timestamp": "2023-12-31T13:33:23.9204699Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00069",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABmAGkAbABlAHMAZQByAHYAZQByACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-203f6149ae321c437c2439f4",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 2682,
+      "timestamp": "2023-12-31T14:34:35.1854793Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00070",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABmAGkAbABlAHMAZQByAHYAZQByACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f2b3f63d2336106d92139f6b",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 6245,
+      "timestamp": "2023-12-31T14:34:35.316000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00071",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABmAGkAbABlAHMAZQByAHYAZQByACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4f27494e78c9ee30b2e84a66",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 3932,
+      "timestamp": "2023-12-31T14:34:35.4190007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00072",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-ab3dcffc81a7eb8deb8dabab",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 4141,
+      "timestamp": "2023-12-31T15:17:11.2050002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00073",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-0f9cc26770649e89bf110980",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 6677,
+      "timestamp": "2023-12-31T15:17:11.408000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00074",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-c947d0eddf491ff8623cb702",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 2835,
+      "timestamp": "2023-12-31T15:17:11.4261906Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00075",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6166,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c ipconfig /all"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在85322.8秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7980ee0b5a8b6a9c2ffc88a8",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 32700,
+      "timestamp": "2023-12-31T16:17:39.0220040Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00076",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7952,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "52.127.45.23.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在265786.2秒内产生381条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.795，传播分=0.795；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2752c775191afc050927155b",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 4167,
+      "timestamp": "2023-12-31T16:25:10.561074Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00077",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7761,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "11.18.107.13.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在241094.7秒内产生144条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1e392bb65945078372aaa30a",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 2801,
+      "timestamp": "2023-12-31T16:25:10.9143919Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00078",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6939,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.60.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在246931.0秒内产生24条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.678，传播分=0.678；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4e4a40cb091ace0bc297030b",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 6570,
+      "timestamp": "2023-12-31T17:43:56.5295115Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00079",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-738f2c7fad4bff4997e60042",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 4467,
+      "timestamp": "2023-12-31T18:58:17.4300007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00080",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-0d6866874918ea7196689b32",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 7193,
+      "timestamp": "2023-12-31T18:58:17.447000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00081",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-0206fc780dfbf75eec9140a8",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 3064,
+      "timestamp": "2023-12-31T18:58:17.8082117Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00082",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8625,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=ntdll.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在262436.1秒内产生549条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.832，传播分=0.832；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-58eba893b1254a87de9a04ba",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 6924,
+      "timestamp": "2023-12-31T19:20:34.015000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00083",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-efdb8f51434ff2a38d76f91b",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 7706,
+      "timestamp": "2023-12-31T22:37:24.029000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00084",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-861508b33a26b3c425dc6879",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 4782,
+      "timestamp": "2023-12-31T22:37:24.1630001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00085",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-4f3617522c1f91128cde9875",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 3293,
+      "timestamp": "2023-12-31T22:37:24.9972417Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00086",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8765,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在264710.3秒内产生108条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6da4d6cccdea4b1b14582d8a",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 9962,
+      "timestamp": "2024-01-01T01:34:48.553000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00087",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-e1ec183f424ebeb874b5871e",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4487,
+      "timestamp": "2024-01-01T04:35:51.1501008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00088",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-a0e0d742d792c71cd0ef26c1",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 18426,
+      "timestamp": "2024-01-01T04:35:51.212000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00089",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-e701354b2cba7b6f5b382c31",
+      "relative_path": "FS-01.example.local/windows_event_security.xml",
+      "record_index": 11097,
+      "timestamp": "2024-01-01T04:35:51.4460003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00090",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6855,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "ps aux | grep sshd"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在248428.7秒内产生41条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.686，传播分=0.686；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cfb31b9f6e825cd6109f3408",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 357,
+      "timestamp": "2024-01-01T05:59:00Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00091",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-5d88f92cdfc9c2a32b72a8ca",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 5471,
+      "timestamp": "2024-01-01T06:08:16.3940001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00092",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-f617f1078c91ee4936095379",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 8805,
+      "timestamp": "2024-01-01T06:08:16.399000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00093",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7753,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-2e40852f5fba551374168a13",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 3751,
+      "timestamp": "2024-01-01T06:08:16.8021248Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00094",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-36376ed3fa118d4852a29f80",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4740,
+      "timestamp": "2024-01-01T07:45:25.6584129Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00095",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-c0dc049dcd1d35cb403bb373",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 19541,
+      "timestamp": "2024-01-01T07:45:25.693000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00096",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.644，传播分=0.644；边关系惊异度=0.720, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-8f7f8577a8f7fefae2f62f11",
+      "relative_path": "FS-01.example.local/windows_event_security.xml",
+      "record_index": 11808,
+      "timestamp": "2024-01-01T07:45:25.9212315Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00097",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7538,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在239844.5秒内产生41条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.754，传播分=0.754；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c3952658d50114f839ca2f9b",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4761,
+      "timestamp": "2024-01-01T07:58:47.8040187Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00098",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6354,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\diego.ramirez\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在189462.7秒内产生36条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.602，传播分=0.602；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-e091e4634196771d4bddcb3e",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 5820,
+      "timestamp": "2024-01-01T08:26:57.8188512Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00099",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7058,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aisha.johnson\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在212838.2秒内产生33条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.706，传播分=0.706；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9a147829f0c063b0d4185b11",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 9273,
+      "timestamp": "2024-01-01T10:32:47.905000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00100",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7761,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "152.67.21.104.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在258369.5秒内产生106条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c1972a871c07de70c5ef8210",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 4283,
+      "timestamp": "2024-01-01T12:17:25.2760403Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00101",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-647d60cdb267337667e8f3a1",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 12778,
+      "timestamp": "2024-01-01T12:20:25.571000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00102",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-40b41357820f9ca621278fe4",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 5898,
+      "timestamp": "2024-01-01T12:20:25.7634021Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00103",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8007,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-11482600651a9a0c12919d15",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 8282,
+      "timestamp": "2024-01-01T12:20:25.8650008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00104",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-f363829ee6bb9849acacb02e",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 9791,
+      "timestamp": "2024-01-01T13:05:46.287000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00105",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-255d66eaf32e0e383b206283",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 6279,
+      "timestamp": "2024-01-01T13:05:46.8740004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00106",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-ae87338f18e067da043dd05d",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 4131,
+      "timestamp": "2024-01-01T13:05:47.0654618Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00107",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAAxADAAMAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-140f088eed46e20d08760983",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 51077,
+      "timestamp": "2024-01-01T14:26:47.3820006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00108",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAAxADAAMAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2e89370a6b5443f84fade091",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 43672,
+      "timestamp": "2024-01-01T14:26:47.859000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00109",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAAxADAAMAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-dd2bf6b144f5e334b8f5bfaf",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 9526,
+      "timestamp": "2024-01-01T14:26:48.0214915Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00110",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5918,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "ps aux"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在231377.9秒内产生57条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.592，传播分=0.592；边关系惊异度=0.780, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f5dc58da290f08b81612b13b",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 529,
+      "timestamp": "2024-01-01T15:09:01Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00111",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-308fb86c9f8293fb3c778f66",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 4309,
+      "timestamp": "2024-01-01T15:17:23.1264462Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00112",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-ba28f79c12a6204accfc5151",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 6702,
+      "timestamp": "2024-01-01T15:17:23.4340001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00113",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7499,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.656，传播分=0.656；边关系惊异度=0.720, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-82635a7c5e5195607d4f2545",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 10312,
+      "timestamp": "2024-01-01T15:17:23.719000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00114",
+    "alert": "检测到计划任务创建/修改",
+    "confidence_score": 0.8608,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "计划任务创建/修改",
+          "description": "检测计划任务的创建、修改或可疑任务执行配置。",
+          "match_reason": "C:\\Windows\\System32\\schtasks.exe /create /tn Updater"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.829，传播分=0.829；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2ea9ae6109d4ee8a1b7d65ea",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 11186,
+      "timestamp": "2024-01-01T15:43:54.958000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00115",
+    "alert": "检测到计划任务创建/修改",
+    "confidence_score": 0.8608,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "计划任务创建/修改",
+          "description": "检测计划任务的创建、修改或可疑任务执行配置。",
+          "match_reason": "C:\\Windows\\System32\\schtasks.exe /create /tn Updater"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.829，传播分=0.829；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5539f00a85dad45fc9c400a1",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 4591,
+      "timestamp": "2024-01-01T15:43:54.9720845Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00116",
+    "alert": "检测到计划任务创建/修改",
+    "confidence_score": 0.8608,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "计划任务创建/修改",
+          "description": "检测计划任务的创建、修改或可疑任务执行配置。",
+          "match_reason": "C:\\Windows\\System32\\schtasks.exe /create /tn Updater"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.829，传播分=0.829；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-08faa34bfb80d28b193737db",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 7382,
+      "timestamp": "2024-01-01T15:43:55.6259586Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00117",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.9299,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:wks-eng-021（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在2.7秒内产生7条直接观测；覆盖3类关系（connect、load、spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.580, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-ca390d8a74f2f96c979a134e",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 18618,
+      "timestamp": "2024-01-01T15:53:57.627000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00118",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7108,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在225685.1秒内产生57条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.711，传播分=0.711；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-97257dba1a8906743554c4c9",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 13895,
+      "timestamp": "2024-01-01T15:55:16.404000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2020-10-15-muddywater-00119",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.9265,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在263564.0秒内产生30条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.926，传播分=0.926；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-71494c954c1b25836864e6ef",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 11666,
+      "timestamp": "2024-01-01T17:17:24.048000Z"
+    }
+  }
+]

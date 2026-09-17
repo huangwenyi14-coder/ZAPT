@@ -1,0 +1,1784 @@
+[
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00001",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-a90fef054753933265108fba",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 1,
+      "timestamp": "2023-12-30T18:03:36.1740005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00002",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-66950bf9943923cf40a80b11",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 5,
+      "timestamp": "2023-12-30T18:03:36.334000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00003",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-3ac839dc8675ecce23954f6c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1,
+      "timestamp": "2023-12-30T18:03:36.4204884Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00004",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7711,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在171224.9秒内产生29条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.771，传播分=0.771；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2b528405cad50637c5931522",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 25,
+      "timestamp": "2023-12-30T18:15:09.4321216Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00005",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8768,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在171227.4秒内产生90条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1aadb62a70630ca0c82a6cd1",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 53,
+      "timestamp": "2023-12-30T18:15:15.183000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00006",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7159,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在171882.4秒内产生204条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.603，传播分=0.603；边关系惊异度=0.690, 主机内行为稀有度=0.111。"
+    },
+    "location": {
+      "physical_record_id": "pr-ad2ca39042a9c5bed9312145",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 350,
+      "timestamp": "2023-12-30T18:32:55.916000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00007",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8768,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在163435.2秒内产生46条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3652a4e8cd0448f8a0430121",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 249,
+      "timestamp": "2023-12-30T19:30:36.893000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00008",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5468,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c systeminfo"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在144736.5秒内产生12条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.527，传播分=0.547；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-44aaff986351ed48824c00c7",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 547,
+      "timestamp": "2023-12-30T22:01:24.789000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00009",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.5977,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在171034.4秒内产生34条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.528，传播分=0.528；边关系惊异度=0.760, 主机内行为稀有度=0.333。"
+    },
+    "location": {
+      "physical_record_id": "pr-547e169438d2efc91037388e",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 472,
+      "timestamp": "2023-12-30T23:47:57.4532937Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00010",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7377,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "50.101.45.23.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在165965.3秒内产生69条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.738，传播分=0.738；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f3c2ec0414e9a61337d97e2f",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 529,
+      "timestamp": "2023-12-30T23:50:33.7475072Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00011",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-f07eb3be8129ca564aa43a46",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 473,
+      "timestamp": "2023-12-30T23:59:04.1143405Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00012",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-b75371b2b7fd013ca8a1cb6f",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1037,
+      "timestamp": "2023-12-30T23:59:04.162000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00013",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-800f3aff2e801a4715fbc55a",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 691,
+      "timestamp": "2023-12-30T23:59:04.5140001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00014",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-02b69f3bdafe4223bfefa468",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 4643,
+      "timestamp": "2023-12-31T00:41:46.2990000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00015",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-72be62f208449d01a0aa4a37",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 4163,
+      "timestamp": "2023-12-31T00:41:46.691000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00016",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-2ee19215263d94c323d7d600",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 913,
+      "timestamp": "2023-12-31T00:41:47.0042179Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00017",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7377,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.10.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在171435.9秒内产生47条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.738，传播分=0.738；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-43488130568835b0bb4b4c41",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 635,
+      "timestamp": "2023-12-31T01:37:55.2796497Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00018",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7208,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "hostname -f"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在148634.0秒内产生26条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7fb945f457d08289892a3a65",
+      "relative_path": "DB-01.example.local/bash_history/haruto.sato.bash_history",
+      "record_index": 31,
+      "timestamp": "2023-12-31T01:51:24Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00019",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6315,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在165824.8秒内产生14条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.581，传播分=0.581；边关系惊异度=0.760, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-458f1ce893fe20aae1f2ae34",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 762,
+      "timestamp": "2023-12-31T02:55:29.4568410Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00020",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-34dbd18d8870d6622dac0e51",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1628,
+      "timestamp": "2023-12-31T03:06:49.508000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00021",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-da27397fdfc3afa17a61ca11",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 1094,
+      "timestamp": "2023-12-31T03:06:49.8730001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00022",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f04b325ea3a8bd2fe0dea3ca",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 731,
+      "timestamp": "2023-12-31T03:06:50.0934768Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00023",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-5c70f1e884f534125a5e0e85",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 531,
+      "timestamp": "2023-12-31T03:17:20.0971484Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00024",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-28e9e0e4ef756de4301ea4d6",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1256,
+      "timestamp": "2023-12-31T03:17:20.145000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00025",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-bd00b267eaaacac5c29d582a",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 760,
+      "timestamp": "2023-12-31T03:17:20.7090003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00026",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-c0c4ba38bc9b6820a3d99cd0",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 1185,
+      "timestamp": "2023-12-31T03:53:19.2120000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00027",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-b049ef0531b7cd1679f72103",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 781,
+      "timestamp": "2023-12-31T03:53:19.3034242Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00028",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-d5ceb336b13e07234fc88d2a",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1770,
+      "timestamp": "2023-12-31T03:53:19.727000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00029",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-20471276d6f97cbca8e89c6d",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 3261,
+      "timestamp": "2023-12-31T04:22:11.251000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00030",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-4087b8ce412d252aa334e9a0",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 819,
+      "timestamp": "2023-12-31T04:22:11.7880076Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00031",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-3ee935e76ba98fd278532470",
+      "relative_path": "FS-01.example.local/windows_event_security.xml",
+      "record_index": 1795,
+      "timestamp": "2023-12-31T04:22:11.8137082Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00032",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.4877,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.4秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.488，传播分=0.488；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-a8026b3308923eba9054657e",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1494,
+      "timestamp": "2023-12-31T04:53:08.5431939Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00033",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.7930,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=process name=mstsc.exe zone=system {\"event_id\": 5, \"provider\": \"microsoft-windows-sysmon\", \"eventrecordid\": \"76026\", \"channel\": \"microsoft-windows-sysmon/operational\", \"processguid\": \"{63b1f558-3c02-6590-7902-000054a7366f}\", \"processid\": \"5848\", \"image\":"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在172697.5秒内产生1303条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.723，传播分=0.723；边关系惊异度=0.580, 主机内行为稀有度=0.177。"
+    },
+    "location": {
+      "physical_record_id": "pr-d5df4a0cd436e4142b421c9a",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1994,
+      "timestamp": "2023-12-31T05:13:25.664000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00034",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6213,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在144339.7秒内产生15条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.564，传播分=0.564；边关系惊异度=0.760, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-95b4a8b2cd6572602826c95f",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 648,
+      "timestamp": "2023-12-31T05:16:21.8011740Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00035",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-c4628049769d947cb5e303ac",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1750,
+      "timestamp": "2023-12-31T06:46:25.095000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00036",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-300778b99bc4b7bd6fa09350",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1077,
+      "timestamp": "2023-12-31T06:46:25.1200003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00037",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-48f87fdc3aad993b568024e7",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 739,
+      "timestamp": "2023-12-31T06:46:25.2271651Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00038",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6378,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在160423.8秒内产生18条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.606，传播分=0.606；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f996a7eb6622dc13a74f8fc1",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2001,
+      "timestamp": "2023-12-31T08:51:13.0851416Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00039",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7399,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在169821.4秒内产生42条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.740，传播分=0.740；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4414174da9e70579e29a6e08",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1187,
+      "timestamp": "2023-12-31T08:55:41.9090036Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00040",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7327,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在169090.8秒内产生74条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.629，传播分=0.629；边关系惊异度=0.690, 主机内行为稀有度=0.204。"
+    },
+    "location": {
+      "physical_record_id": "pr-cdfd27a928fe252daa488b1b",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 4746,
+      "timestamp": "2023-12-31T09:07:44.268000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00041",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6477,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在118630.2秒内产生7条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.606，传播分=0.606；边关系惊异度=0.760, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-a8d50e1c1121d9562a54dee7",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1233,
+      "timestamp": "2023-12-31T10:08:48.5368617Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00042",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8630,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:fs-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在165928.2秒内产生337条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.833，传播分=0.833；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-15752d57e058d51225fc36f4",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2277,
+      "timestamp": "2023-12-31T10:10:51.471000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00043",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8db2b61e050b240dcf2eea44",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1129,
+      "timestamp": "2023-12-31T10:27:09.2283708Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00044",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5729624bb5ab753625858610",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2516,
+      "timestamp": "2023-12-31T10:27:09.283000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00045",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d862592f3b1ca498c3e4686c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 1436,
+      "timestamp": "2023-12-31T10:27:09.4100001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00046",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8768,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在160321.1秒内产生83条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-feaf24cde97ac7d9e1abf90b",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 4170,
+      "timestamp": "2023-12-31T11:53:06.090000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00047",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6479,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在164512.0秒内产生10条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.606，传播分=0.606；边关系惊异度=0.760, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-f050e2f6ad7d88e15f5df933",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1283,
+      "timestamp": "2023-12-31T12:24:47.6613286Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00048",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8633,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=kernelbase.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在171164.4秒内产生325条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.833，传播分=0.833；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b2ef590b35a24e0c33a123e6",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2951,
+      "timestamp": "2023-12-31T12:50:53.767000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00049",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8768,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在163174.0秒内产生41条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0b6320c454afb127d53b81ab",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 3226,
+      "timestamp": "2023-12-31T14:31:11.157000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00050",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAGUAdAB1AHAAIAAtAE4AZQB3AGUAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-dc2bf67a0f1c36a771d27f16",
+      "relative_path": "FS-01.example.local/windows_event_security.xml",
+      "record_index": 3644,
+      "timestamp": "2023-12-31T15:07:19.4530005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00051",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAGUAdAB1AHAAIAAtAE4AZQB3AGUAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9566929f9ea37cb5bfc9466b",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 6666,
+      "timestamp": "2023-12-31T15:07:19.807000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00052",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAGUAdAB1AHAAIAAtAE4AZQB3AGUAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-09f6e6cffbfae280fcc8d55b",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1709,
+      "timestamp": "2023-12-31T15:07:19.8423335Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00053",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAcwB2AGMAaABvAHMAdAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cd017ce9146f01b9672f7f38",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 19165,
+      "timestamp": "2023-12-31T21:59:25.2180007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00054",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAcwB2AGMAaABvAHMAdAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f0dcedefbee71b475305f22e",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 17002,
+      "timestamp": "2023-12-31T21:59:25.684000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00055",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAcwB2AGMAaABvAHMAdAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2b2da7e71478d1f494844e7e",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3730,
+      "timestamp": "2023-12-31T21:59:25.7730501Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00056",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8768,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在164025.4秒内产生38条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-246b52177bd8481c6b651bab",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 4131,
+      "timestamp": "2023-12-31T22:30:13.797000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00057",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFIAZQBwAG8AcgB0AHMAIAAtAFIAZQBjAHUAcgBzAGUAIAB8ACAATQBlAGEAcwB1AHIAZQAtAE8AYgBqAGUAYwB0AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1eeaecc8da8f81b29ddaf418",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 4167,
+      "timestamp": "2023-12-31T22:45:27.370000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00058",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFIAZQBwAG8AcgB0AHMAIAAtAFIAZQBjAHUAcgBzAGUAIAB8ACAATQBlAGEAcwB1AHIAZQAtAE8AYgBqAGUAYwB0AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-eccc45a64fdfe76e15e8b0cf",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1819,
+      "timestamp": "2023-12-31T22:45:27.5682741Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00059",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFIAZQBwAG8AcgB0AHMAIAAtAFIAZQBjAHUAcgBzAGUAIAB8ACAATQBlAGEAcwB1AHIAZQAtAE8AYgBqAGUAYwB0AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ea4e93e8d976120030d8c79c",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 2487,
+      "timestamp": "2023-12-31T22:45:27.7560006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00060",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7711,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在170149.8秒内产生65条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.771，传播分=0.771；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-86507da7205295779de37fdc",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4197,
+      "timestamp": "2024-01-01T01:33:56.9202153Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00061",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6951,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "73.132.114.52.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在153326.3秒内产生17条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.680，传播分=0.680；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4289b9c115d2f4348cf1f7f4",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4337,
+      "timestamp": "2024-01-01T02:43:27.8300031Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00062",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6966,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\haruto.sato\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在60742.1秒内产生42条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.697，传播分=0.697；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a5c677277c3bcef970fda0f5",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5720,
+      "timestamp": "2024-01-01T02:44:36.070000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00063",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6954,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在31311.5秒内产生9条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.695，传播分=0.695；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cec51b36565e5bde5c264e9c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 2965,
+      "timestamp": "2024-01-01T02:57:21.1550000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00064",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9435158f840cda6cc3d4f75c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 2562,
+      "timestamp": "2024-01-01T05:55:28.1043515Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00065",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-aeb4a1f4488027b3db44d609",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3228,
+      "timestamp": "2024-01-01T05:55:28.5890002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00066",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a439a2f90c9987afb73ba9d4",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 5664,
+      "timestamp": "2024-01-01T05:55:28.682000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00067",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5468,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在31014.2秒内产生12条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.527，传播分=0.547；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-b73b561b306786f650dc3f0f",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 5810,
+      "timestamp": "2024-01-01T06:55:12.263000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00068",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7399,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.40.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在168859.2秒内产生91条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.740，传播分=0.740；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-76ff26ca1a040fe113d6298c",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 2395,
+      "timestamp": "2024-01-01T07:21:07.4513070Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00069",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7552,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.40.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在167583.2秒内产生112条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.755，传播分=0.755；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-08bab3fa3903a159895460a3",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 3042,
+      "timestamp": "2024-01-01T09:28:52.4447177Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00070",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7898,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.10.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在171989.5秒内产生295条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5df80db09eaa66bff5c0fb43",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 3817,
+      "timestamp": "2024-01-01T10:43:15.215039Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00071",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7552,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在169562.7秒内产生75条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.755，传播分=0.755；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-733c1570be73b6e93f240fdb",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 2976,
+      "timestamp": "2024-01-01T10:43:15.2834366Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00072",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6966,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\marcus.chen\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在146701.6秒内产生21条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.697，传播分=0.697；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-901a7e9eb3e758aa2a25bdc3",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 6709,
+      "timestamp": "2024-01-01T12:20:05.075000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00073",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7208,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "ps -ef | head"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在114396.3秒内产生10条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-774e4793f9e24f3066557781",
+      "relative_path": "APP-LNX-02.example.local/bash_history/haruto.sato.bash_history",
+      "record_index": 125,
+      "timestamp": "2024-01-01T14:04:57Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00074",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5468,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c ipconfig /all"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在144197.9秒内产生12条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.464，传播分=0.547；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-d9421f4a2c71eef517b81e80",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 8453,
+      "timestamp": "2024-01-01T14:30:20.925000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00075",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8597,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARQB2AGUAbgB0AEwAbwBnAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.828，传播分=0.828；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-42802737c3eaf506d05ee24f",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 8782,
+      "timestamp": "2024-01-01T15:22:29.354000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00076",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8597,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARQB2AGUAbgB0AEwAbwBnAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.828，传播分=0.828；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-846b4673ee9ba903cb1ea562",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 5928,
+      "timestamp": "2024-01-01T15:22:29.4120006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00077",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8597,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARQB2AGUAbgB0AEwAbwBnAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.828，传播分=0.828；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c12e5556131e93fc9659cb2d",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 3626,
+      "timestamp": "2024-01-01T15:22:30.0143198Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00078",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8630,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在13097.9秒内产生13条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.833，传播分=0.833；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-70d2f58efc52e2b19d92df69",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 15706,
+      "timestamp": "2024-01-01T15:52:11.019000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00079",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAAQgBJAFQAUwA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-958a944d37e959d259f77f61",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4114,
+      "timestamp": "2024-01-01T17:14:29.0418698Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00080",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAAQgBJAFQAUwA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0ad16ad7375e02db7b92189f",
+      "relative_path": "MAIL-01.example.local/windows_event_security.xml",
+      "record_index": 5659,
+      "timestamp": "2024-01-01T17:14:29.0535865Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-12-27-bluenoroff-stardust-chollima-v2-00081",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8581,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAAQgBJAFQAUwA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e1e3eb4ba7b8490c7f88ae60",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 9696,
+      "timestamp": "2024-01-01T17:14:29.721000Z"
+    }
+  }
+]

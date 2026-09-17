@@ -1,0 +1,1975 @@
+# Copyright (c) 2026 Cisco Systems, Inc. and its affiliates
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+"""Unit tests for Phase 5.4: Background Traffic & System Activity."""
+
+import random
+import re
+from datetime import UTC, datetime, timedelta
+from unittest.mock import Mock, patch
+
+import pytest
+
+from evidenceforge.generation.activity import ActivityGenerator
+from evidenceforge.generation.activity.extra_syslog import (
+    filter_syslog_message_entries,
+    load_extra_syslog_messages,
+    render_extra_syslog_message,
+)
+from evidenceforge.generation.activity.linux_interfaces import linux_primary_interface
+from evidenceforge.generation.activity.system_processes import load_system_processes
+from evidenceforge.generation.engine.baseline import (
+    BaselineMixin,
+    _cron_shell_command_line,
+    _dc_kerberos_cycle_range,
+    _dc_kerberos_tgs_range,
+    _is_kerberos_member_server,
+    _is_windows_singleton_service_image,
+    _kernel_uptime_stamp,
+    _machine_account_ntlm_offset_seconds,
+    _machine_account_tgs_gap_ms,
+    _networkmanager_message_timestamp,
+    _pick_dc_kerberos_service,
+    _pick_dc_kerberos_target,
+    _registry_writer_candidates,
+    _resolve_cron_command,
+    _windows_background_process_lifetime_seconds,
+)
+from evidenceforge.generation.state_manager import StateManager
+from evidenceforge.models import System, User
+
+
+@pytest.fixture
+def state_manager():
+    sm = StateManager()
+    sm.set_current_time(datetime(2024, 3, 15, 8, 0, 0, tzinfo=UTC))
+    return sm
+
+
+@pytest.fixture
+def mock_emitters():
+    return {
+        "windows_event_security": Mock(),
+        "zeek_conn": Mock(),
+        "ecar": Mock(),
+        "syslog": Mock(),
+    }
+
+
+@pytest.fixture
+def activity_gen(state_manager, mock_emitters):
+    return ActivityGenerator(state_manager, mock_emitters)
+
+
+def test_kernel_uptime_stamp_tracks_event_timestamp_fraction():
+    """Kernel bracket timestamps should be monotonic within a host boot stream."""
+    scenario_start = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    first = scenario_start + timedelta(seconds=387.345076)
+    second = scenario_start + timedelta(seconds=387.997014)
+
+    first_stamp = _kernel_uptime_stamp(2332800.0, scenario_start, first)
+    second_stamp = _kernel_uptime_stamp(2332800.0, scenario_start, second)
+
+    assert first_stamp == "2333187.345076"
+    assert second_stamp == "2333187.997014"
+    assert float(second_stamp) > float(first_stamp)
+
+
+def test_networkmanager_message_timestamp_uses_epoch_time():
+    """NetworkManager bracket timestamps should be epoch-style source timestamps."""
+    ts = datetime(2024, 3, 18, 12, 8, 39, 757990, tzinfo=UTC)
+
+    assert _networkmanager_message_timestamp(ts) == "1710763719.7580"
+
+
+def test_windows_singleton_service_image_uses_system_process_catalog():
+    """Endpoint service agents marked singleton in config should be recognized."""
+    assert _is_windows_singleton_service_image(
+        r"C:\Program Files\Palo Alto Networks\GlobalProtect\PanGPS.exe"
+    )
+    assert not _is_windows_singleton_service_image(
+        r"C:\Program Files\Google\Update\GoogleUpdate.exe"
+    )
+
+
+def test_linux_primary_interface_is_stable_per_host(linux_system):
+    """Linux interface naming should be host-stable instead of per-message random."""
+    first = linux_primary_interface(linux_system)
+    second = linux_primary_interface(linux_system)
+
+    assert first == second
+    assert first in {"ens160", "ens192", "enp0s3", "eth0", "eno1"}
+
+
+def test_extra_syslog_interface_templates_use_host_primary_interface(linux_system):
+    """Interface-bearing syslog templates should honor the host primary interface."""
+    primary_interface = linux_primary_interface(linux_system)
+
+    networkmanager_msg = render_extra_syslog_message(
+        {
+            "messages": [
+                "<info>  [{}] device ({interface}): state change: disconnected -> prepare"
+            ],
+            "params": {"interface": ["eth0"]},
+        },
+        random.Random(3),
+        positional_value="1710763719.7580",
+        values={"interface": primary_interface},
+    )
+    resolved_msg = render_extra_syslog_message(
+        {
+            "messages": [
+                "Flushed positive cache scope {scope} after DNS server {dns_server} changed features."
+            ],
+            "params": {"scope": ["eth0", "br0"]},
+        },
+        random.Random(3),
+        positional_value=123456,
+        values={"dns_server": "10.0.0.1", "scope": primary_interface},
+    )
+
+    assert f"({primary_interface})" in networkmanager_msg
+    assert f"scope {primary_interface} " in resolved_msg
+
+
+def test_rsyslog_fd_state_stays_process_local(linux_system):
+    """Rsyslog file descriptors should look like small per-process integers."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    rng = random.Random(7)
+
+    fds = [engine._next_rsyslog_fd(linux_system.hostname, rng) for _ in range(12)]
+
+    assert min(fds) >= 4
+    assert max(fds) <= 64
+    assert fds == sorted(fds)
+
+
+def test_journald_housekeeping_is_sparse_over_visible_window(linux_system):
+    """Journald capacity rows should be housekeeping, not high-frequency filler."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    engine.start_time = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    engine.end_time = engine.start_time + timedelta(hours=6)
+    engine._machine_ids = {linux_system.hostname: "0123456789abcdef0123456789abcdef"}
+
+    schedule = engine._journald_housekeeping_schedule(linux_system, random.Random(5))
+
+    assert len(schedule) <= 3
+    capacity_rows = [message for _time, message in schedule if " Journal (" in message]
+    assert len(capacity_rows) <= 1
+    if len(schedule) > 1:
+        gaps = [
+            (later[0] - earlier[0]).total_seconds()
+            for earlier, later in zip(schedule, schedule[1:], strict=False)
+        ]
+        assert min(gaps) >= 3600
+
+
+def test_emit_journald_housekeeping_emits_each_scheduled_row_once(linux_system):
+    """Hourly baseline passes should not duplicate journald housekeeping rows."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    engine.start_time = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    engine.end_time = engine.start_time + timedelta(hours=6)
+    engine._machine_ids = {linux_system.hostname: "0123456789abcdef0123456789abcdef"}
+    engine.activity_generator = Mock()
+    sys_pids = {"journald": 410}
+
+    for hour in range(6):
+        current = engine.start_time + timedelta(hours=hour)
+        engine._emit_journald_housekeeping(linux_system, current, random.Random(hour), sys_pids)
+        engine._emit_journald_housekeeping(linux_system, current, random.Random(hour), sys_pids)
+
+    schedule = engine._journald_housekeeping_schedule(linux_system, random.Random(5))
+    assert engine.activity_generator.generate_syslog_event.call_count == len(schedule)
+
+
+def test_polkit_desktop_agent_messages_are_workstation_only(linux_system):
+    """Server-role Linux hosts should not emit GNOME/KDE polkit agent churn."""
+    entries = load_extra_syslog_messages()
+
+    server_entries = filter_syslog_message_entries(
+        entries,
+        is_rhel_like=False,
+        host_roles=["database"],
+        system_type="server",
+    )
+    workstation_entries = filter_syslog_message_entries(
+        entries,
+        is_rhel_like=False,
+        host_roles=["workstation"],
+        system_type="workstation",
+    )
+
+    server_polkit_messages = [
+        message
+        for entry in server_entries
+        if entry["app"] == "polkitd"
+        for message in entry["messages"]
+    ]
+    workstation_polkit_messages = [
+        message
+        for entry in workstation_entries
+        if entry["app"] == "polkitd"
+        for message in entry["messages"]
+    ]
+
+    assert server_polkit_messages
+    assert not any("Authentication Agent" in message for message in server_polkit_messages)
+    assert any("Authentication Agent" in message for message in workstation_polkit_messages)
+
+
+def test_polkit_messages_use_low_session_and_bus_values(linux_system, state_manager):
+    """Polkit payloads should not contain random six-digit sessions or bus IDs."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    engine.state_manager = state_manager
+    entry = next(item for item in load_extra_syslog_messages() if item["app"] == "polkitd")
+    rng = random.Random(11)
+    timestamp = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+
+    messages = [
+        engine._render_polkit_syslog_message(
+            entry,
+            rng,
+            system=linux_system,
+            timestamp=timestamp + timedelta(seconds=i),
+        )
+        for i in range(20)
+    ]
+
+    session_ids = [
+        int(match.group(1))
+        for message in messages
+        if (match := re.search(r"unix-session:(\d+)", message))
+    ]
+    bus_ids = [
+        int(match.group(1)) for message in messages if (match := re.search(r":1\.(\d+)", message))
+    ]
+    process_ids = [
+        int(match.group(1))
+        for message in messages
+        if (match := re.search(r"unix-process:(\d+):", message))
+    ]
+    process_start_ticks = [
+        int(match.group(1))
+        for message in messages
+        if (match := re.search(r"unix-process:\d+:(\d+)", message))
+    ]
+
+    assert session_ids
+    assert max(session_ids) < 1000
+    assert bus_ids
+    assert max(bus_ids) < 1000
+    assert len(set(bus_ids)) > 4
+    assert process_ids
+    assert min(process_ids) >= 300
+    assert process_start_ticks
+    assert set(process_start_ticks).isdisjoint({0, 1000, 2000})
+    assert min(process_start_ticks) > 10_000
+    assert len(set(process_start_ticks)) > 4
+
+
+def test_polkit_action_messages_pair_action_with_source_native_program(linux_system, state_manager):
+    """Polkit authorization rows should not mix unrelated actions and binaries."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    engine.state_manager = state_manager
+    entry = next(item for item in load_extra_syslog_messages() if item["app"] == "polkitd")
+    rng = random.Random(19)
+    timestamp = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    allowed_paths = {
+        "org.freedesktop.systemd1.manage-units": {
+            "/usr/bin/systemctl",
+            "/usr/bin/loginctl",
+        },
+        "org.freedesktop.login1.reboot": {
+            "/usr/bin/systemctl",
+            "/usr/bin/loginctl",
+        },
+        "org.freedesktop.packagekit.system-update": {
+            "/usr/lib/packagekit/packagekitd",
+            "/usr/bin/pkcon",
+        },
+        "org.freedesktop.NetworkManager.settings.modify.system": {
+            "/usr/bin/nmcli",
+            "/usr/sbin/NetworkManager",
+        },
+        "org.freedesktop.timedate1.set-timezone": {
+            "/usr/bin/timedatectl",
+        },
+    }
+
+    messages = [
+        engine._render_polkit_syslog_message(
+            {**entry, "messages": [message]},
+            rng,
+            system=linux_system,
+            timestamp=timestamp + timedelta(seconds=idx),
+        )
+        for idx, message in enumerate(entry["messages"])
+        if "action {action_id}" in message
+    ]
+
+    assert messages
+    for message in messages:
+        action = re.search(r"action ([^ ]+)", message).group(1)
+        path = re.search(r"\[([^]]+)\]", message)
+        if path is not None:
+            assert path.group(1) in allowed_paths[action]
+
+
+def test_polkit_action_messages_materialize_companion_process(linux_system, state_manager):
+    """Polkit action rows should reference endpoint-visible command processes."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    engine.state_manager = state_manager
+    engine.start_time = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    engine.activity_generator = Mock()
+    engine.activity_generator.generate_system_process.return_value = 4242
+    engine._polkit_action_profile = lambda _entry, _rng: (
+        "org.freedesktop.packagekit.system-update",
+        "/usr/lib/packagekit/packagekitd",
+    )
+    entry = next(item for item in load_extra_syslog_messages() if item["app"] == "polkitd")
+    template = next(message for message in entry["messages"] if "action {action_id}" in message)
+    rng = random.Random(29)
+    timestamp = datetime(2024, 3, 18, 12, 5, 0, tzinfo=UTC)
+
+    message = engine._render_polkit_syslog_message(
+        {**entry, "messages": [template]},
+        rng,
+        system=linux_system,
+        timestamp=timestamp,
+        sys_pids={"systemd": 1, "dbus": 412},
+    )
+
+    assert "unix-process:4242:" in message
+    call = engine.activity_generator.generate_system_process.call_args.kwargs
+    assert call["system"] is linux_system
+    assert call["process_name"] in message
+    assert call["emit_linux_syslog"] is False
+    assert call["time"] < timestamp
+
+
+def test_polkit_cli_companion_process_uses_visible_user_shell(
+    linux_system, state_manager, mock_emitters
+):
+    """Foreground polkit CLI tools should not appear as direct PID 1/systemd children."""
+    from evidenceforge.generation.engine import GenerationEngine
+
+    engine = object.__new__(GenerationEngine)
+    engine.state_manager = state_manager
+    engine.start_time = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    engine._system_pids = {}
+
+    pids: dict[str, int] = {}
+    engine._seed_linux_process_tree(linux_system, pids)
+    engine._system_pids[linux_system.hostname] = pids
+
+    activity_generator = ActivityGenerator(state_manager, mock_emitters)
+    activity_generator._system_pids = engine._system_pids
+    engine.activity_generator = activity_generator
+
+    timestamp = datetime(2024, 3, 18, 12, 5, 0, tzinfo=UTC)
+    pid = engine._materialize_polkit_action_process(
+        system=linux_system,
+        timestamp=timestamp,
+        action_id="org.freedesktop.systemd1.manage-units",
+        process_path="/usr/bin/systemctl",
+        subject_user="deploy",
+        rng=random.Random(31),
+        sys_pids=pids,
+    )
+
+    emitted_events = [call.args[0] for call in mock_emitters["ecar"].emit.call_args_list]
+    create_event = next(
+        event
+        for event in emitted_events
+        if event.event_type == "process_create"
+        and event.process is not None
+        and event.process.image == "/usr/bin/systemctl"
+    )
+    terminate_event = next(
+        event
+        for event in emitted_events
+        if event.event_type == "process_terminate"
+        and event.process is not None
+        and event.process.pid == pid
+    )
+
+    assert pid is not None
+    assert create_event.auth.username == "deploy"
+    assert create_event.process.parent_image == "/bin/bash"
+    assert create_event.process.parent_pid != 1
+    assert terminate_event.timestamp > create_event.timestamp
+
+
+def test_polkit_reboot_action_is_explicitly_unsuccessful(
+    linux_system, state_manager, mock_emitters
+):
+    """Generic reboot attempts should not imply a successful host reboot lifecycle."""
+    from evidenceforge.generation.engine import GenerationEngine
+
+    engine = object.__new__(GenerationEngine)
+    engine.state_manager = state_manager
+    engine.start_time = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    engine._system_pids = {}
+
+    pids: dict[str, int] = {}
+    engine._seed_linux_process_tree(linux_system, pids)
+    engine._system_pids[linux_system.hostname] = pids
+
+    activity_generator = ActivityGenerator(state_manager, mock_emitters)
+    activity_generator._system_pids = engine._system_pids
+    engine.activity_generator = activity_generator
+    engine._polkit_action_profile = lambda _entry, _rng: (
+        "org.freedesktop.login1.reboot",
+        "/usr/bin/loginctl",
+    )
+
+    entry = next(item for item in load_extra_syslog_messages() if item["app"] == "polkitd")
+    templates = [message for message in entry["messages"] if "action {action_id}" in message]
+    timestamp = datetime(2024, 3, 18, 12, 5, 0, tzinfo=UTC)
+
+    messages = [
+        engine._render_polkit_syslog_message(
+            {**entry, "messages": [template]},
+            random.Random(41 + index),
+            system=linux_system,
+            timestamp=timestamp + timedelta(seconds=index),
+            sys_pids=pids,
+        )
+        for index, template in enumerate(templates)
+    ]
+
+    emitted_events = [call.args[0] for call in mock_emitters["ecar"].emit.call_args_list]
+    reboot_commands = [
+        event
+        for event in emitted_events
+        if event.event_type == "process_create"
+        and event.process is not None
+        and event.process.image == "/usr/bin/loginctl"
+    ]
+
+    assert messages
+    assert all("org.freedesktop.login1.reboot" in message for message in messages)
+    assert all("successfully authenticated" not in message for message in messages)
+    assert all(" is authorized for action " not in message for message in messages)
+    assert all(
+        "failed to authenticate" in message or "is not authorized" in message
+        for message in messages
+    )
+    assert reboot_commands
+    assert all(
+        event.process.command_line == "/usr/bin/loginctl reboot" for event in reboot_commands
+    )
+
+
+def test_windows_scheduled_task_selector_honors_per_host_window_caps(win_system):
+    """Capped maintenance tasks should not repeat after one visible-window selection."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    entry = {
+        "image": r"C:\Windows\System32\cleanmgr.exe",
+        "command_templates": ["cleanmgr.exe /autoclean /d C:"],
+        "parent": "svchost_local_system",
+        "max_per_host_window": 1,
+        "cooldown_hours": 24,
+        "weight": 1,
+    }
+    timestamp = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+
+    with patch(
+        "evidenceforge.generation.activity.system_processes.get_scheduled_task_entries",
+        return_value=[entry],
+    ):
+        first = engine._select_windows_scheduled_task(
+            system=win_system,
+            rng=random.Random(1),
+            time=timestamp,
+        )
+        second = engine._select_windows_scheduled_task(
+            system=win_system,
+            rng=random.Random(2),
+            time=timestamp + timedelta(hours=2),
+        )
+
+    assert first == (
+        r"C:\Windows\System32\cleanmgr.exe",
+        "cleanmgr.exe /autoclean /d C:",
+        "svchost_local_system",
+    )
+    assert second is None
+
+
+def test_windows_maintenance_lifetimes_are_executable_specific():
+    """Flagged maintenance tools should have bounded source-native runtimes."""
+    rng = random.Random(31)
+
+    compat_samples = [
+        _windows_background_process_lifetime_seconds(
+            r"C:\Windows\System32\CompatTelRunner.exe",
+            "CompatTelRunner.exe -m:appraiser.dll -f:DoScheduledTelemetryRun",
+            rng,
+        )
+        for _ in range(40)
+    ]
+    cleanmgr_samples = [
+        _windows_background_process_lifetime_seconds(
+            r"C:\Windows\System32\cleanmgr.exe",
+            "cleanmgr.exe /autoclean /d C:",
+            rng,
+        )
+        for _ in range(40)
+    ]
+
+    assert all(sample is not None and sample <= 900 for sample in compat_samples)
+    assert all(sample is not None and sample <= 1500 for sample in cleanmgr_samples)
+
+
+def test_dbus_bus_state_stays_source_native(linux_system):
+    """D-Bus bus suffixes should stay in a realistic low integer regime."""
+    engine = type("FakeEngine", (BaselineMixin,), {})()
+    rng = random.Random(13)
+
+    bus_ids = [engine._next_dbus_bus_id(linux_system.hostname, rng) for _ in range(20)]
+
+    assert min(bus_ids) >= 12
+    assert max(bus_ids) < 1000
+    assert bus_ids == sorted(bus_ids)
+
+
+def test_dbus_extra_syslog_is_window_capped():
+    """Generic D-Bus activation noise should stay sparse per host window."""
+    dbus = next(entry for entry in load_extra_syslog_messages() if entry["app"] == "dbus-daemon")
+
+    assert dbus["max_per_host_window"] <= 8
+    assert dbus["weight"] <= 1
+
+
+def test_anacron_lifecycle_emits_once_per_host_day(linux_system):
+    """Anacron syslog should be a coherent daily run, not random repeated fragments."""
+    engine = type("FakeEngine", (object,), {})()
+    engine.activity_generator = Mock()
+    engine.start_time = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    engine.end_time = datetime(2024, 3, 18, 18, 0, 0, tzinfo=UTC)
+    engine._scenario_tz = None
+    engine._emit_anacron_lifecycle = BaselineMixin._emit_anacron_lifecycle.__get__(
+        engine,
+        type(engine),
+    )
+    ts = datetime(2024, 3, 18, 12, 16, 58, tzinfo=UTC)
+
+    engine._emit_anacron_lifecycle(
+        linux_system,
+        ts - timedelta(hours=2),
+        random.Random(5),
+        {"anacron": 13517},
+    )
+    engine._emit_anacron_lifecycle(linux_system, ts, random.Random(7), {"anacron": 13517})
+    engine._emit_anacron_lifecycle(
+        linux_system,
+        ts + timedelta(hours=1),
+        random.Random(9),
+        {"anacron": 13517},
+    )
+
+    calls = engine.activity_generator.generate_syslog_event.call_args_list
+    messages = [call.kwargs["message"] for call in calls]
+    times = [call.kwargs["time"] for call in calls]
+
+    assert len(messages) == 5
+    assert messages[0] == "Anacron 2.3 started on 2024-03-18"
+    assert all("cron.weekly" not in message for message in messages)
+    assert messages[-1] == "Normal exit (1 job run)"
+    assert times == sorted(times)
+
+
+def test_cron_schedule_emits_shell_and_workload_process_tree(linux_system):
+    """Cron schedules should not render shell syntax as the cron daemon image."""
+    engine = type("FakeEngine", (object,), {})()
+    engine.state_manager = Mock()
+    engine.activity_generator = Mock()
+    engine.activity_generator.generate_system_process.side_effect = [41200, 41201]
+    engine._emit_scheduled_event = BaselineMixin._emit_scheduled_event.__get__(
+        engine,
+        type(engine),
+    )
+    ts = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    sched = {
+        "service": "debian-sa1",
+        "type": "cron",
+        "cron_user": "sysstat",
+        "cron_commands": {
+            "debian": "command -v debian-sa1 > /dev/null && debian-sa1 1 1",
+        },
+    }
+
+    engine._emit_scheduled_event(
+        sched,
+        linux_system,
+        ts,
+        random.Random(3),
+        {"cron": 1337},
+        False,
+    )
+
+    process_calls = engine.activity_generator.generate_system_process.call_args_list
+    assert process_calls[0].kwargs["process_name"] == "/bin/sh"
+    assert process_calls[0].kwargs["command_line"] == _cron_shell_command_line(
+        "command -v debian-sa1 > /dev/null && debian-sa1 1 1"
+    )
+    assert process_calls[0].kwargs["parent_pid"] == 1337
+    assert process_calls[0].kwargs["username"] == "sysstat"
+    assert process_calls[0].kwargs["emit_linux_syslog"] is False
+    assert process_calls[1].kwargs["process_name"] == "/usr/lib/sysstat/debian-sa1"
+    assert process_calls[1].kwargs["command_line"] == "debian-sa1 1 1"
+    assert process_calls[1].kwargs["parent_pid"] == 41200
+    assert process_calls[1].kwargs["emit_linux_syslog"] is False
+    assert process_calls[0].kwargs["concurrency_group_id"].startswith("cron:")
+    assert (
+        process_calls[1].kwargs["concurrency_group_id"]
+        == process_calls[0].kwargs["concurrency_group_id"]
+    )
+    syslog_call = engine.activity_generator.generate_syslog_event.call_args
+    assert syslog_call.kwargs["app_name"] == "CRON"
+    assert syslog_call.kwargs["pid"] == 41200
+    assert syslog_call.kwargs["message"] == (
+        "(sysstat) CMD (command -v debian-sa1 > /dev/null && debian-sa1 1 1)"
+    )
+    term_calls = engine.activity_generator.generate_system_process_termination.call_args_list
+    assert [call.kwargs["pid"] for call in term_calls] == [41201, 41200]
+    assert {call.kwargs["concurrency_group_id"] for call in term_calls} == {
+        process_calls[0].kwargs["concurrency_group_id"]
+    }
+    assert term_calls[0].kwargs["time"] >= ts + timedelta(seconds=1)
+
+
+def test_cron_schedule_ignores_configured_slot_jitter(linux_system):
+    """Cron jobs stay minute-aligned even if legacy config carries slot jitter."""
+    engine = type("FakeEngine", (object,), {})()
+    engine._emit_scheduled_event = Mock()
+    engine._generate_scheduled_tasks = BaselineMixin._generate_scheduled_tasks.__get__(
+        engine,
+        type(engine),
+    )
+    current_hour = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    sched = {
+        "service": "debian-sa1",
+        "type": "cron",
+        "frequency": "30min",
+        "typical_hour": 0,
+        "jitter_minutes": 8,
+        "slot_jitter_seconds": 45,
+        "distro": "debian",
+        "cron_user": "sysstat",
+        "cron_commands": {"debian": "debian-sa1 1 1"},
+    }
+
+    with patch("evidenceforge.generation.engine.baseline._load_systemd_schedules") as load:
+        load.return_value = [sched]
+        engine._generate_scheduled_tasks(
+            current_hour,
+            linux_system,
+            random.Random(11),
+            {"cron": 1337},
+            False,
+            False,
+        )
+
+    fire_times = [call.args[2] for call in engine._emit_scheduled_event.call_args_list]
+    assert len(fire_times) == 2
+    assert all(fire_time.second == 0 for fire_time in fire_times)
+    assert all(fire_time.microsecond == 0 for fire_time in fire_times)
+
+
+def test_cron_schedule_without_slot_jitter_stays_minute_aligned(linux_system):
+    """Unconfigured cron schedules still render on cron-like minute boundaries."""
+    engine = type("FakeEngine", (object,), {})()
+    engine._emit_scheduled_event = Mock()
+    engine._generate_scheduled_tasks = BaselineMixin._generate_scheduled_tasks.__get__(
+        engine,
+        type(engine),
+    )
+    current_hour = datetime(2024, 3, 18, 12, 0, 0, tzinfo=UTC)
+    sched = {
+        "service": "debian-sa1",
+        "type": "cron",
+        "frequency": "30min",
+        "typical_hour": 0,
+        "jitter_minutes": 8,
+        "distro": "debian",
+        "cron_user": "sysstat",
+        "cron_commands": {"debian": "debian-sa1 1 1"},
+    }
+
+    with patch("evidenceforge.generation.engine.baseline._load_systemd_schedules") as load:
+        load.return_value = [sched]
+        engine._generate_scheduled_tasks(
+            current_hour,
+            linux_system,
+            random.Random(11),
+            {"cron": 1337},
+            False,
+            False,
+        )
+
+    fire_times = [call.args[2] for call in engine._emit_scheduled_event.call_args_list]
+    assert len(fire_times) == 2
+    assert all(fire_time.second == 0 for fire_time in fire_times)
+    assert all(fire_time.microsecond == 0 for fire_time in fire_times)
+
+
+def test_resolve_cron_command_rejects_non_string_overlay_values():
+    """Cron command resolution should reject malformed truthy non-string values."""
+    assert _resolve_cron_command({"all": True}, is_rhel_like=False) is None
+    assert _resolve_cron_command({"debian": ["sa1", "1", "1"]}, is_rhel_like=False) is None
+    assert _resolve_cron_command({"rhel": {"cmd": "sa1 1 1"}}, is_rhel_like=True) is None
+
+
+def test_resolve_cron_command_trims_and_selects_distro_specific_value():
+    """Cron command resolution should select and trim valid string commands."""
+    resolved = _resolve_cron_command(
+        {"all": "  fallback  ", "debian": "  debian-sa1 1 1  "},
+        is_rhel_like=False,
+    )
+    assert resolved == "debian-sa1 1 1"
+
+
+@pytest.fixture
+def win_system():
+    return System(hostname="WKS-01", ip="10.0.10.1", os="Windows 10", type="workstation")
+
+
+@pytest.fixture
+def linux_system():
+    return System(hostname="LNX-01", ip="10.0.10.2", os="Linux Ubuntu 22.04", type="server")
+
+
+@pytest.fixture
+def timestamp():
+    return datetime(2024, 3, 15, 10, 0, 0, tzinfo=UTC)
+
+
+class TestWindowsProcessTreeSeeding:
+    """Test that Windows system process tree is seeded correctly."""
+
+    def test_hkcu_registry_writers_require_desktop_user(self):
+        """HKCU noise should not be attributed to SYSTEM-owned background helpers."""
+        sys_pids = {"explorer": 2000, "runtime_broker": 2100, "search_indexer": 2200}
+
+        no_desktop_candidates = _registry_writer_candidates(
+            r"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer",
+            sys_pids,
+            desktop_user=None,
+        )
+        desktop_candidates = _registry_writer_candidates(
+            r"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer",
+            sys_pids,
+            desktop_user="alice",
+        )
+
+        assert no_desktop_candidates == []
+        assert desktop_candidates
+        assert {candidate[2] for candidate in desktop_candidates} == {"alice"}
+
+    def test_windows_tree_has_correct_hierarchy(self, state_manager, win_system):
+        """After seeding, services.exe children include svchost instances."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        # Seed the tree directly via the method
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_windows_process_tree(win_system, pids)
+
+        # Verify key processes exist
+        assert "smss" in pids
+        assert "services" in pids
+        assert "lsass" in pids
+        assert "svchost_netsvcs" in pids
+        assert "msmpeng" in pids
+        assert "dwm" in pids
+
+    def test_windows_tree_has_min_svchost_instances(self, state_manager, win_system):
+        """Windows should have at least 7 svchost instances."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_windows_process_tree(win_system, pids)
+
+        svchost_count = sum(1 for k in pids if k.startswith("svchost_"))
+        assert svchost_count >= 7, f"Only {svchost_count} svchost instances"
+
+    def test_services_is_parent_of_svchost(self, state_manager, win_system):
+        """svchost instances should be children of services.exe."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_windows_process_tree(win_system, pids)
+
+        # Check parent of a svchost
+        svchost_pid = pids["svchost_netsvcs"]
+        proc = state_manager.get_process(win_system.hostname, svchost_pid)
+        assert proc is not None
+        assert proc.parent_pid == pids["services"]
+
+    def test_lsass_is_child_of_wininit(self, state_manager, win_system):
+        """lsass.exe should be child of wininit.exe (not services.exe)."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_windows_process_tree(win_system, pids)
+
+        lsass_proc = state_manager.get_process(win_system.hostname, pids["lsass"])
+        assert lsass_proc is not None
+        assert lsass_proc.parent_pid == pids["wininit"]
+
+    def test_no_events_emitted_during_seeding(self, state_manager, win_system, mock_emitters):
+        """Seeding should not emit any log events."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_windows_process_tree(win_system, pids)
+
+        # No emitters should have been called
+        for emitter in mock_emitters.values():
+            assert not emitter.emit_event.called
+
+
+class TestLinuxProcessTreeSeeding:
+    """Test that Linux system process tree is seeded correctly."""
+
+    def test_linux_tree_has_systemd_children(self, state_manager, linux_system):
+        """After seeding, systemd children include sshd, cron, rsyslogd."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_linux_process_tree(linux_system, pids)
+
+        assert "systemd" in pids
+        assert "sshd" in pids
+        assert "cron" in pids
+        assert "rsyslogd" in pids
+        assert "dbus" in pids
+        assert "journald" in pids
+
+    def test_all_daemons_are_children_of_systemd(self, state_manager, linux_system):
+        """All daemons should be direct children of PID 1 (systemd)."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_linux_process_tree(linux_system, pids)
+
+        systemd_pid = pids["systemd"]
+        sshd_pid = pids["sshd"]
+        for name, pid in pids.items():
+            if name == "systemd":
+                continue
+            proc = state_manager.get_process(linux_system.hostname, pid)
+            assert proc is not None
+            if name == "bash":
+                # bash is a child of sshd (login shell), not systemd
+                assert proc.parent_pid == sshd_pid, (
+                    f"bash parent is {proc.parent_pid}, expected sshd ({sshd_pid})"
+                )
+            else:
+                assert proc.parent_pid == systemd_pid, (
+                    f"{name} parent is {proc.parent_pid}, expected {systemd_pid}"
+                )
+
+    def test_rsyslogd_runs_as_syslog_user(self, state_manager, linux_system):
+        """rsyslogd should run as syslog user, not root."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_linux_process_tree(linux_system, pids)
+
+        rsyslogd = state_manager.get_process(linux_system.hostname, pids["rsyslogd"])
+        assert rsyslogd.username == "syslog"
+
+    def test_dbus_runs_as_messagebus(self, state_manager, linux_system):
+        """dbus-daemon should run as messagebus user."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_linux_process_tree(linux_system, pids)
+
+        dbus = state_manager.get_process(linux_system.hostname, pids["dbus"])
+        assert dbus.username == "messagebus"
+
+    def test_rhel_uses_crond(self, state_manager):
+        """RHEL/CentOS should use crond, not cron."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        rhel_system = System(hostname="RHEL-01", ip="10.0.10.3", os="Linux CentOS 9", type="server")
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+
+        pids: dict[str, int] = {}
+        engine._seed_linux_process_tree(rhel_system, pids)
+
+        cron_proc = state_manager.get_process(rhel_system.hostname, pids["cron"])
+        assert "crond" in cron_proc.image
+
+
+class TestGenerateSystemProcess:
+    """Test system process generation method in ActivityGenerator."""
+
+    def test_emits_windows_4688(
+        self, activity_gen, win_system, timestamp, state_manager, mock_emitters
+    ):
+        state_manager.set_current_time(timestamp)
+        # Create a parent first
+        parent_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Windows\System32\services.exe",
+            "services.exe",
+            "SYSTEM",
+            "System",
+        )
+        activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp,
+            process_name=r"C:\Windows\System32\svchost.exe",
+            command_line="svchost.exe -k netsvcs -p -s Schedule",
+            parent_pid=parent_pid,
+            username="SYSTEM",
+        )
+        assert mock_emitters["windows_event_security"].emit.called
+        event = mock_emitters["windows_event_security"].emit.call_args[0][0]
+        assert event.event_type == "system_process_create"
+        assert event.auth.username == "SYSTEM"
+
+    def test_emits_linux_syslog(
+        self, activity_gen, linux_system, timestamp, state_manager, mock_emitters
+    ):
+        state_manager.set_current_time(timestamp)
+        parent_pid = state_manager.create_process(
+            linux_system.hostname, 0, "/usr/sbin/cron", "/usr/sbin/cron -f", "root", "System"
+        )
+        activity_gen.generate_system_process(
+            system=linux_system,
+            time=timestamp,
+            process_name="/usr/sbin/logrotate",
+            command_line="/usr/sbin/logrotate /etc/logrotate.conf",
+            parent_pid=parent_pid,
+            username="root",
+        )
+        assert mock_emitters["syslog"].emit.called
+
+    def test_emits_ecar(self, activity_gen, win_system, timestamp, state_manager, mock_emitters):
+        state_manager.set_current_time(timestamp)
+        parent_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Windows\System32\services.exe",
+            "services.exe",
+            "SYSTEM",
+            "System",
+        )
+        activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp,
+            process_name=r"C:\Windows\System32\taskhostw.exe",
+            command_line="taskhostw.exe /Run",
+            parent_pid=parent_pid,
+            username="SYSTEM",
+        )
+        ecar_calls = [
+            c
+            for c in mock_emitters["ecar"].emit.call_args_list
+            if c[0][0].event_type == "system_process_create"
+        ]
+        assert len(ecar_calls) >= 1
+
+    def test_reuses_active_singleton_windows_service_process(
+        self, activity_gen, win_system, timestamp, state_manager, mock_emitters
+    ):
+        """Singleton Windows services should not overlap as independent processes."""
+        state_manager.set_current_time(timestamp)
+        parent_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Windows\System32\services.exe",
+            "services.exe",
+            "SYSTEM",
+            "System",
+        )
+
+        first_pid = activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp,
+            process_name=r"C:\Windows\System32\spoolsv.exe",
+            command_line="spoolsv.exe",
+            parent_pid=parent_pid,
+            username="SYSTEM",
+        )
+        second_pid = activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp + timedelta(minutes=10),
+            process_name=r"C:\Windows\System32\spoolsv.exe",
+            command_line="spoolsv.exe",
+            parent_pid=parent_pid,
+            username="SYSTEM",
+        )
+
+        assert second_pid == first_pid
+        security_creates = [
+            c
+            for c in mock_emitters["windows_event_security"].emit.call_args_list
+            if c[0][0].event_type == "system_process_create"
+            and c[0][0].process.image.endswith("spoolsv.exe")
+        ]
+        assert len(security_creates) == 1
+
+    def test_stale_cleanup_preserves_catalog_singleton_service_agents(
+        self, win_system, timestamp, state_manager
+    ):
+        """Generic stale cleanup should not stop long-running singleton service agents."""
+        engine = type(
+            "FakeEngine",
+            (BaselineMixin,),
+            {
+                "_find_actor": lambda self, actor_name: User(
+                    username=actor_name,
+                    full_name=actor_name,
+                    email=f"{actor_name.lower()}@example.test",
+                    enabled=True,
+                )
+            },
+        )()
+        engine.scenario = type(
+            "Scenario",
+            (),
+            {"environment": type("Environment", (), {"systems": [win_system]})()},
+        )()
+        engine.state_manager = state_manager
+        engine.activity_generator = Mock()
+        engine._system_pids = {win_system.hostname: {}}
+
+        state_manager.set_current_time(timestamp - timedelta(hours=4))
+        services_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Windows\System32\services.exe",
+            "services.exe",
+            "SYSTEM",
+            "System",
+            logon_id="0x3e7",
+        )
+        agent_pid = state_manager.create_process(
+            win_system.hostname,
+            services_pid,
+            r"C:\Program Files\Palo Alto Networks\GlobalProtect\PanGPS.exe",
+            "PanGPS.exe",
+            "SYSTEM",
+            "System",
+            logon_id="0x3e7",
+        )
+
+        engine._terminate_stale_processes(timestamp)
+
+        assert state_manager.get_process(win_system.hostname, agent_pid) is not None
+        engine.activity_generator.generate_process_termination.assert_not_called()
+
+    def test_singleton_windows_service_reuse_ignores_noncanonical_future_process(
+        self, activity_gen, win_system, timestamp, state_manager, mock_emitters
+    ):
+        """Singleton service reuse should not select attacker-like future user processes."""
+        state_manager.set_current_time(timestamp)
+        parent_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Windows\System32\services.exe",
+            "services.exe",
+            "SYSTEM",
+            "System",
+        )
+        state_manager.set_current_time(timestamp + timedelta(hours=1))
+        rogue_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Users\Public\spoolsv.exe",
+            r"C:\Users\Public\spoolsv.exe",
+            "bob",
+            "Medium",
+        )
+        mock_emitters["windows_event_security"].reset_mock()
+
+        returned_pid = activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp + timedelta(minutes=10),
+            process_name=r"C:\Windows\System32\spoolsv.exe",
+            command_line="spoolsv.exe",
+            parent_pid=parent_pid,
+            username="SYSTEM",
+        )
+
+        assert returned_pid != rogue_pid
+        returned_proc = state_manager.get_process(win_system.hostname, returned_pid)
+        assert returned_proc is not None
+        assert returned_proc.image == r"C:\Windows\System32\spoolsv.exe"
+        assert returned_proc.username == "SYSTEM"
+        assert returned_proc.start_time == timestamp + timedelta(minutes=10)
+        security_creates = [
+            c[0][0]
+            for c in mock_emitters["windows_event_security"].emit.call_args_list
+            if c[0][0].event_type == "system_process_create"
+            and c[0][0].process.image == r"C:\Windows\System32\spoolsv.exe"
+        ]
+        assert len(security_creates) == 1
+        assert security_creates[0].process.pid == returned_pid
+
+    def test_singleton_windows_service_reuse_accepts_canonical_future_process(
+        self, activity_gen, win_system, timestamp, state_manager, mock_emitters
+    ):
+        """Singleton service reuse should be stable when generation visits time out of order."""
+        state_manager.set_current_time(timestamp)
+        parent_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Windows\System32\services.exe",
+            "services.exe",
+            "SYSTEM",
+            "System",
+        )
+        state_manager.set_current_time(timestamp + timedelta(hours=1))
+        future_pid = state_manager.create_process(
+            win_system.hostname,
+            parent_pid,
+            r"C:\Windows\System32\spoolsv.exe",
+            "spoolsv.exe",
+            "SYSTEM",
+            "System",
+        )
+        mock_emitters["windows_event_security"].reset_mock()
+
+        returned_pid = activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp + timedelta(minutes=10),
+            process_name=r"C:\Windows\System32\spoolsv.exe",
+            command_line="spoolsv.exe",
+            parent_pid=parent_pid,
+            username="SYSTEM",
+        )
+
+        assert returned_pid == future_pid
+        returned_proc = state_manager.get_process(win_system.hostname, returned_pid)
+        assert returned_proc is not None
+        assert returned_proc.start_time == timestamp + timedelta(hours=1)
+        security_creates = [
+            c[0][0]
+            for c in mock_emitters["windows_event_security"].emit.call_args_list
+            if c[0][0].event_type == "system_process_create"
+            and c[0][0].process.image == r"C:\Windows\System32\spoolsv.exe"
+        ]
+        assert security_creates == []
+
+    def test_allows_multiple_non_singleton_windows_service_processes(
+        self, activity_gen, win_system, timestamp, state_manager, mock_emitters
+    ):
+        """Multi-instance service hosts like WmiPrvSE.exe may create separate processes."""
+        state_manager.set_current_time(timestamp)
+        parent_pid = state_manager.create_process(
+            win_system.hostname,
+            4,
+            r"C:\Windows\System32\svchost.exe",
+            "svchost.exe -k DcomLaunch",
+            "SYSTEM",
+            "System",
+        )
+
+        first_pid = activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp,
+            process_name=r"C:\Windows\System32\wbem\WmiPrvSE.exe",
+            command_line="WmiPrvSE.exe -Embedding",
+            parent_pid=parent_pid,
+            username="NETWORK SERVICE",
+        )
+        state_manager.set_current_time(timestamp + timedelta(minutes=10))
+        second_pid = activity_gen.generate_system_process(
+            system=win_system,
+            time=timestamp + timedelta(minutes=10),
+            process_name=r"C:\Windows\System32\wbem\WmiPrvSE.exe",
+            command_line="WmiPrvSE.exe -secured -Embedding",
+            parent_pid=parent_pid,
+            username="NETWORK SERVICE",
+        )
+
+        assert second_pid != first_pid
+
+
+class TestInfrastructureDetection:
+    """Test infrastructure IP detection."""
+
+    def test_detects_dc_from_hostname(self):
+        from evidenceforge.generation.engine import GenerationEngine
+        from evidenceforge.models.scenario import (
+            BaselineActivity,
+            Environment,
+            OutputSpec,
+            Scenario,
+            TimeWindow,
+        )
+
+        scenario = Scenario(
+            name="test",
+            description="test",
+            environment=Environment(
+                description="test",
+                users=[User(username="j", full_name="J", email="j@x.com")],
+                systems=[
+                    System(
+                        hostname="DC-01",
+                        ip="10.0.0.5",
+                        os="Windows Server 2019",
+                        type="domain_controller",
+                    ),
+                    System(hostname="WKS-01", ip="10.0.10.1", os="Windows 10", type="workstation"),
+                ],
+            ),
+            time_window=TimeWindow(start=datetime(2024, 1, 1, tzinfo=UTC), duration="8h"),
+            baseline_activity=BaselineActivity(
+                description="Normal", intensity="low", variation="low"
+            ),
+            output=OutputSpec(logs=[{"format": "windows_event_security"}], destination="./out"),
+        )
+
+        engine = object.__new__(GenerationEngine)
+        engine.scenario = scenario
+        infra = engine._detect_infrastructure_ips()
+
+        assert infra["dc"] == ["10.0.0.5"]
+        assert infra["dns"] == ["10.0.0.5"]  # DC also serves DNS
+
+    def test_kerberos_connection_packets_cover_nearby_dc_audits(
+        self,
+        activity_gen,
+        mock_emitters,
+    ):
+        """One visible Kerberos tuple should account for all nearby KDC audit exchanges."""
+        dc = System(
+            hostname="DC-01",
+            ip="10.10.2.10",
+            os="Windows Server 2022",
+            type="domain_controller",
+            roles=["domain_controller"],
+        )
+        client = System(
+            hostname="WS-01",
+            ip="10.10.1.36",
+            os="Windows 10",
+            type="workstation",
+        )
+        activity_gen._ad_domain = "meridianhcs.local"
+        activity_gen._ip_to_system = {dc.ip: dc, client.ip: client}
+        activity_gen._dc_systems = [dc]
+        ts = datetime(2024, 3, 18, 13, 18, 22, tzinfo=UTC)
+        src_port = 50209
+
+        activity_gen.generate_kerberos_tgt(
+            username=f"{client.hostname}$",
+            source_ip=client.ip,
+            dc_hostname=dc.hostname,
+            time=ts,
+            source_port=src_port,
+        )
+        activity_gen.generate_kerberos_service_ticket(
+            username=f"{client.hostname}$",
+            service_name=f"cifs/{dc.hostname}",
+            source_ip=client.ip,
+            dc_hostname=dc.hostname,
+            time=ts + timedelta(milliseconds=200),
+            source_port=src_port,
+        )
+        activity_gen.generate_kerberos_preauth_failed(
+            username="expired.user",
+            source_ip=client.ip,
+            dc_hostname=dc.hostname,
+            time=ts + timedelta(milliseconds=230),
+            source_port=src_port,
+        )
+        mock_emitters["zeek_conn"].reset_mock()
+
+        activity_gen.generate_connection(
+            src_ip=client.ip,
+            dst_ip=dc.ip,
+            time=ts + timedelta(milliseconds=250),
+            dst_port=88,
+            proto="udp",
+            service="kerberos",
+            duration=0.015,
+            orig_bytes=300,
+            resp_bytes=300,
+            src_port=src_port,
+            source_system=client,
+            conn_state="SF",
+            emit_dns=False,
+        )
+
+        event = mock_emitters["zeek_conn"].emit.call_args[0][0]
+        assert event.network.orig_pkts >= 3
+        assert event.network.resp_pkts >= 3
+        assert event.network.history == "DdDdDd"
+
+    def test_connection_driven_kerberos_audits_are_counted_in_packets(
+        self,
+        activity_gen,
+        mock_emitters,
+    ):
+        """Auto-generated DC audit companions should be reflected in Zeek packet counts."""
+        dc = System(
+            hostname="DC-01",
+            ip="10.10.2.10",
+            os="Windows Server 2022",
+            type="domain_controller",
+            roles=["domain_controller"],
+        )
+        client = System(
+            hostname="APP-01",
+            ip="10.10.2.20",
+            os="Ubuntu 22.04",
+            type="server",
+        )
+        activity_gen._ad_domain = "meridianhcs.local"
+        activity_gen._ip_to_system = {dc.ip: dc, client.ip: client}
+        activity_gen._dc_systems = [dc]
+        ts = datetime(2024, 3, 18, 13, 18, 22, tzinfo=UTC)
+
+        with patch.object(activity_gen, "_should_emit_visible_kerberos_tgt", return_value=True):
+            activity_gen.generate_connection(
+                src_ip=client.ip,
+                dst_ip=dc.ip,
+                time=ts,
+                dst_port=88,
+                proto="udp",
+                service="kerberos",
+                duration=0.015,
+                orig_bytes=260,
+                resp_bytes=260,
+                src_port=49937,
+                source_system=client,
+                conn_state="SF",
+                emit_dns=False,
+            )
+
+        audit_events = [
+            call[0][0]
+            for call in mock_emitters["windows_event_security"].emit.call_args_list
+            if call[0][0].event_type in {"kerberos_tgt", "kerberos_service"}
+        ]
+        event = mock_emitters["zeek_conn"].emit.call_args[0][0]
+        assert len(audit_events) == 2
+        assert event.network.orig_pkts >= len(audit_events)
+        assert event.network.resp_pkts >= len(audit_events)
+        assert event.network.history == "DdDd"
+
+    def test_tcp_kerberos_audit_companions_force_successful_packet_shape(
+        self,
+        activity_gen,
+        mock_emitters,
+    ):
+        """KDC audit companions should not pair with a reset-only TCP shape."""
+        dc = System(
+            hostname="DC-01",
+            ip="10.10.2.10",
+            os="Windows Server 2022",
+            type="domain_controller",
+            roles=["domain_controller"],
+        )
+        client = System(
+            hostname="APP-01",
+            ip="10.10.2.20",
+            os="Ubuntu 22.04",
+            type="server",
+        )
+        activity_gen._ad_domain = "meridianhcs.local"
+        activity_gen._ip_to_system = {dc.ip: dc, client.ip: client}
+        activity_gen._dc_systems = [dc]
+        ts = datetime(2024, 3, 18, 13, 18, 22, tzinfo=UTC)
+
+        with patch.object(activity_gen, "_should_emit_visible_kerberos_tgt", return_value=True):
+            activity_gen.generate_connection(
+                src_ip=client.ip,
+                dst_ip=dc.ip,
+                time=ts,
+                dst_port=88,
+                proto="tcp",
+                service="kerberos",
+                duration=0.2,
+                orig_bytes=600,
+                resp_bytes=1600,
+                src_port=56502,
+                source_system=client,
+                conn_state="SF",
+                emit_dns=False,
+            )
+
+        audit_events = [
+            call[0][0]
+            for call in mock_emitters["windows_event_security"].emit.call_args_list
+            if call[0][0].event_type in {"kerberos_tgt", "kerberos_service"}
+        ]
+        event = mock_emitters["zeek_conn"].emit.call_args[0][0]
+        assert len(audit_events) == 2
+        assert event.network.conn_state == "SF"
+        assert event.network.resp_pkts >= len(audit_events)
+        assert event.network.history not in {"ShAR", "Sr", "S"}
+
+    def test_standalone_kerberos_audit_avoids_recent_used_connection_port(
+        self,
+        activity_gen,
+        mock_emitters,
+    ):
+        """A later standalone audit should not attach to an already rendered flow tuple."""
+        dc = System(
+            hostname="DC-01",
+            ip="10.10.2.10",
+            os="Windows Server 2022",
+            type="domain_controller",
+            roles=["domain_controller"],
+        )
+        client = System(
+            hostname="WS-01",
+            ip="10.10.1.32",
+            os="Windows 10",
+            type="workstation",
+        )
+        activity_gen._ad_domain = "meridianhcs.local"
+        activity_gen._ip_to_system = {dc.ip: dc, client.ip: client}
+        activity_gen._dc_systems = [dc]
+        ts = datetime(2024, 3, 18, 13, 18, 22, tzinfo=UTC)
+        src_port = 59885
+
+        activity_gen.generate_connection(
+            src_ip=client.ip,
+            dst_ip=dc.ip,
+            time=ts,
+            dst_port=88,
+            proto="udp",
+            service="kerberos",
+            duration=0.015,
+            orig_bytes=260,
+            resp_bytes=260,
+            src_port=src_port,
+            source_system=client,
+            conn_state="SF",
+            emit_dns=False,
+        )
+        mock_emitters["windows_event_security"].reset_mock()
+
+        activity_gen.generate_kerberos_service_ticket(
+            username=f"{client.hostname}$",
+            service_name="cifs/FILE-SRV-01",
+            source_ip=client.ip,
+            dc_hostname=dc.hostname,
+            time=ts + timedelta(seconds=1),
+        )
+
+        event = mock_emitters["windows_event_security"].emit.call_args[0][0]
+        assert event.kerberos.source_port != src_port
+
+    def test_service_defaults_windows(self):
+        from evidenceforge.generation.engine import GenerationEngine
+        from evidenceforge.models.scenario import (
+            BaselineActivity,
+            Environment,
+            OutputSpec,
+            Scenario,
+            TimeWindow,
+        )
+
+        scenario = Scenario(
+            name="test",
+            description="test",
+            environment=Environment(
+                description="test",
+                users=[User(username="j", full_name="J", email="j@x.com")],
+                systems=[
+                    System(hostname="WKS-01", ip="10.0.10.1", os="Windows 10", type="workstation"),
+                ],
+            ),
+            time_window=TimeWindow(start=datetime(2024, 1, 1, tzinfo=UTC), duration="8h"),
+            baseline_activity=BaselineActivity(
+                description="Normal", intensity="low", variation="low"
+            ),
+            output=OutputSpec(logs=[{"format": "windows_event_security"}], destination="./out"),
+        )
+
+        engine = object.__new__(GenerationEngine)
+        engine.scenario = scenario
+        defaults = engine._build_service_defaults()
+
+        assert "dns-client" in defaults["WKS-01"]
+        assert "ntp-client" in defaults["WKS-01"]
+        assert "smb-client" in defaults["WKS-01"]
+
+
+class TestParentPidSelection:
+    """Test that user processes get realistic parent PIDs."""
+
+    def test_windows_process_gets_explorer_parent(self, state_manager, mock_emitters, win_system):
+        """Windows user process should have explorer.exe as parent, not System (4)."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+
+        pids: dict[str, int] = {}
+        engine._system_pids = {}
+        engine._seed_windows_process_tree(win_system, pids)
+        engine._system_pids[win_system.hostname] = pids
+
+        ag = ActivityGenerator(state_manager, mock_emitters)
+        ag._system_pids = engine._system_pids
+        user = User(username="test.user", full_name="Test User", email="t@t.com", enabled=True)
+
+        logon_id = ag.generate_logon(user, win_system, datetime(2024, 3, 15, 10, 0, 0, tzinfo=UTC))
+        pid = ag.generate_process(
+            user,
+            win_system,
+            datetime(2024, 3, 15, 10, 0, 1, tzinfo=UTC),
+            logon_id,
+            r"C:\Windows\System32\notepad.exe",
+            "notepad.exe",
+            parent_pid=ag._select_parent_pid(win_system, user, r"C:\Windows\System32\notepad.exe"),
+        )
+
+        proc = state_manager.get_process(win_system.hostname, pid)
+        # Parent should be an explorer.exe PID (session-specific or system-seeded)
+        parent_proc = state_manager.get_process(win_system.hostname, proc.parent_pid)
+        assert parent_proc is not None, f"Parent PID {proc.parent_pid} not found in state"
+        assert "explorer.exe" in parent_proc.image.lower(), (
+            f"User process parent should be explorer, got {parent_proc.image} (PID {proc.parent_pid})"
+        )
+
+    def test_linux_process_gets_bash_parent(self, state_manager, mock_emitters, linux_system):
+        """Linux user process should have bash as parent, not systemd or PID 0."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+
+        pids: dict[str, int] = {}
+        engine._system_pids = {}
+        engine._seed_linux_process_tree(linux_system, pids)
+        engine._system_pids[linux_system.hostname] = pids
+
+        ag = ActivityGenerator(state_manager, mock_emitters)
+        ag._system_pids = engine._system_pids
+        user = User(username="test.user", full_name="Test User", email="t@t.com", enabled=True)
+
+        logon_id = ag.generate_logon(
+            user, linux_system, datetime(2024, 3, 15, 10, 0, 0, tzinfo=UTC)
+        )
+        pid = ag.generate_process(
+            user,
+            linux_system,
+            datetime(2024, 3, 15, 10, 0, 1, tzinfo=UTC),
+            logon_id,
+            "/usr/bin/vim",
+            "vim /etc/config",
+            parent_pid=ag._select_parent_pid(linux_system, user, "/usr/bin/vim"),
+        )
+
+        proc = state_manager.get_process(linux_system.hostname, pid)
+        bash_pid = pids["bash"]
+        session = state_manager.get_session(logon_id)
+        assert session is not None
+        assert proc.parent_pid != bash_pid
+        assert proc.parent_pid == session.session_shell_pid
+        parent_proc = state_manager.get_process(linux_system.hostname, proc.parent_pid)
+        assert parent_proc is not None
+        assert parent_proc.image == "/bin/bash"
+
+    def test_process_tree_depth(self, state_manager, mock_emitters, win_system):
+        """After creating a shell, subsequent processes should sometimes use it as parent."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+
+        pids: dict[str, int] = {}
+        engine._system_pids = {}
+        engine._seed_windows_process_tree(win_system, pids)
+        engine._system_pids[win_system.hostname] = pids
+
+        ag = ActivityGenerator(state_manager, mock_emitters)
+        ag._system_pids = engine._system_pids
+        user = User(username="test.user", full_name="Test User", email="t@t.com", enabled=True)
+
+        ts = datetime(2024, 3, 15, 10, 0, 0, tzinfo=UTC)
+        logon_id = ag.generate_logon(user, win_system, ts)
+
+        # Create a cmd.exe shell first
+        cmd_pid = ag.generate_process(
+            user,
+            win_system,
+            ts,
+            logon_id,
+            r"C:\Windows\System32\cmd.exe",
+            "cmd.exe",
+            parent_pid=ag._select_parent_pid(win_system, user, r"C:\Windows\System32\cmd.exe"),
+        )
+        ag._record_user_process(win_system, user, cmd_pid, r"C:\Windows\System32\cmd.exe")
+
+        # Create many processes — some should have cmd.exe as parent
+        parent_pids = set()
+        for _i in range(20):
+            parent = ag._select_parent_pid(win_system, user, r"C:\Windows\System32\ipconfig.exe")
+            parent_pids.add(parent)
+
+        # Should see both explorer and cmd as possible parents
+        assert cmd_pid in parent_pids or pids["explorer"] in parent_pids, (
+            "Process tree should have depth — shells should sometimes be parents"
+        )
+
+
+class TestSystemProcessSessionOwnership:
+    """Test source-native ownership for system-pool Windows process candidates."""
+
+    def test_shell_uwp_processes_use_active_interactive_session(self, state_manager, mock_emitters):
+        """Shell/UWP processes selected by system traffic should not run as SYSTEM/session 0."""
+        from evidenceforge.generation.engine import GenerationEngine
+
+        system = System(
+            hostname="WKS-01",
+            ip="10.0.10.1",
+            os="Windows 10",
+            type="workstation",
+            assigned_user="alice",
+        )
+        user = User(username="alice", full_name="Alice", email="alice@example.com")
+        engine = object.__new__(GenerationEngine)
+        engine.state_manager = state_manager
+        engine._system_pids = {}
+        pids: dict[str, int] = {}
+        engine._seed_windows_process_tree(system, pids)
+
+        ag = ActivityGenerator(state_manager, mock_emitters)
+        ag._system_pids = {system.hostname: pids}
+        ag._users_by_username = {user.username: user}
+        timestamp = datetime(2024, 3, 15, 10, 0, 0, tzinfo=UTC)
+        logon_id = ag.generate_logon(user, system, timestamp, logon_type=2)
+        mock_emitters["windows_event_security"].reset_mock()
+
+        pid = ag.generate_system_process(
+            system,
+            timestamp + timedelta(seconds=3),
+            r"C:\Windows\System32\sihost.exe",
+            "sihost.exe",
+            parent_pid=pids["svchost_netsvcs"],
+            username="SYSTEM",
+        )
+
+        assert pid != 0
+        proc = state_manager.get_process(system.hostname, pid)
+        assert proc is not None
+        assert proc.username == user.username
+        assert proc.logon_id == logon_id
+        emitted = [
+            call.args[0] for call in mock_emitters["windows_event_security"].emit.call_args_list
+        ]
+        process_event = next(
+            event
+            for event in emitted
+            if event.event_type == "process_create" and event.process.pid == pid
+        )
+        assert process_event.auth.username == user.username
+        assert process_event.auth.logon_id == logon_id
+        assert process_event.auth.logon_type == 2
+        assert process_event.process.integrity_level == "Medium"
+        assert all(
+            event.event_type != "system_process_create" or event.process.pid != pid
+            for event in emitted
+        )
+
+    def test_shell_uwp_processes_skip_without_interactive_session(
+        self, activity_gen, state_manager, mock_emitters
+    ):
+        """Desktop-only shell helpers should not appear on hosts without a desktop session."""
+        system = System(hostname="DC-01", ip="10.0.0.10", os="Windows Server 2022", type="server")
+        state_manager.set_current_time(datetime(2024, 3, 15, 10, 0, 0, tzinfo=UTC))
+
+        pid = activity_gen.generate_system_process(
+            system,
+            datetime(2024, 3, 15, 10, 0, 1, tzinfo=UTC),
+            r"C:\Windows\System32\RuntimeBroker.exe",
+            "RuntimeBroker.exe -Embedding",
+            parent_pid=4,
+            username="SYSTEM",
+        )
+
+        assert pid == 0
+        emitted = [
+            call.args[0] for call in mock_emitters["windows_event_security"].emit.call_args_list
+        ]
+        assert all(
+            "runtimebroker.exe" not in (event.process.image or "").lower()
+            for event in emitted
+            if event.process is not None
+        )
+
+    def test_system_service_pools_exclude_desktop_shell_helpers(self):
+        """System service config should not list user-session shell/UWP processes."""
+        service_pools = load_system_processes()["system_services"]
+        pool_images = {
+            image.rsplit("\\", 1)[-1].lower()
+            for pool_name in ("all", "workstation")
+            for entry in service_pools[pool_name]
+            for image in [entry["image"]]
+        }
+
+        assert "sihost.exe" not in pool_images
+        assert "runtimebroker.exe" not in pool_images
+        assert "backgroundtaskhost.exe" not in pool_images
+        assert "searchhost.exe" not in pool_images
+
+
+class TestInfrastructureTrafficGeneration:
+    """Test Kerberos/LDAP/DB traffic detection and generation."""
+
+    def test_machine_account_kerberos_gaps_include_non_immediate_tgs(self):
+        """Machine-account TGS timing should not be locked to tiny millisecond gaps."""
+        rng = random.Random(7)
+        gaps = [_machine_account_tgs_gap_ms(rng, first=True) for _ in range(100)]
+
+        assert any(gap > 2_000 for gap in gaps)
+        assert any(gap > 60_000 for gap in gaps)
+
+    def test_machine_account_ntlm_offset_avoids_same_second_kerberos(self):
+        """Baseline NTLM validation should not share the Kerberos cycle timestamp."""
+        rng = random.Random(11)
+        tgt_offset = 512.5
+        offsets = [_machine_account_ntlm_offset_seconds(tgt_offset, rng) for _ in range(100)]
+
+        assert all(0 <= offset <= 3599 for offset in offsets)
+        assert all(abs(offset - tgt_offset) >= 2.0 for offset in offsets)
+
+    def test_dc_kerberos_counts_are_capped_for_high_activity_dcs(self):
+        """DC activity multipliers should not explode machine-account TGS volume."""
+        assert _dc_kerberos_cycle_range(8.0) == (2, 8)
+        assert _dc_kerberos_tgs_range(8.0) == (2, 3)
+
+    def test_dc_kerberos_service_distribution_is_skewed(self):
+        """Baseline service-ticket classes should not be uniform buckets."""
+        from collections import Counter
+
+        member_rng = random.Random(21)
+        dc_rng = random.Random(22)
+        member_counts = Counter(
+            _pick_dc_kerberos_service(member_rng, target_is_dc=False) for _ in range(500)
+        )
+        dc_counts = Counter(
+            _pick_dc_kerberos_service(dc_rng, target_is_dc=True) for _ in range(500)
+        )
+
+        assert member_counts["cifs"] > member_counts["http"] > member_counts["termsrv"]
+        assert dc_counts["ldap"] > dc_counts["cifs"] > dc_counts["http"]
+
+    def test_dc_kerberos_targets_prefer_member_servers_when_available(self):
+        rng = random.Random(23)
+        picks = [_pick_dc_kerberos_target(rng, ["FILE-01", "APP-01"], "DC-01") for _ in range(200)]
+
+        member_count = sum(1 for _target, is_dc in picks if not is_dc)
+        assert member_count > 140
+
+    def test_kerberos_member_server_detector_handles_roles_and_source_native_services(self):
+        file_server = System(
+            hostname="FILE-SRV-01",
+            ip="10.0.0.20",
+            os="Windows Server 2019",
+            type="server",
+            services=["SMB", "Windows Search"],
+            roles=["file_server"],
+        )
+        ordinary_workstation = System(
+            hostname="WS-01",
+            ip="10.0.0.30",
+            os="Windows 11",
+            type="workstation",
+            services=["dns-client"],
+        )
+
+        assert _is_kerberos_member_server(file_server)
+        assert not _is_kerberos_member_server(ordinary_workstation)
+
+    def test_detects_mssql_from_services(self):
+        """DB servers should be detected from system services list."""
+        from evidenceforge.generation.engine import GenerationEngine
+        from evidenceforge.models.scenario import (
+            BaselineActivity,
+            Environment,
+            OutputSpec,
+            Scenario,
+            TimeWindow,
+        )
+
+        scenario = Scenario(
+            name="test",
+            description="test",
+            environment=Environment(
+                description="test",
+                users=[User(username="j", full_name="J", email="j@x.com")],
+                systems=[
+                    System(
+                        hostname="DC-01",
+                        ip="10.0.0.5",
+                        os="Windows Server 2019",
+                        type="domain_controller",
+                    ),
+                    System(
+                        hostname="SRV-DB-01",
+                        ip="10.0.100.14",
+                        os="Windows Server 2019",
+                        type="server",
+                        services=["mssql", "SQL Server 2019"],
+                    ),
+                ],
+            ),
+            time_window=TimeWindow(start=datetime(2024, 1, 1, tzinfo=UTC), duration="8h"),
+            baseline_activity=BaselineActivity(
+                description="Normal", intensity="low", variation="low"
+            ),
+            output=OutputSpec(logs=[{"format": "windows_event_security"}], destination="./out"),
+        )
+
+        engine = object.__new__(GenerationEngine)
+        engine.scenario = scenario
+        infra = engine._detect_infrastructure_ips()
+
+        db_servers = infra["db_servers"]
+        assert len(db_servers) >= 1
+        assert any(
+            d["ip"] == "10.0.100.14" and d["port"] == 1433 and d["service"] == "mssql"
+            for d in db_servers
+        )
+
+    def test_detects_mysql_from_services(self):
+        """MySQL servers should also be detected."""
+        from evidenceforge.generation.engine import GenerationEngine
+        from evidenceforge.models.scenario import (
+            BaselineActivity,
+            Environment,
+            OutputSpec,
+            Scenario,
+            TimeWindow,
+        )
+
+        scenario = Scenario(
+            name="test",
+            description="test",
+            environment=Environment(
+                description="test",
+                users=[User(username="j", full_name="J", email="j@x.com")],
+                systems=[
+                    System(
+                        hostname="DB-01",
+                        ip="10.0.100.10",
+                        os="Linux Ubuntu 22.04",
+                        type="server",
+                        services=["MySQL 8.0"],
+                    ),
+                ],
+            ),
+            time_window=TimeWindow(start=datetime(2024, 1, 1, tzinfo=UTC), duration="8h"),
+            baseline_activity=BaselineActivity(
+                description="Normal", intensity="low", variation="low"
+            ),
+            output=OutputSpec(logs=[{"format": "windows_event_security"}], destination="./out"),
+        )
+
+        engine = object.__new__(GenerationEngine)
+        engine.scenario = scenario
+        infra = engine._detect_infrastructure_ips()
+
+        db_servers = infra["db_servers"]
+        assert len(db_servers) >= 1
+        assert any(d["port"] == 3306 and d["service"] == "mysql" for d in db_servers)
+
+    def test_kerberos_ldap_in_default_windows_services(self):
+        """Windows systems should have kerberos-client and ldap-client by default."""
+        from evidenceforge.generation.engine import GenerationEngine
+        from evidenceforge.models.scenario import (
+            BaselineActivity,
+            Environment,
+            OutputSpec,
+            Scenario,
+            TimeWindow,
+        )
+
+        scenario = Scenario(
+            name="test",
+            description="test",
+            environment=Environment(
+                description="test",
+                users=[User(username="j", full_name="J", email="j@x.com")],
+                systems=[
+                    System(hostname="WKS-01", ip="10.0.10.1", os="Windows 10", type="workstation"),
+                ],
+            ),
+            time_window=TimeWindow(start=datetime(2024, 1, 1, tzinfo=UTC), duration="8h"),
+            baseline_activity=BaselineActivity(
+                description="Normal", intensity="low", variation="low"
+            ),
+            output=OutputSpec(logs=[{"format": "windows_event_security"}], destination="./out"),
+        )
+
+        engine = object.__new__(GenerationEngine)
+        engine.scenario = scenario
+        defaults = engine._build_service_defaults()
+
+        assert "kerberos-client" in defaults["WKS-01"]
+        assert "ldap-client" in defaults["WKS-01"]

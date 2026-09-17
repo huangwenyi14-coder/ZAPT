@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "case_id": "minimal-no-ioc",
+      "source": {
+        "kind": "txt",
+        "display_name": "无 IOC 的简短行为报告",
+        "fixture": "minimal_no_ioc.txt"
+      },
+      "iocs": {
+        "hashes": [],
+        "urls": [],
+        "domains": [],
+        "ips": []
+      },
+      "exact_iocs": true,
+      "required_commands": [],
+      "required_files": [
+        "C:\\Users\\Public\\resume.tmp"
+      ],
+      "required_scheduled_tasks": [],
+      "required_behaviors": [
+        "malware_execution",
+        "file_create",
+        "self_deletion"
+      ],
+      "required_process_bindings": [],
+      "required_network_bindings": [],
+      "required_registry_queries": [],
+      "forbidden": {
+        "process_images": [],
+        "behaviors": [
+          "c2_checkin",
+          "persistence_scheduled_task",
+          "credential_theft_chrome",
+          "lateral_movement"
+        ],
+        "process_bindings": [],
+        "network_bindings": [],
+        "registry_writes": [],
+        "reject_unprovenanced_exact_claims": true
+      }
+    },
+    {
+      "case_id": "network-only",
+      "source": {
+        "kind": "txt",
+        "display_name": "仅网络与 C2 行为报告",
+        "fixture": "network_only.txt"
+      },
+      "iocs": {
+        "hashes": [],
+        "urls": [
+          "https://telemetry-sync.example.test/api/v1/checkin"
+        ],
+        "domains": [
+          "telemetry-sync.example.test"
+        ],
+        "ips": [
+          "203.0.113.77"
+        ]
+      },
+      "exact_iocs": true,
+      "required_commands": [],
+      "required_files": [],
+      "required_scheduled_tasks": [],
+      "required_behaviors": [
+        "c2_beacon_https"
+      ],
+      "required_process_bindings": [],
+      "required_network_bindings": [
+        {
+          "behavior": "c2_beacon_https",
+          "url": "https://telemetry-sync.example.test/api/v1/checkin",
+          "target_file": null
+        }
+      ],
+      "required_registry_queries": [],
+      "forbidden": {
+        "process_images": [
+          "powershell.exe",
+          "cmd.exe"
+        ],
+        "behaviors": [
+          "persistence_scheduled_task",
+          "remote_command_execution",
+          "file_create",
+          "lateral_movement"
+        ],
+        "process_bindings": [],
+        "network_bindings": [],
+        "registry_writes": [],
+        "reject_unprovenanced_exact_claims": true
+      }
+    },
+    {
+      "case_id": "multi-artifact",
+      "source": {
+        "kind": "txt",
+        "display_name": "多任务、多文件与多 URL 报告",
+        "fixture": "multi_artifact.txt"
+      },
+      "iocs": {
+        "hashes": [],
+        "urls": [
+          "https://cdn-lab.example.test/drop/alpha.bin",
+          "https://cdn-lab.example.test/drop/beta.bin"
+        ],
+        "domains": [
+          "cdn-lab.example.test"
+        ],
+        "ips": [
+          "203.0.113.80"
+        ]
+      },
+      "exact_iocs": true,
+      "required_commands": [],
+      "required_files": [
+        "C:\\ProgramData\\Lab\\alpha.bin",
+        "%LOCALAPPDATA%\\Lab\\beta.bin"
+      ],
+      "required_scheduled_tasks": [
+        {
+          "name": "UpdaterTelemetry",
+          "binary": "C:\\ProgramData\\Lab\\alpha.bin",
+          "interval_minutes": 20,
+          "mechanism": "unspecified"
+        },
+        {
+          "name": "UserCacheRefresh",
+          "binary": "%LOCALAPPDATA%\\Lab\\beta.bin",
+          "interval_minutes": 30,
+          "mechanism": "unspecified"
+        }
+      ],
+      "required_behaviors": [
+        "payload_download",
+        "persistence_scheduled_task"
+      ],
+      "required_process_bindings": [],
+      "required_network_bindings": [
+        {
+          "behavior": "payload_download",
+          "url": "https://cdn-lab.example.test/drop/alpha.bin",
+          "target_file": "C:\\ProgramData\\Lab\\alpha.bin"
+        },
+        {
+          "behavior": "payload_download",
+          "url": "https://cdn-lab.example.test/drop/beta.bin",
+          "target_file": "%LOCALAPPDATA%\\Lab\\beta.bin"
+        }
+      ],
+      "required_registry_queries": [],
+      "forbidden": {
+        "process_images": [
+          "powershell.exe",
+          "cmd.exe"
+        ],
+        "behaviors": [
+          "credential_theft_chrome",
+          "lateral_movement"
+        ],
+        "process_bindings": [],
+        "network_bindings": [
+          {
+            "behavior": "payload_download",
+            "url": "https://cdn-lab.example.test/drop/alpha.bin",
+            "target_file": "%LOCALAPPDATA%\\Lab\\beta.bin"
+          },
+          {
+            "behavior": "payload_download",
+            "url": "https://cdn-lab.example.test/drop/beta.bin",
+            "target_file": "C:\\ProgramData\\Lab\\alpha.bin"
+          }
+        ],
+        "registry_writes": [],
+        "reject_unprovenanced_exact_claims": true
+      }
+    }
+  ]
+}

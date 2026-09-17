@@ -1,0 +1,6 @@
+# CPU/macOS stack for the official TAPAS LSTM checkpoint and GraphSAGE classes.
+numpy==1.26.4
+scikit-learn==1.2.0
+torch==2.7.1
+torch-geometric==2.6.1
+tqdm==4.69.0

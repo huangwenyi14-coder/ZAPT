@@ -1,0 +1,125 @@
+{
+  "fact_extraction": {
+    "source_metadata": {
+      "report_name": "仅网络与 C2 行为报告",
+      "description": "受感染主机通过 HTTPS 周期性发送心跳，报告明确给出 URL 和服务端 IP。"
+    },
+    "metadata_provenance": {
+      "origin": "source",
+      "source_span_ids": ["span-0001-700582259c36"]
+    },
+    "facts": [
+      {
+        "fact_id": "fact-001",
+        "behavior": "c2_beacon_https",
+        "order": 1,
+        "description": "受感染主机每 15 分钟通过 HTTPS 向指定 URL 发送心跳。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      }
+    ],
+    "entities": [
+      {
+        "entity_id": "entity-001",
+        "entity_type": "url",
+        "value": "https://telemetry-sync.example.test/api/v1/checkin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      },
+      {
+        "entity_id": "entity-002",
+        "entity_type": "domain",
+        "value": "telemetry-sync.example.test",
+        "attributes": {
+          "protocol": "HTTPS"
+        },
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      },
+      {
+        "entity_id": "entity-003",
+        "entity_type": "ip",
+        "value": "203.0.113.77",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "relation-001",
+        "source_id": "fact-001",
+        "predicate": "connects_to",
+        "target_id": "entity-001",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      },
+      {
+        "relation_id": "relation-002",
+        "source_id": "entity-002",
+        "predicate": "resolves_to",
+        "target_id": "entity-003",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      }
+    ],
+    "report_iocs": [
+      {
+        "indicator_id": "ioc-001",
+        "kind": "url",
+        "value": "https://telemetry-sync.example.test/api/v1/checkin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      },
+      {
+        "indicator_id": "ioc-002",
+        "kind": "domain",
+        "value": "telemetry-sync.example.test",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      },
+      {
+        "indicator_id": "ioc-003",
+        "kind": "ip",
+        "value": "203.0.113.77",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-700582259c36"]
+        }
+      }
+    ]
+  },
+  "fact_audit": {
+    "summary": "报告只支撑一个周期性 HTTPS 心跳行为，没有其他攻击阶段。",
+    "ledger_complete": true
+  },
+  "simulation_completion": {
+    "completions": [
+      {
+        "request_id": "complete-fact-0001-process-image",
+        "target_id": "fact-0001",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\periodic-client.exe",
+        "origin": "ai_completed",
+        "reason": "为来源明确但未披露主体镜像的心跳行为建立内部仿真进程。",
+        "compatible": true,
+        "compatibility_explanation": "不新增命令、持久化、文件或外部 IOC。"
+      }
+    ]
+  }
+}

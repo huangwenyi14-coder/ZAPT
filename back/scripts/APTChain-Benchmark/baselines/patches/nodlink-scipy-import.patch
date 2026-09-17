@@ -1,0 +1,12 @@
+diff --git a/src/ETW/train.py b/src/ETW/train.py
+index 4ab6fb0..71e2e1a 100644
+--- a/src/ETW/train.py
++++ b/src/ETW/train.py
+@@ -4,7 +4,7 @@ import networkx as nx
+ import scipy.sparse as sp
+ from scipy.sparse.construct import random
+-from scipy.sparse.linalg.eigen.arpack import eigsh
++from scipy.sparse.linalg import eigsh
+ import sys
+ import torch
+ import torch.nn as nn

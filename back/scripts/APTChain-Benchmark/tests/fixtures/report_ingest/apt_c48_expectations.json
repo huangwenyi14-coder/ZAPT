@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "case_id": "apt-c48-2024-11-26",
+      "source": {
+        "kind": "pdf",
+        "display_name": "2024.11.26 - Analysis report on recent phishing attacks by APT-C-48 (CNC).pdf",
+        "fixture": null
+      },
+      "iocs": {
+        "hashes": [
+          "e74d7351a73c0343c2b607c8f137f847",
+          "974f51eb0ea821434504cb22c36fbfab",
+          "ef98ed09bedea8daef9d09ec62ffe9cc"
+        ],
+        "urls": [
+          "https://panbaiclu.com/Guide/Architecture.pdf",
+          "https://panbaiclu.com/Guide/structure",
+          "https://panbaiclu.com/Metadata/indexes",
+          "https://panbaiclu.com/APIs/BaiduSearchAPI"
+        ],
+        "domains": [
+          "panbaiclu.com"
+        ],
+        "ips": [
+          "158.255.215.248"
+        ]
+      },
+      "exact_iocs": true,
+      "required_commands": [
+        "C:\\Windows\\System32\\cmd.exe /c"
+      ],
+      "required_files": [
+        "%Appdata%\\SCSCloudService\\scs64.exe",
+        "%UserProfile%\\AppData\\Local\\Microsoft\\Feeds\\msfeedsync.exe"
+      ],
+      "required_scheduled_tasks": [
+        {
+          "name": "SCS-Update",
+          "binary": "%Appdata%\\SCSCloudService\\scs64.exe",
+          "interval_minutes": 10,
+          "mechanism": "com"
+        },
+        {
+          "name": "User_Feed_Synchronization",
+          "binary": "%UserProfile%\\AppData\\Local\\Microsoft\\Feeds\\msfeedsync.exe",
+          "interval_minutes": 10,
+          "mechanism": "com"
+        }
+      ],
+      "required_behaviors": [
+        "spearphishing_archive_attachment",
+        "masqueraded_executable",
+        "user_execution",
+        "decoy_document_download",
+        "decoy_document_open",
+        "process_enumeration",
+        "bios_registry_query",
+        "conditional_self_delete",
+        "host_inventory_exfiltration",
+        "attack_component_download",
+        "com_scheduled_task_creation",
+        "cleanup_self_delete"
+      ],
+      "required_process_bindings": [
+        {
+          "process_image": "C:\\Windows\\System32\\cmd.exe",
+          "behavior": "decoy_document_open"
+        }
+      ],
+      "required_network_bindings": [
+        {
+          "behavior": "decoy_document_download",
+          "url": "https://panbaiclu.com/Guide/Architecture.pdf",
+          "target_file": null
+        }
+      ],
+      "required_registry_queries": [
+        "HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\SystemBiosVersion"
+      ],
+      "forbidden": {
+        "process_images": [
+          "powershell.exe"
+        ],
+        "behaviors": [],
+        "process_bindings": [
+          {
+            "process_image": "C:\\Windows\\System32\\cmd.exe",
+            "behavior": "c2_checkin"
+          },
+          {
+            "process_image": "C:\\Windows\\System32\\cmd.exe",
+            "behavior": "attack_component_download"
+          },
+          {
+            "process_image": "C:\\Windows\\System32\\cmd.exe",
+            "behavior": "com_scheduled_task_creation"
+          }
+        ],
+        "network_bindings": [
+          {
+            "behavior": "c2_checkin",
+            "url": "https://panbaiclu.com/Guide/Architecture.pdf",
+            "target_file": null
+          }
+        ],
+        "registry_writes": [
+          "HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\System\\SystemBiosVersion"
+        ],
+        "reject_unprovenanced_exact_claims": true
+      }
+    }
+  ]
+}

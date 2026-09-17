@@ -1,0 +1,13 @@
+# NODLINK publishes no versioned dependency manifest. These versions retain the
+# SciPy private import paths used by the source and use the available CPU PyTorch.
+gensim==4.3.1
+matplotlib==3.8.4
+networkx==2.8.7
+nltk==3.8.1
+numpy==1.26.4
+scikit-learn==1.2.0
+scipy==1.10.1
+seaborn==0.13.2
+torch==2.7.1
+tqdm==4.69.0
+git+https://github.com/casics/nostril.git@fbc0c91249283a9fbc9036206391ce1138826fd3

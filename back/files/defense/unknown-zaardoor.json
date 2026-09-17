@@ -1,0 +1,2569 @@
+[
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00001",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8637,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:mail-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在112456.2秒内产生711条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8200451966b27d81b1f486c2",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 66,
+      "timestamp": "2023-12-31T10:18:02.192000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00002",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6073,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在112633.2秒内产生29条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.543，传播分=0.543；边关系惊异度=0.760, 主机内行为稀有度=0.378。"
+    },
+    "location": {
+      "physical_record_id": "pr-585cde5528ee8e886d59a15f",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 54,
+      "timestamp": "2023-12-31T10:33:37.4218672Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00003",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7232,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在113275.7秒内产生125条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.614，传播分=0.614；边关系惊异度=0.690, 主机内行为稀有度=0.149。"
+    },
+    "location": {
+      "physical_record_id": "pr-d9bc9592449c6661b859ca5c",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 665,
+      "timestamp": "2023-12-31T10:57:12.413000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00004",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7211,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "getent passwd $(whoami)"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在84184.7秒内产生16条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0abd6f61f3c52fb2ececc9d9",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 7,
+      "timestamp": "2023-12-31T11:34:14Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00005",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7352,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "36.140.84.52.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在112546.7秒内产生41条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5436e796103b069caf165e64",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 156,
+      "timestamp": "2023-12-31T11:36:08.9804595Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00006",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7304,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在108072.4秒内产生63条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.626，传播分=0.626；边关系惊异度=0.690, 主机内行为稀有度=0.189。"
+    },
+    "location": {
+      "physical_record_id": "pr-e87be54dfb4a6c56ca675010",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 534,
+      "timestamp": "2023-12-31T11:41:05.099000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00007",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5275,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net user /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在97587.5秒内产生9条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.528，传播分=0.528；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-2718cb90734fc0995c0fc25b",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 375,
+      "timestamp": "2023-12-31T11:42:27.365000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00008",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8775,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在108511.4秒内产生22条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c9f2df70b1b1c1b99652501a",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 291,
+      "timestamp": "2023-12-31T11:43:11.209000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00009",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7357,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在111781.1秒内产生76条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.634，传播分=0.634；边关系惊异度=0.690, 主机内行为稀有度=0.218。"
+    },
+    "location": {
+      "physical_record_id": "pr-10a19c0f79699929762944b7",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 698,
+      "timestamp": "2023-12-31T12:18:15.653000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00010",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5740,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c ipconfig /all"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在745.5秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.528，传播分=0.574；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-e958ad37231bf7a4236a95c9",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 2075,
+      "timestamp": "2023-12-31T12:50:19.2390002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00011",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-dbe44b300d93b4d84a16cd73",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 2165,
+      "timestamp": "2023-12-31T13:02:21.2320006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00012",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-53208a7267b656a1269aa50c",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 1893,
+      "timestamp": "2023-12-31T13:02:21.750000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00013",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-edb3c9ba615ca17dce77e104",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 377,
+      "timestamp": "2023-12-31T13:02:21.8784946Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00014",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7002,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "200.197.79.204.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在98945.2秒内产生19条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.688，传播分=0.688；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c528491f67d97d0b987e1f48",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 459,
+      "timestamp": "2023-12-31T13:39:17.5571485Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00015",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7400,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在104691.9秒内产生55条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.641，传播分=0.641；边关系惊异度=0.690, 主机内行为稀有度=0.243。"
+    },
+    "location": {
+      "physical_record_id": "pr-a4e984d6e65f08f250100c7e",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 1046,
+      "timestamp": "2023-12-31T14:47:28.691000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00016",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7211,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "whoami"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在61327.9秒内产生14条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e6d13327161d2f3785185231",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 37,
+      "timestamp": "2023-12-31T14:53:05Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00017",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3c7b15787aed243eee3c75d5",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 3621,
+      "timestamp": "2023-12-31T15:33:20.237000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00018",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7c78922b58e976407f702694",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 4083,
+      "timestamp": "2023-12-31T15:33:20.5770001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00019",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f877ce5515c336867c8fa6d8",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 769,
+      "timestamp": "2023-12-31T15:33:20.6093334Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00020",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6959,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aisha.johnson\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在92918.0秒内产生27条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5bf674a45f0a5a43ad5c09d0",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 601,
+      "timestamp": "2023-12-31T16:04:56.3530004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00021",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8640,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:mail-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在113410.5秒内产生275条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-08c3acf6aa71857706b9fc70",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1159,
+      "timestamp": "2023-12-31T17:07:54.292000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00022",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-d29cdfe14a3ccb8d00769bd9",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 972,
+      "timestamp": "2023-12-31T17:28:00.9061707Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00023",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-fe4d6816513ffdf94edd4d59",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 616,
+      "timestamp": "2023-12-31T17:28:01.2154748Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00024",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-9134c1cad42bb59d5fd8ac53",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1403,
+      "timestamp": "2023-12-31T17:28:01.240000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00025",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f77de7568cf60d8dd0d26c33",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1187,
+      "timestamp": "2023-12-31T18:33:56.1234374Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00026",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-41007b8aeec2f2afdf76ec6b",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 5470,
+      "timestamp": "2023-12-31T18:33:56.479000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00027",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-7cf3f91297c94ad47fec82e5",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 6187,
+      "timestamp": "2023-12-31T18:33:56.5980004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00028",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7645,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在92192.7秒内产生16条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.764，传播分=0.764；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8aa3456ee7ce41890495fc8c",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1031,
+      "timestamp": "2023-12-31T22:30:01.3839594Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00029",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6102,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\lucas.martinez\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在67999.4秒内产生15条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.563，传播分=0.563；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-71b982f3bff279d1773f66c1",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 8800,
+      "timestamp": "2023-12-31T22:40:52.0490006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00030",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.7338,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:mail-01:pid:4500 -> net:23.45.126.52:443; n=5 mean=15083.5s cv=0.243"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.631，传播分=0.631；边关系惊异度=0.580, 主机内行为稀有度=0.302。"
+    },
+    "location": {
+      "physical_record_id": "pr-3c476bdba9b25ba258b5e13b",
+      "relative_path": "MAIL-01.example.local/windows_event_security.xml",
+      "record_index": 1584,
+      "timestamp": "2023-12-31T23:25:55.8815671Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00031",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8640,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=rpcrt4.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在108428.8秒内产生194条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1c2384c21ef15d3774d9844f",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2101,
+      "timestamp": "2023-12-31T23:39:49.877000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00032",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7349,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在112937.0秒内产生53条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-418a24df69996cd89655410a",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1219,
+      "timestamp": "2024-01-01T00:59:26.4671268Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00033",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6488,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在99231.2秒内产生21条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.608，传播分=0.608；边关系惊异度=0.760, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-c607d74734e3eed3fd230654",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1372,
+      "timestamp": "2024-01-01T02:49:46.5601545Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00034",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7770,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在80068.0秒内产生11条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.698，传播分=0.698；边关系惊异度=0.690, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-fed9ac4f5307ae0575047034",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2684,
+      "timestamp": "2024-01-01T03:21:29.973000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00035",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5275,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c ipconfig /all"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.3秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.528，传播分=0.528；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-7e8c5e2c57bc817581f17767",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1050,
+      "timestamp": "2024-01-01T03:26:19.3721571Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00036",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.8107,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "9.20.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在113998.3秒内产生333条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.811，传播分=0.811；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-74348ed2748e3c3ca85ba5aa",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 1660,
+      "timestamp": "2024-01-01T04:08:42.534760Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00037",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7762,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "9.20.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在113998.1秒内产生92条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cab721c30094359c432fa51b",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1475,
+      "timestamp": "2024-01-01T04:08:42.5928938Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00038",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.7489,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:dc-01:pid:2368 -> net:104.18.26.243:80; n=6 mean=7754.9s cv=0.204"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.655，传播分=0.655；边关系惊异度=0.580, 主机内行为稀有度=0.378。"
+    },
+    "location": {
+      "physical_record_id": "pr-8470c4c026d79a458a828da3",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 14298,
+      "timestamp": "2024-01-01T06:22:09.5351672Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00039",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABBAHAAcABsAGkAYwBhAHQAaQBvAG4AIAAtAE4AZQB3AGUAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4071a5d94f3bdd629280c685",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1925,
+      "timestamp": "2024-01-01T06:30:55.2190007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00040",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABBAHAAcABsAGkAYwBhAHQAaQBvAG4AIAAtAE4AZQB3AGUAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6cdc0a9515c0991f4f46191b",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1398,
+      "timestamp": "2024-01-01T06:30:55.6330973Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00041",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABBAHAAcABsAGkAYwBhAHQAaQBvAG4AIAAtAE4AZQB3AGUAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-89ee5a0910352435b31e8182",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 3164,
+      "timestamp": "2024-01-01T06:30:55.751000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00042",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-5df7ebcbafa5a59d10b7b26e",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2837,
+      "timestamp": "2024-01-01T07:08:48.4800763Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00043",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-a362d866f0bd41a1f3c48205",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 14836,
+      "timestamp": "2024-01-01T07:08:48.5150006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00044",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-75b80c36c2e92b569b310550",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 13038,
+      "timestamp": "2024-01-01T07:08:48.640000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00045",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8775,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在110423.7秒内产生18条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d864d52d95e58c604ba95648",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 3873,
+      "timestamp": "2024-01-01T07:35:53.945000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00046",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ad97a96781d03828ffaebd28",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 16872,
+      "timestamp": "2024-01-01T09:07:38.2460002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00047",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cf2877c6a98a8886f6196b9f",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 14672,
+      "timestamp": "2024-01-01T09:07:38.334000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00048",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7853276f2ca84b73a80d61ba",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3110,
+      "timestamp": "2024-01-01T09:07:38.6103889Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00049",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f7650070bdaa3ded922a7fb1",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 2687,
+      "timestamp": "2024-01-01T10:00:52.1220008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00050",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-bfe0a5e231d531f1663a71a2",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 4122,
+      "timestamp": "2024-01-01T10:00:52.623000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00051",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1c600939fbaa1e29130b3312",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1581,
+      "timestamp": "2024-01-01T10:00:53.0234504Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00052",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7649,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows nt\\currentversion\\winlogon\\shell"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在98427.9秒内产生35条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.765，传播分=0.765；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3c92d23f789acdc295d482c7",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3362,
+      "timestamp": "2024-01-01T10:21:25.3018737Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00053",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.9701,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:wks-eng-021:pid:12724 -> net:70.34.208.197:443; n=16 mean=1127.8s cv=0.181"
+        },
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.953，传播分=0.953；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-01ff33c5c28d789c7566dd5c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3382,
+      "timestamp": "2024-01-01T10:40:13.7258802Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00054",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.9317,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:wks-eng-021:{63b1f558-90bc-6592-df02-0010794a42b9} -> net:70.34.208.197:443; n=16 mean=1127.8s cv=0.181"
+        },
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.893，传播分=0.893；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-8fc3469bc6228ea3e227c926",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2101,
+      "timestamp": "2024-01-01T10:40:14.3342608Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00055",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.9446,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:wks-eng-021:bf0e6808-f1ff-4184-bea2-194691db564e -> net:70.34.208.197:443; n=16 mean=1127.8s cv=0.181"
+        },
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.913，传播分=0.913；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-c2459e08d6b1b73980c9b642",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 4785,
+      "timestamp": "2024-01-01T10:40:14.708000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00056",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7478,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在112930.9秒内产生73条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.748，传播分=0.748；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fdc3ef39af7093c4a596e76d",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1671,
+      "timestamp": "2024-01-01T10:51:31.2927042Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00057",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8946,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:22"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在294.2秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.882，传播分=0.882；边关系惊异度=0.580, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-12664f0cede2a8eaec0c17f0",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3432,
+      "timestamp": "2024-01-01T10:53:56.8613583Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00058",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8946,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:22"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在294.6秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.882，传播分=0.882；边关系惊异度=0.580, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-882b42449a814a07417bb96e",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2126,
+      "timestamp": "2024-01-01T10:53:56.9507015Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00059",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.9198,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:22"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在293.9秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.920，传播分=0.920；边关系惊异度=0.580, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-33e34b8b2258f7fe9da2bb97",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 4849,
+      "timestamp": "2024-01-01T10:53:57.487000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00060",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7657,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.610，传播分=0.688；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-0f065ed80b26aa64528fd57b",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3507,
+      "timestamp": "2024-01-01T11:18:11.8761059Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00061",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7693,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.670，传播分=0.688；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-f17f4f04e3860293bbaf6668",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2176,
+      "timestamp": "2024-01-01T11:18:12.5252472Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00062",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7875,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.690，传播分=0.717；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-f68b303abc371c6cf037dc05",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 4952,
+      "timestamp": "2024-01-01T11:18:13.625000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00063",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7331,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.610，传播分=0.632；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-984fe571ae0df3937e2a456c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3577,
+      "timestamp": "2024-01-01T11:39:21.9704700Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00064",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7587,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.670，传播分=0.670；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-127764872f653c12af19e2f0",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2210,
+      "timestamp": "2024-01-01T11:39:22.2476104Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00065",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7716,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.690，传播分=0.690；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-c7108116af9fc2b532428539",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5047,
+      "timestamp": "2024-01-01T11:39:23.316000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00066",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-8300f6b0b48f3b8ea6bdf4a7",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3627,
+      "timestamp": "2024-01-01T11:52:24.1943828Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00067",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-4bc8263bae51908aa7f78c8a",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2229,
+      "timestamp": "2024-01-01T11:52:24.2816897Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00068",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8484,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.810，传播分=0.810；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-ded9359c7107a75ff056b333",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5113,
+      "timestamp": "2024-01-01T11:52:25.898000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00069",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6705,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "12.30.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在112950.2秒内产生50条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.641，传播分=0.641；边关系惊异度=0.550, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-096375859b55cd93772d52d7",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2314,
+      "timestamp": "2024-01-01T12:09:24.7790378Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00070",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7638,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在95220.3秒内产生9条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.764，传播分=0.764；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-903a56497fbc7d22197489d9",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1791,
+      "timestamp": "2024-01-01T12:15:24.2655991Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00071",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-b057ca51f9a41a2445d14141",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3677,
+      "timestamp": "2024-01-01T12:16:42.1862007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00072",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-214ce4f8408231edc267ca58",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2262,
+      "timestamp": "2024-01-01T12:16:42.2925060Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00073",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8484,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.810，传播分=0.810；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-16af3c425c9a596f2798dbc0",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5195,
+      "timestamp": "2024-01-01T12:16:43.850000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00074",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6747,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在81836.3秒内产生9条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.648，传播分=0.648；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-6bc8aa5b96007addbbdd9c17",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1870,
+      "timestamp": "2024-01-01T12:17:16.6264324Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00075",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-c76d894574d85ca5eeaef996",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3742,
+      "timestamp": "2024-01-01T12:32:01.5014485Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00076",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-6c9ee1262519358771b21083",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2285,
+      "timestamp": "2024-01-01T12:32:01.5309409Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00077",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7307,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.570，传播分=0.632；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-d4a5f858dd05fed7739a0026",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5276,
+      "timestamp": "2024-01-01T12:32:02.357000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00078",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6170,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.8秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5fe12b854cc11887cd852b1a",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1884,
+      "timestamp": "2024-01-01T12:32:12.1311391Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00079",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6929,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在95448.6秒内产生24条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.692，传播分=0.692；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-06bfa685cf846677fb9b3351",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3788,
+      "timestamp": "2024-01-01T12:38:36.7323535Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00080",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-17e627fe58d6aa8253faa05d",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 4946,
+      "timestamp": "2024-01-01T12:51:56.077000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00081",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-512170a26f464d88e2640fb8",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3360,
+      "timestamp": "2024-01-01T12:51:56.1190003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00082",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-906c080d950285b71b9f594f",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1849,
+      "timestamp": "2024-01-01T12:51:56.3031707Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00083",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-2c92e1df70f834fc3062d4ee",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3856,
+      "timestamp": "2024-01-01T12:53:23.2609974Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00084",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-c4c1578495a458c539e12aa3",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2340,
+      "timestamp": "2024-01-01T12:53:23.9731297Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00085",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.6948,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.570，传播分=0.570；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-01f74cbc44385763f22a4974",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5430,
+      "timestamp": "2024-01-01T12:53:24.711000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00086",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7203,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.610，传播分=0.610；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-02b0dcf3376747924c7d2c7c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3872,
+      "timestamp": "2024-01-01T13:06:39.6276856Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00087",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7587,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.670，传播分=0.670；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-b166c68b59a16a4bceaf150b",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2351,
+      "timestamp": "2024-01-01T13:06:40.2369692Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00088",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7716,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.690，传播分=0.690；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-29c169347d27e9bdaf29dd63",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5459,
+      "timestamp": "2024-01-01T13:06:40.701000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00089",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-56169ddc4cc3b8212b5ac1d2",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3957,
+      "timestamp": "2024-01-01T13:28:49.1352346Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00090",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-0ea9ddb85d15bddd6dc9593f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2398,
+      "timestamp": "2024-01-01T13:28:49.8557300Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00091",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7307,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.570，传播分=0.632；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-e041f7244e1e3c65b1c7d1ce",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5564,
+      "timestamp": "2024-01-01T13:28:50.283000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00092",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-0f450769b0b60f6d25c63a07",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4068,
+      "timestamp": "2024-01-01T13:46:18.3372051Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00093",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-1b87b3e73ce32411a1b8d6a1",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2438,
+      "timestamp": "2024-01-01T13:46:18.6186107Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00094",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8484,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.810，传播分=0.810；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-052316a460ff6bb6c1c28cac",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5696,
+      "timestamp": "2024-01-01T13:46:19.706000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00095",
+    "alert": "检测到计划任务创建/修改",
+    "confidence_score": 0.9558,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "计划任务创建/修改",
+          "description": "检测计划任务的创建、修改或可疑任务执行配置。",
+          "match_reason": "type=scheduled_task value=\"kasperskysecurity\" <?xml version=\"1.0\" encoding=\"utf-16\"?> <task version=\"1.4\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"> <registrationinfo> <date>2024-01-01t13:59:10z</date> <author>example\\priya.patel</author> <uri>\\\""
+        }
+      ],
+      "graph_reason": "同一主机、同一fallback身份在0.0秒内产生1条直接观测；覆盖1类关系（scheduled_task）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.956，传播分=0.956；边关系惊异度=0.860, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-86ae548a9130ae2d5271be22",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4120,
+      "timestamp": "2024-01-01T13:59:10.4016335Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00096",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7331,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.610，传播分=0.632；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-aef208be46ee2f2e2c946383",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4137,
+      "timestamp": "2024-01-01T14:08:21.9834459Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00097",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7587,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.670，传播分=0.670；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-13bff5d113dc04cb5ace5d8a",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2466,
+      "timestamp": "2024-01-01T14:08:22.3726839Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00098",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7716,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.690，传播分=0.690；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-7d935fcf003775b002ffa563",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5784,
+      "timestamp": "2024-01-01T14:08:22.794000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00099",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-493b5dda85c2faaf0075c3c1",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4244,
+      "timestamp": "2024-01-01T14:27:10.3250399Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00100",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8484,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.810，传播分=0.810；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-e0f7303a5b803d3b433eb365",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5912,
+      "timestamp": "2024-01-01T14:27:10.900000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00101",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-9070d458e5e638f48653534f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2497,
+      "timestamp": "2024-01-01T14:27:10.9214654Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00102",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-32ba22460f31640abac6694c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4326,
+      "timestamp": "2024-01-01T14:45:47.2055945Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00103",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-b1ee4cca539f715c1c7251fc",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2526,
+      "timestamp": "2024-01-01T14:45:47.6849428Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00104",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7803,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.570，传播分=0.717；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-c773ea76bfebfd4e089381b7",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 6010,
+      "timestamp": "2024-01-01T14:45:48.342000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00105",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8946,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:22"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.882，传播分=0.882；边关系惊异度=0.580, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-24749a0fcc61be0b45635515",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4349,
+      "timestamp": "2024-01-01T14:57:43.1302349Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00106",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8946,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:22"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.882，传播分=0.882；边关系惊异度=0.580, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f0c24e640c63bb7150cd25d1",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2537,
+      "timestamp": "2024-01-01T14:57:43.4223080Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00107",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.9198,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:22"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.920，传播分=0.920；边关系惊异度=0.580, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-30dad89889d4b1d7c9501aff",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 6041,
+      "timestamp": "2024-01-01T14:57:43.933000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00108",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-2c4a64f9cef2b509e91a8e1f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4392,
+      "timestamp": "2024-01-01T15:07:53.6951225Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00109",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7971,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.730，传播分=0.730；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-9985cb613ecd27786493566b",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2557,
+      "timestamp": "2024-01-01T15:07:53.9364191Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00110",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.7803,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.570，传播分=0.717；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-818bf89236f18c92326f5700",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 6094,
+      "timestamp": "2024-01-01T15:07:54.590000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00111",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-a140340cb3de49c962d5470d",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4453,
+      "timestamp": "2024-01-01T15:22:10.7311957Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00112",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8355,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-fee312eed71556e125e9982f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2578,
+      "timestamp": "2024-01-01T15:22:11.0176627Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00113",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8484,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 70.34.208.197:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.810，传播分=0.810；边关系惊异度=0.580, 主机内行为稀有度=0.250。"
+    },
+    "location": {
+      "physical_record_id": "pr-b0c6b8caf11ea65bdfd35f36",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 6171,
+      "timestamp": "2024-01-01T15:22:11.676000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00114",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7035,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\diego.ramirez\\AppData\\Local\\Temp\\dotnet-sdk-installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在70091.2秒内产生35条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.704，传播分=0.704；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f86d9f3b9084971963bad5de",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 5831,
+      "timestamp": "2024-01-01T15:47:50.883000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00115",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7423,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在103332.2秒内产生6条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.742，传播分=0.742；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ad1b19f65b51d109135ef85c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2636,
+      "timestamp": "2024-01-01T15:51:06.9569179Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-02-08-unknown-zaardoor-00116",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7617,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.10.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在113608.3秒内产生70条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.762，传播分=0.762；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-974fc5e1da7a8cddf52eb776",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 2275,
+      "timestamp": "2024-01-01T16:52:39.9802621Z"
+    }
+  }
+]

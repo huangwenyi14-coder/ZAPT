@@ -1,0 +1,9 @@
+# Python 3.11/arm64 adapter stack. The source-native Python 3.8/x86_64 stack is
+# preserved separately in baselines/envs/magic and results/source_native.
+dgl==1.1.3
+numpy==1.26.4
+packaging==24.2
+scikit-learn==1.2.0
+setuptools==75.3.2
+torch==2.7.1
+xxhash==3.6.0

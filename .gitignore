@@ -1,0 +1,18 @@
+# 依赖
+front/node_modules/
+
+# 构建产物
+front/dist/
+back/target/
+
+# IDE
+front/.idea/
+*.iml
+.vscode/
+
+# 敏感凭据(README 明确要求勿提交,部署服务器时单独拷贝)
+back/scripts/minimax-key.txt
+
+# 日志与临时文件
+*.log
+npm-debug.log*

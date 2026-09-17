@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "catalog_name": "MITRE ATT&CK Enterprise Tactic IDs",
+  "attack_version": "18.1",
+  "domain": "enterprise-attack",
+  "publication_scope": "competition-public-reference",
+  "description": "Public competition reference derived from the official MITRE ATT&CK Enterprise v18.1 tactics worksheet. It contains no challenge labels, physical record IDs, storyline IDs, techniques, or scoring answers.",
+  "source": {
+    "workbook": "enterprise-attack-v18.1-tactics.xlsx",
+    "worksheet": "tactics",
+    "workbook_sha256": "aff4f24f0de1655af068eaa8ce78f92a9c0c028fa36ae336d193512d69079a29",
+    "release_date": "2025-11-13",
+    "versioned_catalog_url": "https://attack.mitre.org/versions/v18/",
+    "version_history_url": "https://attack.mitre.org/resources/versions/",
+    "terms_of_use_url": "https://attack.mitre.org/resources/legal-and-branding/terms-of-use/"
+  },
+  "legal": {
+    "copyright_notice": "© 2025 The MITRE Corporation. This work is reproduced and distributed with the permission of The MITRE Corporation.",
+    "trademark_notice": "MITRE ATT&CK and ATT&CK are registered trademarks of The MITRE Corporation."
+  },
+  "sort_order": "tactic_id_ascending",
+  "tactic_count": 14,
+  "tactics": [
+    {
+      "id": "TA0001",
+      "name": "Initial Access",
+      "url": "https://attack.mitre.org/tactics/TA0001"
+    },
+    {
+      "id": "TA0002",
+      "name": "Execution",
+      "url": "https://attack.mitre.org/tactics/TA0002"
+    },
+    {
+      "id": "TA0003",
+      "name": "Persistence",
+      "url": "https://attack.mitre.org/tactics/TA0003"
+    },
+    {
+      "id": "TA0004",
+      "name": "Privilege Escalation",
+      "url": "https://attack.mitre.org/tactics/TA0004"
+    },
+    {
+      "id": "TA0005",
+      "name": "Defense Evasion",
+      "url": "https://attack.mitre.org/tactics/TA0005"
+    },
+    {
+      "id": "TA0006",
+      "name": "Credential Access",
+      "url": "https://attack.mitre.org/tactics/TA0006"
+    },
+    {
+      "id": "TA0007",
+      "name": "Discovery",
+      "url": "https://attack.mitre.org/tactics/TA0007"
+    },
+    {
+      "id": "TA0008",
+      "name": "Lateral Movement",
+      "url": "https://attack.mitre.org/tactics/TA0008"
+    },
+    {
+      "id": "TA0009",
+      "name": "Collection",
+      "url": "https://attack.mitre.org/tactics/TA0009"
+    },
+    {
+      "id": "TA0010",
+      "name": "Exfiltration",
+      "url": "https://attack.mitre.org/tactics/TA0010"
+    },
+    {
+      "id": "TA0011",
+      "name": "Command and Control",
+      "url": "https://attack.mitre.org/tactics/TA0011"
+    },
+    {
+      "id": "TA0040",
+      "name": "Impact",
+      "url": "https://attack.mitre.org/tactics/TA0040"
+    },
+    {
+      "id": "TA0042",
+      "name": "Resource Development",
+      "url": "https://attack.mitre.org/tactics/TA0042"
+    },
+    {
+      "id": "TA0043",
+      "name": "Reconnaissance",
+      "url": "https://attack.mitre.org/tactics/TA0043"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+受感染主机使用 HTTPS 每 15 分钟向 https://telemetry-sync.example.test/api/v1/checkin 发送一次心跳，服务端地址为 203.0.113.77。报告未观察到持久化、命令执行、文件落地或横向移动。

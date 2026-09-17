@@ -1,0 +1,18 @@
+# CPU/macOS stack for running the locked ORTHRUS model through the neutral adapter.
+# The upstream Docker/PostgreSQL workflow remains authoritative for paper reproduction.
+gensim==4.3.1
+networkx==2.8.7
+nltk==3.8.1
+numpy==1.26.4
+pandas==2.2.2
+psycopg2-binary==2.9.10
+pytz==2024.2
+PyYAML==6.0.2
+scikit-learn==1.2.0
+scipy==1.10.1
+torch==2.7.1
+torch-geometric==2.6.1
+tqdm==4.69.0
+wandb==0.24.1
+xxhash==3.6.0
+yacs==0.1.8

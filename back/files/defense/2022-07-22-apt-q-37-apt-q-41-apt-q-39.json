@@ -1,0 +1,2114 @@
+[
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00001",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7478,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在195466.0秒内产生33条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.653，传播分=0.653；边关系惊异度=0.690, 主机内行为稀有度=0.289。"
+    },
+    "location": {
+      "physical_record_id": "pr-fa987b777a6a12ee4b0d04aa",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 25,
+      "timestamp": "2022-03-29T00:09:32.812000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00002",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6210,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在184016.2秒内产生23条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.564，传播分=0.564；边关系惊异度=0.760, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-0dc4a759fbcef8d3262fb946",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 37,
+      "timestamp": "2022-03-29T00:35:09.7057316Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00003",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6068,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在176711.0秒内产生32条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.542，传播分=0.542；边关系惊异度=0.760, 主机内行为稀有度=0.378。"
+    },
+    "location": {
+      "physical_record_id": "pr-f5f3055285ef536db5563ddc",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 120,
+      "timestamp": "2022-03-29T01:28:43.1575679Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00004",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e5b68d8e85edc45978d1047e",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 318,
+      "timestamp": "2022-03-29T02:12:40.138000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00005",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c33101b38575036bdc852c10",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 168,
+      "timestamp": "2022-03-29T02:12:40.2160006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00006",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-eda4431ec1577e0ef55e328a",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 156,
+      "timestamp": "2022-03-29T02:12:40.8064241Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00007",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6476,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在153958.0秒内产生15条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.606，传播分=0.606；边关系惊异度=0.760, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-7e512b0472dae13153a8093c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 162,
+      "timestamp": "2022-03-29T02:13:57.0040766Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00008",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7764,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows nt\\currentversion\\winlogon\\shell"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在183855.9秒内产生23条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-bb78ac6d0c21f2dd5bdcf277",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 201,
+      "timestamp": "2022-03-29T02:14:10.6102432Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00009",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5428,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c netstat -an | findstr LISTENING"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在84009.1秒内产生9条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.464，传播分=0.543；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-2a397332e593dc31d50128a9",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 240,
+      "timestamp": "2022-03-29T03:42:32.5300506Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00010",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-e83883e0966c8c1115708e21",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 372,
+      "timestamp": "2022-03-29T03:47:39.2600005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00011",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-dd817828bd3e1f1b42f360a4",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 247,
+      "timestamp": "2022-03-29T03:47:39.3583091Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00012",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-f18ae0ec4badc28e72f927c2",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 600,
+      "timestamp": "2022-03-29T03:47:39.947000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00013",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8767,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在195877.1秒内产生208条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ddf46910eb2f0ed6d0738952",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 2599,
+      "timestamp": "2022-03-29T04:08:13.075000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00014",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5628,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.3秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.464，传播分=0.563；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-d3c14cd6ecf2c5f091b3c0d8",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1237,
+      "timestamp": "2022-03-29T07:01:39.318000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00015",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8008,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-877663d01605acb2cea95186",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 5217,
+      "timestamp": "2022-03-29T07:39:46.4750007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00016",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8008,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f396cc44614c3b9e978b0b32",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 4903,
+      "timestamp": "2022-03-29T07:39:46.611000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00017",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8008,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-2491b9f88af99d53caf357d7",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1127,
+      "timestamp": "2022-03-29T07:39:46.6590627Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00018",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8767,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在196982.7秒内产生104条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-23f9fb7574026b0952e0d391",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 3088,
+      "timestamp": "2022-03-29T09:23:08.566000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00019",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6212,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在146548.9秒内产生5条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.564，传播分=0.564；边关系惊异度=0.760, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-7149b8c04d9c0a7602c809ba",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 720,
+      "timestamp": "2022-03-29T10:21:51.8035020Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00020",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7364,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.60.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在189403.7秒内产生81条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8c1e4439c3d992a1ffe54935",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 971,
+      "timestamp": "2022-03-29T10:24:45.6367972Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00021",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7364,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在196634.6秒内产生158条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e40ee99cfe425e0b10f5f955",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 965,
+      "timestamp": "2022-03-29T11:12:38.5344624Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00022",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7346,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在178819.4秒内产生50条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-257b830b0706c9056e5e150d",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 963,
+      "timestamp": "2022-03-29T11:43:53.9682132Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00023",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-f87d7edbd034e86d45d8c9ab",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 869,
+      "timestamp": "2022-03-29T11:51:56.3454665Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00024",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-9398ff78156d3c6d472ae30a",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2257,
+      "timestamp": "2022-03-29T11:51:56.405000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00025",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-228ac5543e1899d45a4c4d59",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1531,
+      "timestamp": "2022-03-29T11:51:56.8780006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00026",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7093,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\diego.ramirez\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在128729.5秒内产生54条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.709，传播分=0.709；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-237f0884ae986d531603c5d5",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2251,
+      "timestamp": "2022-03-29T12:03:50.579000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00027",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8631,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:web-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在194214.1秒内产生434条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.833，传播分=0.833；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d450b30cc6c2f2a0d5c85595",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2340,
+      "timestamp": "2022-03-29T12:19:07.704000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00028",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows nt\\currentversion\\winlogon\\shell"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在146545.9秒内产生5条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4226a2b76113cf85a7b45d39",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1114,
+      "timestamp": "2022-03-29T12:56:49.7757695Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00029",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.9244,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:fs-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在192554.2秒内产生502条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.924，传播分=0.924；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d10269d6d1276137034b11f0",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2740,
+      "timestamp": "2022-03-29T13:41:39.125000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00030",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7354,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在189759.1秒内产生112条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-67eacb9df85d075bdd130e3e",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1121,
+      "timestamp": "2022-03-29T14:14:09.2747118Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00031",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7558,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在175168.2秒内产生28条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.665，传播分=0.665；边关系惊异度=0.690, 主机内行为稀有度=0.333。"
+    },
+    "location": {
+      "physical_record_id": "pr-b562cf425cf34ec0414dd484",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 3439,
+      "timestamp": "2022-03-29T15:00:53.851000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00032",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8028,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在196449.7秒内产生1326条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.739，传播分=0.739；边关系惊异度=0.690, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-883a9483dd50af3c28751e29",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 3675,
+      "timestamp": "2022-03-29T15:38:23.596000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00033",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.8107,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在196458.9秒内产生384条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.811，传播分=0.811；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-88d3a3fa6b1d4bd0e3dbd32e",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 2368,
+      "timestamp": "2022-03-29T17:22:38.694985Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00034",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7761,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在193981.7秒内产生152条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f986effc84b84a8f66ba25f8",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1360,
+      "timestamp": "2022-03-29T17:22:39.0614648Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00035",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7002,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "whoami"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在158235.7秒内产生30条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.700，传播分=0.700；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-405dd9998271d2abc07d6e37",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 128,
+      "timestamp": "2022-03-29T17:42:13Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00036",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-d5791350dfd850fb111e8cd5",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 4435,
+      "timestamp": "2022-03-29T18:26:54.409000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00037",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-1fbea8a63c80beec5edea96a",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1692,
+      "timestamp": "2022-03-29T18:26:54.5641829Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00038",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-a0acae426c666d830ac47322",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3392,
+      "timestamp": "2022-03-29T18:26:54.8020000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00039",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8767,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在190594.9秒内产生45条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-05a84faf54cee57791bab306",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 3938,
+      "timestamp": "2022-03-29T18:58:52.431000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00040",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7764,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在197177.9秒内产生74条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-70ad9d95e35c16109887084b",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3112,
+      "timestamp": "2022-03-29T19:23:40.3505667Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00041",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-d26d8d9db7b44bd471ca7ced",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4048,
+      "timestamp": "2022-03-29T23:30:25.0470009Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00042",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-a298067ff8014b6ee7596ab2",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5383,
+      "timestamp": "2022-03-29T23:30:25.335000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00043",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-41194c9dea775f32aed85408",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2130,
+      "timestamp": "2022-03-29T23:30:25.9704126Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00044",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6962,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在178214.6秒内产生36条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1f4cb8f12f0496db72ad023b",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4126,
+      "timestamp": "2022-03-30T00:11:29.1550004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00045",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8767,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在196423.2秒内产生122条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7e174bc8122a23d1b137fbe5",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 7641,
+      "timestamp": "2022-03-30T00:48:56.888000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00046",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6167,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c systeminfo"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在104866.4秒内产生18条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7f79deffb1f51c567a97a362",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 18524,
+      "timestamp": "2022-03-30T00:53:18.026000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00047",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8767,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在193066.7秒内产生115条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.854，传播分=0.854；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0880c8bfc979206b89dbbdf4",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 6109,
+      "timestamp": "2022-03-30T04:27:03.312000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00048",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6167,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在75581.2秒内产生15条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-56beaa32897230636be02f6c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3514,
+      "timestamp": "2022-03-30T04:46:27.2890006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00049",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-a5147cfcc1cb4bfb35eec701",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 5883,
+      "timestamp": "2022-03-30T07:22:09.489000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00050",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-b2d7ce292cc0209e0624ef5c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 2313,
+      "timestamp": "2022-03-30T07:22:09.6904381Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00051",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-b7e947ec702655d38f5704df",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3820,
+      "timestamp": "2022-03-30T07:22:09.8190002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00052",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6927,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aisha.johnson\\AppData\\Local\\Temp\\msi_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在168648.9秒内产生48条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.692，传播分=0.692；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1e6316d70af138e770492fae",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 6181,
+      "timestamp": "2022-03-30T07:40:03.749000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00053",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6101,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\lucas.martinez\\AppData\\Local\\Temp\\msi_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在41376.0秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.563，传播分=0.563；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-8ff403e10a85e39f744e9136",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 24548,
+      "timestamp": "2022-03-30T10:09:22.052000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00054",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIAAxADAALgAwAC4AMAAuADEAIAAtAFAAbwByAHQAIAAzADMAOAA5AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-98a3ff952d8dd668448689dc",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 4959,
+      "timestamp": "2022-03-30T11:07:42.4540005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00055",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIAAxADAALgAwAC4AMAAuADEAIAAtAFAAbwByAHQAIAAzADMAOAA5AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-39fc7add525ac23d0064f3e2",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 7066,
+      "timestamp": "2022-03-30T11:07:42.613000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00056",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIAAxADAALgAwAC4AMAAuADEAIAAtAFAAbwByAHQAIAAzADMAOAA5AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-09f219988d8f336f859afd49",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 2643,
+      "timestamp": "2022-03-30T11:07:42.9430756Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00057",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6995,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "185.4.163.72.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在178799.1秒内产生29条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.687，传播分=0.687；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5ebaa3ea7bb58572fe1c4490",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 5419,
+      "timestamp": "2022-03-30T11:28:25.8016081Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00058",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-44d8f34d611e70cb236dda5c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 3331,
+      "timestamp": "2022-03-30T12:25:54.0793304Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00059",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-6184028a9bf091b08496b0f1",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 6063,
+      "timestamp": "2022-03-30T12:25:54.3840005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00060",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-087522963a65c237f7c4a8a3",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 8276,
+      "timestamp": "2022-03-30T12:25:54.724000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00061",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7354,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在195227.9秒内产生77条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ba4f68600b50e81525c0790e",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3361,
+      "timestamp": "2022-03-30T13:27:52.6469154Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00062",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8008,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-979edeb9d0ba890865d8c88b",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 6391,
+      "timestamp": "2022-03-30T13:59:39.3380003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00063",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8008,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-53f7e45dea5c14aeac297dc6",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 8712,
+      "timestamp": "2022-03-30T13:59:39.757000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00064",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8008,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAdwBpAG4AbABvAGcAbwBuAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-2b92660e58de9ceea343d787",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 3515,
+      "timestamp": "2022-03-30T13:59:39.9033730Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00065",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8575,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.824，传播分=0.824；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-468b408a600636f6952ba219",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 14483,
+      "timestamp": "2022-03-30T15:07:36.028000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00066",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8575,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.824，传播分=0.824；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2490b2e331543e1c167888eb",
+      "relative_path": "FS-01.example.local/windows_event_security.xml",
+      "record_index": 9738,
+      "timestamp": "2022-03-30T15:07:36.7280000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00067",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8575,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.824，传播分=0.824；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4e0226ba1f75bc92eb5dedbf",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3537,
+      "timestamp": "2022-03-30T15:07:37.0592161Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00068",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-ee331ea0a1e55dcaaf9f66c8",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 7993,
+      "timestamp": "2022-03-30T16:18:31.638000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00069",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-9d0d47f202e9bb9c2d703d31",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 5285,
+      "timestamp": "2022-03-30T16:18:31.6940002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00070",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-adab75c1edfc3f1085386da0",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 3064,
+      "timestamp": "2022-03-30T16:18:32.0711827Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00071",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.829，传播分=0.829；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-45fdde347a41f691914b981b",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 6307,
+      "timestamp": "2022-03-30T16:35:48.1430609Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00072",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.829，传播分=0.829；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-34d74f27fb60f914c37f1e98",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 30174,
+      "timestamp": "2022-03-30T16:35:48.465000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00073",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8604,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.829，传播分=0.829；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e3633d0f0abd84aea3ae451e",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 34887,
+      "timestamp": "2022-03-30T16:35:48.4810005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00074",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-cbcaabf2c9d77bd7b090e267",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 3173,
+      "timestamp": "2022-03-30T16:50:26.5813907Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00075",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-23b43f70f18b9df0f71ad87e",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 6182,
+      "timestamp": "2022-03-30T16:50:26.6000006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00076",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-febba82075ac742d06283f9d",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 8629,
+      "timestamp": "2022-03-30T16:50:26.681000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00077",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-f79233d413314e55d02bf682",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 3521,
+      "timestamp": "2022-03-30T21:15:17.0202789Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00078",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-f0bd4845aa64272204fd6d4a",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 6899,
+      "timestamp": "2022-03-30T21:15:17.7500000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00079",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7754,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-b7f4830f6ff5a74d57e5f7c4",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 9609,
+      "timestamp": "2022-03-30T21:15:17.803000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00080",
+    "alert": "检测到文档阅读器启动脚本解释器",
+    "confidence_score": 0.9606,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "文档阅读器启动脚本解释器",
+          "description": "检测文档阅读器或 Office 类进程启动脚本解释器的可疑父子关系。",
+          "match_reason": "winword.exe -> cmd.exe"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.938，传播分=0.938；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-dd2d2a6c48ab6ce525008f35",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 3680,
+      "timestamp": "2022-03-30T23:33:12.2640233Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00081",
+    "alert": "检测到文档阅读器启动脚本解释器",
+    "confidence_score": 0.9606,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "文档阅读器启动脚本解释器",
+          "description": "检测文档阅读器或 Office 类进程启动脚本解释器的可疑父子关系。",
+          "match_reason": "winword.exe -> cmd.exe"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.938，传播分=0.938；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fdd1722fcf57feb71bc3c334",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 7112,
+      "timestamp": "2022-03-30T23:33:12.3656781Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00082",
+    "alert": "检测到文档阅读器启动脚本解释器",
+    "confidence_score": 0.9606,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "文档阅读器启动脚本解释器",
+          "description": "检测文档阅读器或 Office 类进程启动脚本解释器的可疑父子关系。",
+          "match_reason": "winword.exe -> cmd.exe"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.938，传播分=0.938；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-572df97e382fa0d764fe675a",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 9952,
+      "timestamp": "2022-03-30T23:33:12.436000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00083",
+    "alert": "检测到计划任务创建/修改",
+    "confidence_score": 0.9554,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "计划任务创建/修改",
+          "description": "检测计划任务的创建、修改或可疑任务执行配置。",
+          "match_reason": "type=scheduled_task value=windows management service <?xml version=\"1.0\" encoding=\"utf-16\"?> <task version=\"1.4\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"> <registrationinfo> <date>2022-03-30t23:37:03z</date> <author>example\\aisha.johnson</author"
+        }
+      ],
+      "graph_reason": "同一主机、同一fallback身份在0.4秒内产生2条直接观测；覆盖1类关系（scheduled_task）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.955，传播分=0.955；边关系惊异度=0.860, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fe7a380358c8dc60fc4bb7c1",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 7122,
+      "timestamp": "2022-03-30T23:37:03.2560104Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00084",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.9420,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 23.45.101.12:80"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.942，传播分=0.942；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8651090ff48285f541921e50",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 7141,
+      "timestamp": "2022-03-30T23:51:47.2887784Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00085",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 23.45.101.12:80"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.010，传播分=1.010；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c095dc069de4a4a1f972d3e3",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 10002,
+      "timestamp": "2022-03-30T23:51:47.648000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00086",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.9420,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "cmd.exe -> 23.45.101.12:80"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.942，传播分=0.942；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d0c6076faa12a0cbafdc8ffe",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 3712,
+      "timestamp": "2022-03-30T23:51:47.9519689Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00087",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-b1dc8830e51871d5898a5bf1",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 10505,
+      "timestamp": "2022-03-31T02:58:30.299000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00088",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-5e5e11a48968a00a07ca09e8",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 7459,
+      "timestamp": "2022-03-31T02:58:30.3140003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00089",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7603,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.720, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-49f4d397f962f1a335f72e73",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 3923,
+      "timestamp": "2022-03-31T02:58:30.8611857Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00090",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3d6c5f52fa2db68a88a94c2e",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 3973,
+      "timestamp": "2022-03-31T04:53:39.2184498Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00091",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ad70e14c96b2c5c9a5c2649d",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 6591,
+      "timestamp": "2022-03-31T04:53:39.6260009Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00092",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e1ba4891697689da54728707",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 10152,
+      "timestamp": "2022-03-31T04:53:39.920000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00093",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABnAGEAdABlAHcAYQB5ACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2e7e2e1a91f054d079272e23",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 10856,
+      "timestamp": "2022-03-31T05:11:26.261000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00094",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABnAGEAdABlAHcAYQB5ACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a3a092a958060cf0145a7062",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 7701,
+      "timestamp": "2022-03-31T05:11:26.4870004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00095",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABnAGEAdABlAHcAYQB5ACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ccec27a62d48c4e635ff3c5b",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 4071,
+      "timestamp": "2022-03-31T05:11:27.0043800Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-22-apt-q-37-apt-q-41-apt-q-39-00096",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7002,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "ps -ef"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在178957.4秒内产生33条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.700，传播分=0.700；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7f11c4ee54bb9e92b27771e6",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 285,
+      "timestamp": "2022-03-31T05:35:18Z"
+    }
+  }
+]

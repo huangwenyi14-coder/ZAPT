@@ -1,0 +1,1821 @@
+[
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00001",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7469,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "142.164.217.172.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在116362.3秒内产生96条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.747，传播分=0.747；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7b2be9f10f56ffab7a70f207",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 8,
+      "timestamp": "2022-07-13T09:05:54.9910806Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00002",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8773,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在106588.6秒内产生11条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ccf232da298a9e31ac714b17",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 53,
+      "timestamp": "2022-07-13T09:15:41.003000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00003",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8773,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在115598.5秒内产生90条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4852f8c6c481a8ebccee0638",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 127,
+      "timestamp": "2022-07-13T09:19:05.786000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00004",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7323,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在108935.7秒内产生62条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.629，传播分=0.629；边关系惊异度=0.690, 主机内行为稀有度=0.200。"
+    },
+    "location": {
+      "physical_record_id": "pr-5e23b40d584c93e4fbcbea05",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 289,
+      "timestamp": "2022-07-13T09:40:15.910000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00005",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7228,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在116293.1秒内产生130条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.614，传播分=0.614；边关系惊异度=0.690, 主机内行为稀有度=0.147。"
+    },
+    "location": {
+      "physical_record_id": "pr-5d12a6b6cf4504fa273dd89e",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 829,
+      "timestamp": "2022-07-13T09:56:48.036000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00006",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6966,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在102333.6秒内产生9条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.697，传播分=0.697；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6885b74bcb48980d2a6129af",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 1197,
+      "timestamp": "2022-07-13T10:17:32.1710008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00007",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8611,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.830，传播分=0.830；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d56a70d7a0a68cb57684a4b1",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 2967,
+      "timestamp": "2022-07-13T11:58:08.0930007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00008",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8611,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.830，传播分=0.830；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a3f3d0cbab91240e1145afb3",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 2550,
+      "timestamp": "2022-07-13T11:58:08.590000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00009",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8611,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.830，传播分=0.830；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2ad0b483e80e1b0781210d61",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 463,
+      "timestamp": "2022-07-13T11:58:08.9354560Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00010",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7600,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在105285.0秒内产生21条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.672，传播分=0.672；边关系惊异度=0.690, 主机内行为稀有度=0.354。"
+    },
+    "location": {
+      "physical_record_id": "pr-72ea088271baa6c5d0ad300a",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 852,
+      "timestamp": "2022-07-13T12:44:51.787000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00011",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7211,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "hostname -f"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在107750.8秒内产生23条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-84eaf573b3f8a5477354b39d",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 16,
+      "timestamp": "2022-07-13T12:47:16Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00012",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7342,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在115538.9秒内产生78条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.734，传播分=0.734；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b923bee5068048af5809fd57",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 317,
+      "timestamp": "2022-07-13T13:35:06.3114766Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00013",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7081,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\diego.ramirez\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在95501.3秒内产生27条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.708，传播分=0.708；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-aa75a07380c6042edb25aa3a",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 1182,
+      "timestamp": "2022-07-13T13:37:36.215000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00014",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8773,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在114609.4秒内产生60条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ffd5d23cfcdefc2778642f09",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 1474,
+      "timestamp": "2022-07-13T14:15:11.682000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00015",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.9249,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:wks-hr-009（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在12362.5秒内产生9条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6dc0c590aab0f91be345fa44",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 2183,
+      "timestamp": "2022-07-13T14:18:20.993000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00016",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6170,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c netstat -an | findstr LISTENING"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.4秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fb06c51dedb92bf5cdc630ba",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 7035,
+      "timestamp": "2022-07-13T15:39:48.2380006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00017",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8773,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在114239.4秒内产生28条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8923f779015defde8bfb8939",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2078,
+      "timestamp": "2022-07-13T16:35:59.120000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00018",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7814,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_kerberos._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在117912.6秒内产生313条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.781，传播分=0.781；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7ba553358fa9b730f44ee353",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 1503,
+      "timestamp": "2022-07-13T16:47:27.519953Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00019",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7469,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "14.20.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在117131.3秒内产生89条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.747，传播分=0.747；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9b8d0a70561c562d4dade287",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 725,
+      "timestamp": "2022-07-13T16:47:27.5860804Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00020",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-0fa79a09a2b944b41f6db793",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 809,
+      "timestamp": "2022-07-13T17:29:46.0552225Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00021",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-eb25e60f5bae731a7d3d9748",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 1835,
+      "timestamp": "2022-07-13T17:29:46.4760007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00022",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-14b1b604b3e93fa3f7b6c76b",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 2237,
+      "timestamp": "2022-07-13T17:29:46.914000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00023",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6324,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在106836.0秒内产生19条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.582，传播分=0.582；边关系惊异度=0.760, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-cc6fc8e7398864b909704f6e",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1047,
+      "timestamp": "2022-07-13T17:30:47.1611432Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00024",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7377,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.40.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在117906.4秒内产生91条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.738，传播分=0.738；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cab8a53ca10d9af1ff5bebfc",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1002,
+      "timestamp": "2022-07-13T17:39:10.2836440Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00025",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-927a3bff1053977c3f9f7539",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 9973,
+      "timestamp": "2022-07-13T18:21:37.4360006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00026",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8665333c8f77260b2646252b",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 8315,
+      "timestamp": "2022-07-13T18:21:37.699000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00027",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-18b1539582d052f3fba5a536",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1397,
+      "timestamp": "2022-07-13T18:21:37.9833185Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00028",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6327,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在107161.0秒内产生20条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.582，传播分=0.582；边关系惊异度=0.760, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-6cbddd0da772067333a8d121",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1141,
+      "timestamp": "2022-07-13T18:55:13.5531258Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00029",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7342,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.10.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在117367.8秒内产生78条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.734，传播分=0.734；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e876e7a680459bda15e487a9",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1224,
+      "timestamp": "2022-07-13T19:03:49.9219768Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00030",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7412,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.0秒内产生1条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.741，传播分=0.741；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7850e48befff896e60c30c4b",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 866,
+      "timestamp": "2022-07-13T19:18:00.5088064Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00031",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6937,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "73.132.114.52.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在106976.4秒内产生23条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.678，传播分=0.678；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e31c0dbf73f975843c4ebef8",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1853,
+      "timestamp": "2022-07-13T21:22:12.8375708Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00032",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5275,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.8秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.528，传播分=0.528；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-00870015c1cef7c9a0c5ba5a",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 3547,
+      "timestamp": "2022-07-13T23:17:19.081000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00033",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6356,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aisha.johnson\\AppData\\Roaming\\Zoom\\bin\\Zoom.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在93890.1秒内产生27条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.603，传播分=0.603；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-0839f9cb8f9f0e4ef50c4d2d",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 3689,
+      "timestamp": "2022-07-14T02:25:05.411000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00034",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7211,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "hostname -f"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在88321.1秒内产生9条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c5ce667fd6ec3090be7c0bda",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 87,
+      "timestamp": "2022-07-14T03:45:41Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00035",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6751,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在78050.9秒内产生7条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.649，传播分=0.649；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-30aef323fbfcf0341dd670b5",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1416,
+      "timestamp": "2022-07-14T04:44:17.1985529Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00036",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8639,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=process name=mstsc.exe zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在115040.8秒内产生233条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-11061824c1eb062f12d130ab",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 4073,
+      "timestamp": "2022-07-14T05:13:33.268000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00037",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7762,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在117159.5秒内产生52条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a5e6234f9fc6bbeb2c9d36fb",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3004,
+      "timestamp": "2022-07-14T05:18:50.2364607Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00038",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-bad33b394fa3cc57058c67bb",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 4146,
+      "timestamp": "2022-07-14T05:46:07.670000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00039",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f2028a28572e9d293676dac5",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 2986,
+      "timestamp": "2022-07-14T05:46:07.8740002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00040",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-35fb1570a2d3c066778f887f",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1478,
+      "timestamp": "2022-07-14T05:46:08.0044813Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00041",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8636,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:fs-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在117676.6秒内产生799条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-152560416db6c0eb2df96ef7",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 4722,
+      "timestamp": "2022-07-14T06:30:02.303000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00042",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-91d6d28b87d990ebea0c4543",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 16595,
+      "timestamp": "2022-07-14T06:54:06.920000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00043",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-21e4811ae84acf15331c9d6b",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 19255,
+      "timestamp": "2022-07-14T06:54:07.2345034Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00044",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-4a243981a388348e163ef0ef",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3242,
+      "timestamp": "2022-07-14T06:54:07.6177239Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00045",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAAQgBJAFQAUwA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6d82c91b5ce9853d7d2bd1f8",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 20063,
+      "timestamp": "2022-07-14T07:45:14.4150004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00046",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAAQgBJAFQAUwA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-198b0647efbdfa0da5325278",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 17304,
+      "timestamp": "2022-07-14T07:45:14.639000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00047",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAAQgBJAFQAUwA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-626bb285498eac228c8f045c",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3400,
+      "timestamp": "2022-07-14T07:45:14.6763455Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00048",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6384,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在115776.5秒内产生55条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.574，传播分=0.593；边关系惊异度=0.550, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-0808079a3d24ce88300176c5",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2390,
+      "timestamp": "2022-07-14T10:05:51.3900813Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00049",
+    "alert": "检测到LSASS/凭据转储",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "LSASS/凭据转储",
+          "description": "检测针对 LSASS 的访问或与凭据转储相符的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 612 C:\\Users\\Public\\mem.dmp full"
+        },
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 612 C:\\Users\\Public\\mem.dmp full"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.002，传播分=1.002；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b7643915a7fac7e1db42d106",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5653,
+      "timestamp": "2022-07-14T10:14:32.400000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00050",
+    "alert": "检测到LSASS/凭据转储",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "LSASS/凭据转储",
+          "description": "检测针对 LSASS 的访问或与凭据转储相符的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 612 C:\\Users\\Public\\mem.dmp full"
+        },
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 612 C:\\Users\\Public\\mem.dmp full"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.002，传播分=1.002；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f4217e6a2f0ea5e3bb9c5400",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4166,
+      "timestamp": "2022-07-14T10:14:32.4915623Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00051",
+    "alert": "检测到LSASS/凭据转储",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "LSASS/凭据转储",
+          "description": "检测针对 LSASS 的访问或与凭据转储相符的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 612 C:\\Users\\Public\\mem.dmp full"
+        },
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 612 C:\\Users\\Public\\mem.dmp full"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.002，传播分=1.002；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c7b913748fe08a87a60067b7",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2204,
+      "timestamp": "2022-07-14T10:14:32.6108502Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00052",
+    "alert": "检测到LSASS/凭据转储",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "LSASS/凭据转储",
+          "description": "检测针对 LSASS 的访问或与凭据转储相符的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 612 C:\\Users\\Public\\mem.dmp full"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（write）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.105，传播分=1.105；边关系惊异度=0.680, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2252447dd46beb1b0ceb57b6",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5656,
+      "timestamp": "2022-07-14T10:14:47.177000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00053",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9520,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\cmd.exe /c C:\\Windows\\System32\\reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3403dce31c1aa9804e926342",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2209,
+      "timestamp": "2022-07-14T10:16:39.0690878Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00054",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9520,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\cmd.exe /c C:\\Windows\\System32\\reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在128.3秒内产生2条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d9c606e823e166bd4c9f57f3",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5662,
+      "timestamp": "2022-07-14T10:16:39.405000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00055",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9520,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\cmd.exe /c C:\\Windows\\System32\\reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在128.1秒内产生2条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-978de8395733283cf8ec9c75",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4168,
+      "timestamp": "2022-07-14T10:16:39.7150053Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00056",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6ed5ddb96e906e4f5e96c75d",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5663,
+      "timestamp": "2022-07-14T10:16:39.885000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00057",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-245b15ef437914805996b07f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2210,
+      "timestamp": "2022-07-14T10:16:40.0344723Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00058",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-108952375be70b981eda68f6",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4169,
+      "timestamp": "2022-07-14T10:16:40.0750057Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00059",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SYSTEM C:\\Users\\Public\\SYSTEM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（write）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.105，传播分=1.105；边关系惊异度=0.680, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c13d6c4d322987a9625f18f1",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5667,
+      "timestamp": "2022-07-14T10:16:41.886000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00060",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9521,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\cmd.exe /c C:\\Windows\\System32\\reg.exe save HKLM\\SECURITY C:\\Users\\Public\\SECURITY.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-feeed91202854d3f78ae3e36",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4187,
+      "timestamp": "2022-07-14T10:18:27.7081138Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00061",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9521,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\cmd.exe /c C:\\Windows\\System32\\reg.exe save HKLM\\SECURITY C:\\Users\\Public\\SECURITY.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a88bf790c95de65caedf5477",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5682,
+      "timestamp": "2022-07-14T10:18:27.757000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00062",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SECURITY C:\\Users\\Public\\SECURITY.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b76c9ac7648f0c44757c8d0a",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5683,
+      "timestamp": "2022-07-14T10:18:27.904000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00063",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9521,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\cmd.exe /c C:\\Windows\\System32\\reg.exe save HKLM\\SECURITY C:\\Users\\Public\\SECURITY.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f06299f7ac23d25fd063ff7d",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2220,
+      "timestamp": "2022-07-14T10:18:28.0073290Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00064",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SECURITY C:\\Users\\Public\\SECURITY.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-41b48d877d4897e451cb8281",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2221,
+      "timestamp": "2022-07-14T10:18:28.1965311Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00065",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SECURITY C:\\Users\\Public\\SECURITY.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-09900c4550ca373912641809",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4188,
+      "timestamp": "2022-07-14T10:18:28.3611135Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00066",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SECURITY C:\\Users\\Public\\SECURITY.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（write）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.105，传播分=1.105；边关系惊异度=0.680, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-09f2165092fcb668fdb5862d",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5686,
+      "timestamp": "2022-07-14T10:18:29.653000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00067",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-73376536f632bce3aba18feb",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5695,
+      "timestamp": "2022-07-14T10:18:47.833000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00068",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9520,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\cmd.exe /c C:\\Windows\\System32\\reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-30fc178cba43a59710f859bb",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2230,
+      "timestamp": "2022-07-14T10:18:48.1310205Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00069",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f2ebef28210e5c42a3bcf11f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4196,
+      "timestamp": "2022-07-14T10:18:48.4298879Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00070",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 0.9551,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.930，传播分=0.930；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fdb84143136ddb1d856d5634",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2231,
+      "timestamp": "2022-07-14T10:18:49.0923538Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00071",
+    "alert": "检测到SAM/SECURITY/NTDS 转储",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "SAM/SECURITY/NTDS 转储",
+          "description": "检测访问或导出 SAM、SECURITY、NTDS 等凭据数据库的行为。",
+          "match_reason": "C:\\Windows\\System32\\reg.exe save HKLM\\SAM C:\\Users\\Public\\SAM.save /y"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（write）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.105，传播分=1.105；边关系惊异度=0.680, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-74aaa874d6fd8d4aaa8d8670",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5696,
+      "timestamp": "2022-07-14T10:18:49.834000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00072",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-60720f422a6b40a4bfaf02e6",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 4398,
+      "timestamp": "2022-07-14T11:15:21.1920004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00073",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-b0ff1f84f944f0766030501b",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5967,
+      "timestamp": "2022-07-14T11:15:21.417000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00074",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.7756,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.696，传播分=0.696；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-0d924bbf0a06b604dc2c040d",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2335,
+      "timestamp": "2022-07-14T11:15:21.6374364Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00075",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABkAGMAMAAxACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7b55043f8590a6f578acee99",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 4037,
+      "timestamp": "2022-07-14T12:04:53.1740002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00076",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABkAGMAMAAxACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d0dc3346deab6c1c1fa47bad",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1988,
+      "timestamp": "2022-07-14T12:04:53.4574085Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00077",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand VABlAHMAdAAtAE4AZQB0AEMAbwBuAG4AZQBjAHQAaQBvAG4AIABkAGMAMAAxACAALQBQAG8AcgB0ACAAOAAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6a6423cb3a366a219d7aec11",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 5542,
+      "timestamp": "2022-07-14T12:04:53.934000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00078",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7418,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在37260.7秒内产生5条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.742，传播分=0.742；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6cc9493ddf0fc6f86c6559e7",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2444,
+      "timestamp": "2022-07-14T12:26:35.3492647Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00079",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7767,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在112756.3秒内产生36条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.777，传播分=0.777；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a5b02dfa536fbe965cb21f14",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2675,
+      "timestamp": "2022-07-14T12:33:56.9202636Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00080",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:fs-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在116027.9秒内产生237条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.045，传播分=1.045；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a2a7ed6e283f3087b9f36e0d",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 6839,
+      "timestamp": "2022-07-14T15:19:10.830000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00081",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7081,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\priya.patel\\AppData\\Local\\Postman\\Postman.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在93781.6秒内产生57条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.708，传播分=0.708；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e53bf2773a5806532fdb7050",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 5464,
+      "timestamp": "2022-07-14T15:53:52.3252280Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-07-14-crashoverride-00082",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6170,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在20252.7秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8900448209baa7d323a7619d",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 4850,
+      "timestamp": "2022-07-14T16:28:13.2480005Z"
+    }
+  }
+]

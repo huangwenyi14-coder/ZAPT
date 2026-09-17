@@ -1,0 +1,5 @@
+# Python 3.11 API-port environment. The native Python 3.6 incompatibility and
+# Python 3.9 entry-point probe are retained separately.
+numpy==1.26.4
+torch==2.7.1
+torch-geometric==2.6.1

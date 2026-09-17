@@ -1,0 +1,3 @@
+# Modern CPU/macOS runtime for the ShadeWatcher objective port.
+numpy==1.26.4
+torch==2.7.1

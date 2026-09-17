@@ -1,0 +1,1 @@
+样本从 https://cdn-lab.example.test/drop/alpha.bin 下载文件到 C:\ProgramData\Lab\alpha.bin，并从 https://cdn-lab.example.test/drop/beta.bin 下载文件到 %LOCALAPPDATA%\Lab\beta.bin；域名解析地址为 203.0.113.80。随后创建计划任务 UpdaterTelemetry，每 20 分钟运行 C:\ProgramData\Lab\alpha.bin；另创建计划任务 UserCacheRefresh，每 30 分钟运行 %LOCALAPPDATA%\Lab\beta.bin。报告没有描述命令解释器、凭据访问或横向移动。

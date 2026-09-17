@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "methods": [
+    {
+      "id": "threatrace",
+      "python_version": "3.6",
+      "source_subdir": "threatrace",
+      "workdir": "scripts",
+      "probe": ["train_darpatc.py", "--help"],
+      "dependency_source": "README.md (version-pinned list, no requirements file)",
+      "native_platform": "Ubuntu, PyTorch 1.9.1, PyG 1.4.3",
+      "compile_excludes": ["graphchi-cpp-master"]
+    },
+    {
+      "id": "magic",
+      "python_version": "3.8",
+      "source_subdir": "magic",
+      "workdir": ".",
+      "probe": ["train.py", "--help"],
+      "requirements": "requirements.txt",
+      "dependency_source": "requirements.txt",
+      "native_platform": "CUDA 11.6, PyTorch 1.12.1, DGL 1.0.0",
+      "compile_excludes": []
+    },
+    {
+      "id": "shadewatcher",
+      "python_version": "3.6",
+      "source_subdir": "shadewatcher",
+      "workdir": "recommend",
+      "probe": ["driver.py", "--help"],
+      "dependency_source": "docs/recommendation_setup.md (version-pinned list, no requirements file)",
+      "native_platform": "Ubuntu 16.04, Python 3.6.5, tensorflow_gpu 1.14",
+      "compile_excludes": []
+    },
+    {
+      "id": "nodlink",
+      "python_version": "3.9",
+      "source_subdir": "nodlink",
+      "workdir": "src/ETW",
+      "probe": ["train.py", "--help"],
+      "dependency_source": "src/README.md (unversioned package list)",
+      "native_platform": "Linux/Windows audit data; model contains CUDA-only tensor allocation",
+      "compile_excludes": []
+    },
+    {
+      "id": "kairos",
+      "python_version": "3.9",
+      "source_subdir": "kairos",
+      "workdir": "DARPA/CADETS_E3",
+      "probe": ["train.py"],
+      "requirements": "DARPA/settings/requirements.txt",
+      "dependency_source": "DARPA/settings/requirements.txt",
+      "native_platform": "CUDA 11.7, PyTorch 1.13.1, PyG 2.0.0, PostgreSQL",
+      "compile_excludes": []
+    },
+    {
+      "id": "pidsmaker",
+      "python_version": "3.9",
+      "source_subdir": "pidsmaker",
+      "workdir": ".",
+      "probe": ["pidsmaker/main.py", "--help"],
+      "dependency_source": "Dockerfile (no Python requirements file)",
+      "native_platform": "Linux amd64 Docker, CUDA 11.7, PostgreSQL",
+      "compile_excludes": []
+    },
+    {
+      "id": "orthrus",
+      "python_version": "3.9",
+      "source_subdir": "orthrus",
+      "workdir": ".",
+      "probe": ["src/orthrus.py", "--help"],
+      "dependency_source": "Dockerfile (no Python requirements file)",
+      "native_platform": "Linux amd64 Docker, CUDA 11.7, PostgreSQL",
+      "compile_excludes": []
+    },
+    {
+      "id": "provfusion",
+      "python_version": "3.9",
+      "source_subdir": "provfusion",
+      "workdir": "Open_Source_ProvFusion",
+      "probe": ["ProvFusion.py", "--help"],
+      "dependency_source": "No dependency manifest in current public tree",
+      "native_platform": "Unspecified; current code imports PyTorch and DGL",
+      "compile_excludes": []
+    }
+  ]
+}

@@ -1,0 +1,1513 @@
+[
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00001",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.8043,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "1.0.0.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在78937.5秒内产生419条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.804，传播分=0.804；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8525cd3169993ad24be5305b",
+      "relative_path": "ZEEK-ZEEK-SENSOR-01/dns.json",
+      "record_index": 0,
+      "timestamp": "2021-11-22T20:00:30.583599Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00002",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7763,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "1.0.0.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在77123.6秒内产生43条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d5800f0a38787b764860f328",
+      "relative_path": "WS-OFFICE-07.example.local/windows_event_sysmon.xml",
+      "record_index": 0,
+      "timestamp": "2021-11-22T20:00:30.8979832Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00003",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fa26f8851255ecf74a2edef1",
+      "relative_path": "WS-OFFICE-06.example.local/windows_event_security.xml",
+      "record_index": 137,
+      "timestamp": "2021-11-22T22:02:54.3370007Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00004",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-540c9190f7ad8876c2e2bc58",
+      "relative_path": "WS-OFFICE-06.example.local/ecar.json",
+      "record_index": 252,
+      "timestamp": "2021-11-22T22:02:54.443000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00005",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a9a4b157e98cef032b3aa64f",
+      "relative_path": "WS-OFFICE-06.example.local/windows_event_sysmon.xml",
+      "record_index": 106,
+      "timestamp": "2021-11-22T22:02:54.4873634Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00006",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7513,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在74041.3秒内产生4条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.751，传播分=0.751；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-73cb237c7ef7c037609288b4",
+      "relative_path": "WS-OFFICE-02.example.local/windows_event_sysmon.xml",
+      "record_index": 195,
+      "timestamp": "2021-11-22T23:38:40.0295017Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00007",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5268,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在62297.1秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.527，传播分=0.527；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-75942cbd3e90f7a9a3911e4f",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 264,
+      "timestamp": "2021-11-22T23:57:09.0450001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00008",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6168,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在17164.2秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-37327271d2424d15afeb6f75",
+      "relative_path": "WS-OFFICE-07.example.local/ecar.json",
+      "record_index": 763,
+      "timestamp": "2021-11-23T01:47:44.620000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00009",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6769,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在76384.9秒内产生169条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.449，传播分=0.677；边关系惊异度=0.720, 主机内行为稀有度=0.209。"
+    },
+    "location": {
+      "physical_record_id": "pr-d126b259c700f74d94c78134",
+      "relative_path": "WS-OFFICE-07.example.local/ecar.json",
+      "record_index": 875,
+      "timestamp": "2021-11-23T02:53:22.562000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00010",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8854,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24030.9-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在65531.2秒内产生12条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.868，传播分=0.868；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e7e96003859a36e0350dd010",
+      "relative_path": "WS-OFFICE-07.example.local/ecar.json",
+      "record_index": 876,
+      "timestamp": "2021-11-23T02:53:23.188000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00011",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8804,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在75533.0秒内产生15条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.860，传播分=0.860；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ab32f5d7817c286b5d18db65",
+      "relative_path": "WS-OFFICE-04.example.local/ecar.json",
+      "record_index": 961,
+      "timestamp": "2021-11-23T04:17:12.653000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00012",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8583,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARABoAGMAcAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3b2e0c83c7d24be7b6a03cd3",
+      "relative_path": "WS-OFFICE-02.example.local/windows_event_security.xml",
+      "record_index": 639,
+      "timestamp": "2021-11-23T05:02:57.1940001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00013",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8583,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARABoAGMAcAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-333f42668798fa16928d9054",
+      "relative_path": "WS-OFFICE-02.example.local/ecar.json",
+      "record_index": 1064,
+      "timestamp": "2021-11-23T05:02:57.197000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00014",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8583,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARABoAGMAcAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-bd9ba920070f1462846ceca1",
+      "relative_path": "WS-OFFICE-02.example.local/windows_event_sysmon.xml",
+      "record_index": 450,
+      "timestamp": "2021-11-23T05:02:57.8373336Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00015",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7498,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在70573.8秒内产生4条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.750，传播分=0.750；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-822caf621fa69da0ef6835be",
+      "relative_path": "WS-OFFICE-03.example.local/windows_event_sysmon.xml",
+      "record_index": 443,
+      "timestamp": "2021-11-23T05:31:21.9477876Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00016",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8804,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在64846.1秒内产生13条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.860，传播分=0.860；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-83e447c1a4387d7266b77a81",
+      "relative_path": "WS-OFFICE-02.example.local/ecar.json",
+      "record_index": 1147,
+      "timestamp": "2021-11-23T05:45:42.544000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00017",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7874,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在77260.3秒内产生6条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.787，传播分=0.787；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7a68e34a600ce8298e51b481",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_sysmon.xml",
+      "record_index": 549,
+      "timestamp": "2021-11-23T05:59:31.2074435Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00018",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5628,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.7秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.527，传播分=0.563；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-133101f9fc4476f222259ff2",
+      "relative_path": "WS-OFFICE-03.example.local/ecar.json",
+      "record_index": 1206,
+      "timestamp": "2021-11-23T06:23:47.207000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00019",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6793,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在36369.7秒内产生2条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.655，传播分=0.655；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-a242a86a9e092036ff516e8a",
+      "relative_path": "WS-OFFICE-07.example.local/windows_event_sysmon.xml",
+      "record_index": 538,
+      "timestamp": "2021-11-23T07:08:38.8711512Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00020",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7874,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在72781.0秒内产生4条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.787，传播分=0.787；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-615e8e140f761fcff5d926c8",
+      "relative_path": "WS-OFFICE-06.example.local/windows_event_sysmon.xml",
+      "record_index": 525,
+      "timestamp": "2021-11-23T07:16:19.0866717Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00021",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7342,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "23.20.10.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在67525.4秒内产生61条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.734，传播分=0.734；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a047697e1211d715b070180f",
+      "relative_path": "WS-OFFICE-06.example.local/windows_event_sysmon.xml",
+      "record_index": 598,
+      "timestamp": "2021-11-23T08:37:26.6202001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00022",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-15bfb787ec91a688fc9bb64e",
+      "relative_path": "WS-OFFICE-06.example.local/ecar.json",
+      "record_index": 1496,
+      "timestamp": "2021-11-23T08:47:03.041000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00023",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ec971f96ed6b7fa05bb52039",
+      "relative_path": "WS-OFFICE-06.example.local/windows_event_security.xml",
+      "record_index": 797,
+      "timestamp": "2021-11-23T08:47:03.0660006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00024",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-918612a9a559b32be65a3895",
+      "relative_path": "WS-OFFICE-06.example.local/windows_event_sysmon.xml",
+      "record_index": 608,
+      "timestamp": "2021-11-23T08:47:03.2183756Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00025",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7347,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "24.20.10.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在61604.1秒内产生58条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-58f2e4d3ce7f54745f42b03d",
+      "relative_path": "WS-OFFICE-02.example.local/windows_event_sysmon.xml",
+      "record_index": 743,
+      "timestamp": "2021-11-23T09:17:04.6649688Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00026",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6275,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\liam.chen\\AppData\\Local\\Postman\\Postman.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在31124.1秒内产生103条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.562，传播分=0.593；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-320dff93eaaca36262eac500",
+      "relative_path": "WS-OFFICE-04.example.local/ecar.json",
+      "record_index": 1964,
+      "timestamp": "2021-11-23T09:37:09.496000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00027",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8257,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:ws-office-05（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在29988.9秒内产生62条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.775，传播分=0.775；边关系惊异度=0.580, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-f49f002d321388bd9258008e",
+      "relative_path": "WS-OFFICE-03.example.local/windows_event_security.xml",
+      "record_index": 1134,
+      "timestamp": "2021-11-23T09:45:52.7550072Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00028",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8745,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:ws-office-07（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在29830.2秒内产生86条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.851，传播分=0.851；边关系惊异度=0.580, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-ad53def6bda4d47aaf1b3614",
+      "relative_path": "WS-OFFICE-05.example.local/ecar.json",
+      "record_index": 1694,
+      "timestamp": "2021-11-23T09:46:49.744000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00029",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7327,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "26.20.10.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在47543.6秒内产生52条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.733，传播分=0.733；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6859d3ccc54c0d11f9158b55",
+      "relative_path": "WS-OFFICE-05.example.local/windows_event_sysmon.xml",
+      "record_index": 741,
+      "timestamp": "2021-11-23T10:15:43.3731331Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00030",
+    "alert": "检测到文档阅读器启动脚本解释器",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "文档阅读器启动脚本解释器",
+          "description": "检测文档阅读器或 Office 类进程启动脚本解释器的可疑父子关系。",
+          "match_reason": "winword.exe -> rundll32.exe"
+        },
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Users\\priya.patel\\AppData\\Local\\Temp\\syswow64.dll,InterMHoueTos"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.024，传播分=1.024；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cbff0400bde0d82b78bf39bd",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 2066,
+      "timestamp": "2021-11-23T10:19:02.898000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00031",
+    "alert": "检测到文档阅读器启动脚本解释器",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "文档阅读器启动脚本解释器",
+          "description": "检测文档阅读器或 Office 类进程启动脚本解释器的可疑父子关系。",
+          "match_reason": "winword.exe -> rundll32.exe"
+        },
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Users\\priya.patel\\AppData\\Local\\Temp\\syswow64.dll,InterMHoueTos"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.024，传播分=1.024；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ae5725e6820804f87cf2db23",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_sysmon.xml",
+      "record_index": 862,
+      "timestamp": "2021-11-23T10:19:03.4217914Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00032",
+    "alert": "检测到文档阅读器启动脚本解释器",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "文档阅读器启动脚本解释器",
+          "description": "检测文档阅读器或 Office 类进程启动脚本解释器的可疑父子关系。",
+          "match_reason": "winword.exe -> rundll32.exe"
+        },
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Users\\priya.patel\\AppData\\Local\\Temp\\syswow64.dll,InterMHoueTos"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.024，传播分=1.024；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-797c5a9e5e9a835c592e467e",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 1173,
+      "timestamp": "2021-11-23T10:19:03.5114665Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00033",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6951,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\maya.singh\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在72947.3秒内产生193条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.695，传播分=0.695；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-49dfbf47061befd87ecdb02d",
+      "relative_path": "WS-OFFICE-03.example.local/windows_event_sysmon.xml",
+      "record_index": 871,
+      "timestamp": "2021-11-23T10:19:06.0518793Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00034",
+    "alert": "检测到计划任务创建/修改",
+    "confidence_score": 0.9558,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "计划任务创建/修改",
+          "description": "检测计划任务的创建、修改或可疑任务执行配置。",
+          "match_reason": "type=scheduled_task value=\\onedriveupdater <?xml version=\"1.0\" encoding=\"utf-16\"?> <task version=\"1.4\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"> <registrationinfo> <date>2021-11-23t10:22:47z</date> <author>example\\priya.patel</author> <uri>\\oned"
+        }
+      ],
+      "graph_reason": "同一主机、同一fallback身份在0.0秒内产生1条直接观测；覆盖1类关系（scheduled_task）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.956，传播分=0.956；边关系惊异度=0.860, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4affe74c6a46655a915631e3",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 1194,
+      "timestamp": "2021-11-23T10:22:47.7378242Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00035",
+    "alert": "检测到Rundll32 异常载荷",
+    "confidence_score": 0.8648,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Users\\priya.patel\\AppData\\Local\\Temp\\gtue.dll,KetoHoueRog"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-95b79c644b2e0c1fa88a402c",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 2096,
+      "timestamp": "2021-11-23T10:23:54.133000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00036",
+    "alert": "检测到Rundll32 异常载荷",
+    "confidence_score": 0.8648,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Users\\priya.patel\\AppData\\Local\\Temp\\gtue.dll,KetoHoueRog"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e3cc65f8b99bbee00818b8d0",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 1201,
+      "timestamp": "2021-11-23T10:23:54.2334850Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00037",
+    "alert": "检测到Rundll32 异常载荷",
+    "confidence_score": 0.8648,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "Rundll32 异常载荷",
+          "description": "检测 rundll32.exe 加载异常 DLL、导出函数或载荷的行为。",
+          "match_reason": "C:\\Windows\\System32\\rundll32.exe C:\\Users\\priya.patel\\AppData\\Local\\Temp\\gtue.dll,KetoHoueRog"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c18dd0d20f87827020fc3713",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_sysmon.xml",
+      "record_index": 875,
+      "timestamp": "2021-11-23T10:23:54.5047914Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00038",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8745,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:ws-office-04（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在27862.8秒内产生64条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.851，传播分=0.851；边关系惊异度=0.580, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-dff845eeb86f3e03b4865835",
+      "relative_path": "WS-OFFICE-07.example.local/ecar.json",
+      "record_index": 2565,
+      "timestamp": "2021-11-23T10:25:01.163000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00039",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 208.80.154.224:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在197.1秒内产生3条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.007，传播分=1.007；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ba69af76380aaec79606aa7f",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 1224,
+      "timestamp": "2021-11-23T10:26:51.4692772Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00040",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 208.80.154.224:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在197.7秒内产生3条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.054，传播分=1.054；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-daea97f8262309273114303b",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 2132,
+      "timestamp": "2021-11-23T10:26:51.650000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00041",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 208.80.154.224:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在197.0秒内产生3条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.007，传播分=1.007；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-91e39968c5299ad488aace22",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_sysmon.xml",
+      "record_index": 894,
+      "timestamp": "2021-11-23T10:26:51.7655641Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00042",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7342,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "26.20.10.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在71310.9秒内产生52条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.734，传播分=0.734；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-38c33bfa3af0b950191dfbf1",
+      "relative_path": "WS-OFFICE-03.example.local/windows_event_sysmon.xml",
+      "record_index": 892,
+      "timestamp": "2021-11-23T10:30:01.0522184Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00043",
+    "alert": "检测到计划任务创建/修改",
+    "confidence_score": 0.9558,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "计划任务创建/修改",
+          "description": "检测计划任务的创建、修改或可疑任务执行配置。",
+          "match_reason": "type=scheduled_task value=\\googletaskupdatemachine <?xml version=\"1.0\" encoding=\"utf-16\"?> <task version=\"1.4\" xmlns=\"http://schemas.microsoft.com/windows/2004/02/mit/task\"> <registrationinfo> <date>2021-11-23t10:31:47z</date> <author>example\\priya.patel</author> <u"
+        }
+      ],
+      "graph_reason": "同一主机、同一fallback身份在0.0秒内产生1条直接观测；覆盖1类关系（scheduled_task）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.956，传播分=0.956；边关系惊异度=0.860, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1e18382c6be7e06940ec98cd",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 1269,
+      "timestamp": "2021-11-23T10:31:47.5032764Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00044",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.9135,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在64011.4秒内产生16条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.912，传播分=0.912；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d192d2053d77bdcc68c0c6fb",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 2191,
+      "timestamp": "2021-11-23T10:33:04.486000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00045",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8982,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 167.71.156.89:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在56.6秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.888，传播分=0.888；边关系惊异度=0.580, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-2caecbd810fec84b2f9a581d",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 1316,
+      "timestamp": "2021-11-23T10:35:38.5865380Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00046",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8982,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 167.71.156.89:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在56.2秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.888，传播分=0.888；边关系惊异度=0.580, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-c2644a6b4cf32cad9030f65e",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_sysmon.xml",
+      "record_index": 953,
+      "timestamp": "2021-11-23T10:35:38.7267046Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00047",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.9192,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 167.71.156.89:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在56.6秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.919，传播分=0.919；边关系惊异度=0.580, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-0ced2cc0247e6152511b15cc",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 2245,
+      "timestamp": "2021-11-23T10:35:39.015000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00048",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.8224,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\priya.patel\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在50705.8秒内产生123条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.702，传播分=0.822；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-bab0019b28bb467b6a518813",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 2332,
+      "timestamp": "2021-11-23T10:39:22.152000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00049",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6924,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aaron.wu\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在65747.7秒内产生200条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.691，传播分=0.691；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b95e1c5afd639dfa591db794",
+      "relative_path": "WS-OFFICE-02.example.local/ecar.json",
+      "record_index": 2574,
+      "timestamp": "2021-11-23T10:41:49.718000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00050",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 167.71.156.89:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在254.4秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.007，传播分=1.007；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8dda65e240961e5c521cfa7c",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_security.xml",
+      "record_index": 1515,
+      "timestamp": "2021-11-23T10:47:36.3209175Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00051",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 167.71.156.89:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在252.9秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.054，传播分=1.054；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3c1386355df18958cde58b5d",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 2482,
+      "timestamp": "2021-11-23T10:47:36.522000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00052",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "rundll32.exe -> 167.71.156.89:443"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在254.5秒内产生2条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.007，传播分=1.007；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a07f5890139a2085456c76fb",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1049,
+      "timestamp": "2021-11-23T10:47:36.6932455Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00053",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAbwB1AHQAbABvAG8AawA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1d141851fe258027ab056f83",
+      "relative_path": "WS-OFFICE-05.example.local/ecar.json",
+      "record_index": 2433,
+      "timestamp": "2021-11-23T11:28:10.230000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00054",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAbwB1AHQAbABvAG8AawA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8331d78bba28bfbc55b0354f",
+      "relative_path": "WS-OFFICE-05.example.local/windows_event_security.xml",
+      "record_index": 1650,
+      "timestamp": "2021-11-23T11:28:10.6370009Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00055",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8577,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAbwB1AHQAbABvAG8AawA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-23e843e376e1a8a88d46408a",
+      "relative_path": "WS-OFFICE-05.example.local/windows_event_sysmon.xml",
+      "record_index": 943,
+      "timestamp": "2021-11-23T11:28:10.9812114Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00056",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8654,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:ws-office-06（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在31553.2秒内产生94条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.837，传播分=0.837；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f0f3e424113206b21af381da",
+      "relative_path": "WKS-OFFICE-01.example.local/ecar.json",
+      "record_index": 3773,
+      "timestamp": "2021-11-23T14:34:35.472000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00057",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7347,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "22.20.10.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在60349.9秒内产生37条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f003cdab0b94575f659ab95c",
+      "relative_path": "WS-OFFICE-04.example.local/windows_event_sysmon.xml",
+      "record_index": 1497,
+      "timestamp": "2021-11-23T14:55:21.0239697Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00058",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7489,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在65499.1秒内产生6条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.749，传播分=0.749；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-53d3dddf24ef383f5ca95f2a",
+      "relative_path": "WS-OFFICE-04.example.local/windows_event_sysmon.xml",
+      "record_index": 1692,
+      "timestamp": "2021-11-23T15:35:36.7846012Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00059",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8657,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:ws-office-02（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在30525.9秒内产生83条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.837，传播分=0.837；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cdbaf41a128d5c33cebec094",
+      "relative_path": "WS-OFFICE-04.example.local/ecar.json",
+      "record_index": 4520,
+      "timestamp": "2021-11-23T16:06:52.997000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00060",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7513,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在64158.0秒内产生3条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.751，传播分=0.751；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-edd5301cc7bf996ca29d7d8a",
+      "relative_path": "WS-OFFICE-05.example.local/windows_event_sysmon.xml",
+      "record_index": 2111,
+      "timestamp": "2021-11-23T16:24:22.0239298Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00061",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8649,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:ws-office-05（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在30645.9秒内产生96条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-271d8b130a2df236c41366f0",
+      "relative_path": "WS-OFFICE-06.example.local/ecar.json",
+      "record_index": 5815,
+      "timestamp": "2021-11-23T16:38:10.516000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00062",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8745,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=process name=mstsc.exe zone=system {\"event_id\": 5, \"provider\": \"microsoft-windows-sysmon\", \"eventrecordid\": \"97532\", \"channel\": \"microsoft-windows-sysmon/operational\", \"processguid\": \"{c72e9abb-c7b2-619b-3802-00100c252ee2}\", \"processid\": \"6212\", \"image\":"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在75369.8秒内产生79条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.851，传播分=0.851；边关系惊异度=0.580, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-1e8646102efb7776235eb8d5",
+      "relative_path": "WS-OFFICE-02.example.local/ecar.json",
+      "record_index": 5491,
+      "timestamp": "2021-11-23T16:38:29.542000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00063",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8854,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24030.9-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在65840.8秒内产生8条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.868，传播分=0.868；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9e851b3a44098f858b91aac2",
+      "relative_path": "WS-OFFICE-03.example.local/ecar.json",
+      "record_index": 4811,
+      "timestamp": "2021-11-23T16:49:53.151000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00064",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6769,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\emma.zhao\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在43542.2秒内产生119条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.449，传播分=0.677；边关系惊异度=0.720, 主机内行为稀有度=0.209。"
+    },
+    "location": {
+      "physical_record_id": "pr-4cbac5b4108b3086dd7251b5",
+      "relative_path": "WS-OFFICE-05.example.local/ecar.json",
+      "record_index": 5427,
+      "timestamp": "2021-11-23T17:00:51.524000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00065",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8854,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24030.9-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在70302.9秒内产生14条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.868，传播分=0.868；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4d3315306134a9758cca8f02",
+      "relative_path": "WS-OFFICE-05.example.local/ecar.json",
+      "record_index": 5428,
+      "timestamp": "2021-11-23T17:00:51.864000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00066",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8854,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在74018.3秒内产生12条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.868，传播分=0.868；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-87eaba26ece32ec8901ce68d",
+      "relative_path": "WS-OFFICE-06.example.local/ecar.json",
+      "record_index": 6271,
+      "timestamp": "2021-11-23T17:34:45.331000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00067",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6769,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\noah.kim\\AppData\\Local\\Temp\\msi_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在51425.3秒内产生135条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.459，传播分=0.677；边关系惊异度=0.720, 主机内行为稀有度=0.236。"
+    },
+    "location": {
+      "physical_record_id": "pr-783a555beae4e4557a3d80c6",
+      "relative_path": "WS-OFFICE-06.example.local/ecar.json",
+      "record_index": 6298,
+      "timestamp": "2021-11-23T17:38:24.131000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2021-11-23-donot-apt-q-38-00068",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7347,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "23.20.10.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在69987.6秒内产生56条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.735，传播分=0.735；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f3d84492b6ecc6d4ef4c398e",
+      "relative_path": "WKS-OFFICE-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2457,
+      "timestamp": "2021-11-23T17:42:33.3259324Z"
+    }
+  }
+]

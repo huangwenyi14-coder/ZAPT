@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "checked_at": "2026-07-21",
+  "tools": [
+    {
+      "id": "spade",
+      "url": "https://github.com/ashish-gehani/SPADE.git",
+      "ref": "3859bbde8db6c0b985dde11dfb32fd43938d3a10",
+      "license": "GPL-3.0"
+    }
+  ]
+}

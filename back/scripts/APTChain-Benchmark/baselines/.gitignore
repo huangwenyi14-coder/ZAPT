@@ -1,0 +1,11 @@
+# Published implementations are fetched at pinned commits and are not vendored.
+third_party/
+
+# Method-specific virtual environments, converted inputs, and raw model outputs.
+envs/
+work/
+results/raw/
+
+# Large external artifacts (for example, the 24 GB TAPAS Zenodo archive).
+artifacts/
+

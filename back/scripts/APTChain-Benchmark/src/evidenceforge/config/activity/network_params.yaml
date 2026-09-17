@@ -1,0 +1,200 @@
+# network_params.yaml — Network parameters for realistic DHCP and MAC address generation.
+#
+# Purpose: Defines OUI prefixes and public NTP server defaults for realistic
+#          DHCP, MAC address, and time synchronization evidence.
+#
+# Depended on by: generation engine (MAC address generation)
+# Depends on: nothing — standalone
+#
+# Full schema: see commands/eforge/references/config-network-params.md
+
+oui_prefixes:
+  - prefix: "D4:BE:D9"
+    vendor: "Dell"
+    weight: 25
+  - prefix: "3C:97:0E"
+    vendor: "HP/HPE"
+    weight: 20
+  - prefix: "F0:1F:AF"
+    vendor: "Dell"
+    weight: 15
+  - prefix: "A4:1F:72"
+    vendor: "Lenovo"
+    weight: 15
+  - prefix: "00:25:B5"
+    vendor: "Intel"
+    weight: 10
+  - prefix: "00:50:56"
+    vendor: "VMware"
+    weight: 10
+  - prefix: "8C:DC:D4"
+    vendor: "Intel"
+    weight: 5
+
+public_ntp_servers:
+  - name: "time-a-g.nist.gov"
+    ip: "129.6.15.28"
+    operator: "NIST"
+    stratum: 1
+    ref_id: ".NIST."
+    weight: 20
+  - name: "time-b-g.nist.gov"
+    ip: "129.6.15.29"
+    operator: "NIST"
+    stratum: 1
+    ref_id: ".NIST."
+    weight: 15
+  - name: "time.cloudflare.com"
+    ip: "162.159.200.1"
+    operator: "Cloudflare"
+    stratum: 2
+    ref_id: ".GPS."
+    weight: 20
+  - name: "time.google.com"
+    ip: "216.239.35.0"
+    operator: "Google"
+    stratum: 2
+    ref_id: ".GOOG."
+    weight: 15
+  - name: "time.apple.com"
+    ip: "17.253.34.125"
+    operator: "Apple"
+    stratum: 2
+    ref_id: ".PPS."
+    weight: 10
+  - name: "ntp.ubuntu.com"
+    ip: "91.189.89.198"
+    operator: "Canonical"
+    stratum: 2
+    ref_id: ".GPS."
+    weight: 10
+  - name: "pool.ntp.org"
+    ip: "23.186.168.130"
+    operator: "NTP Pool"
+    stratum: 2
+    ref_id: ".PPS."
+    weight: 10
+
+dns_tunnel_rtt:
+  min_seconds: 0.04
+  max_seconds: 0.35
+
+dns_tunnel_response_templates:
+  - "{token}"
+  - "{token}.{seq_hex}"
+  - "{seq_hex}.{token}"
+  - "{edge}{seq_hex}{token}"
+  - "{token}-{edge}{seq_hex}"
+  - "_{edge}{token}"
+  - "{seq_hex}-{token}"
+  - "x{edge}{token}"
+  - "r{seq_hex}{token}"
+  - "m{edge}{token}"
+
+dns_tunnel_ttl_choices:
+  - value: 0
+    weight: 4
+  - value: 1
+    weight: 11
+  - value: 2
+    weight: 17
+  - value: 3
+    weight: 7
+  - value: 5
+    weight: 22
+  - value: 7
+    weight: 5
+  - value: 10
+    weight: 14
+  - value: 15
+    weight: 8
+  - value: 20
+    weight: 3
+  - value: 30
+    weight: 5
+  - value: 45
+    weight: 2
+  - value: 60
+    weight: 2
+
+dns_tunnel_rcode_weights:
+  NOERROR: 92
+  NXDOMAIN: 5
+  SERVFAIL: 2
+  REFUSED: 1
+
+external_scanner_port_profiles:
+  - name: "web_recon"
+    weight: 32
+    ports:
+      - {port: 80, weight: 34}
+      - {port: 443, weight: 38}
+      - {port: 8080, weight: 16}
+      - {port: 8443, weight: 7}
+      - {port: 22, weight: 5}
+  - name: "windows_exposure"
+    weight: 24
+    ports:
+      - {port: 445, weight: 36}
+      - {port: 3389, weight: 28}
+      - {port: 135, weight: 14}
+      - {port: 139, weight: 10}
+      - {port: 5985, weight: 7}
+      - {port: 80, weight: 5}
+  - name: "iot_telnet"
+    weight: 15
+    ports:
+      - {port: 23, weight: 48}
+      - {port: 2323, weight: 18}
+      - {port: 22, weight: 16}
+      - {port: 80, weight: 10}
+      - {port: 8080, weight: 8}
+  - name: "mail_relay_probe"
+    weight: 10
+    ports:
+      - {port: 25, weight: 44}
+      - {port: 587, weight: 24}
+      - {port: 465, weight: 16}
+      - {port: 110, weight: 8}
+      - {port: 143, weight: 8}
+  - name: "database_probe"
+    weight: 9
+    ports:
+      - {port: 1433, weight: 32}
+      - {port: 3306, weight: 24}
+      - {port: 5432, weight: 22}
+      - {port: 6379, weight: 12}
+      - {port: 9200, weight: 10}
+  - name: "broad_low_rate"
+    weight: 10
+    ports:
+      - {port: 22, weight: 12}
+      - {port: 23, weight: 10}
+      - {port: 80, weight: 18}
+      - {port: 443, weight: 18}
+      - {port: 445, weight: 12}
+      - {port: 3389, weight: 12}
+      - {port: 8080, weight: 10}
+      - {port: 8443, weight: 8}
+
+proxy_connect_status_messages:
+  200:
+    - "Connection Established"
+  403:
+    - "Forbidden"
+    - "Access Denied"
+  407:
+    - "Proxy Authentication Required"
+    - "Authentication Required"
+  502:
+    - "Bad Gateway"
+    - "Upstream Connection Failed"
+    - "Connection Failed"
+  503:
+    - "Service Unavailable"
+    - "No Healthy Upstream"
+    - "Connection Limit Exceeded"
+  504:
+    - "Gateway Timeout"
+    - "Upstream Timeout"
+    - "Connection Timed Out"

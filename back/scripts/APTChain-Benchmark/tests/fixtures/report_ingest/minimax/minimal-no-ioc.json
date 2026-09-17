@@ -1,0 +1,116 @@
+{
+  "fact_extraction": {
+    "source_metadata": {
+      "report_name": "无 IOC 的简短行为报告",
+      "description": "员工打开附件程序，程序创建并删除一个临时文件。"
+    },
+    "metadata_provenance": {
+      "origin": "source",
+      "source_span_ids": ["span-0001-545fc06734d5"]
+    },
+    "facts": [
+      {
+        "fact_id": "fact-001",
+        "behavior": "malware_execution",
+        "order": 1,
+        "description": "员工打开邮件附件中的程序。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-545fc06734d5"]
+        }
+      },
+      {
+        "fact_id": "fact-002",
+        "behavior": "file_create",
+        "order": 2,
+        "description": "程序创建临时文件 C:\\Users\\Public\\resume.tmp。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-545fc06734d5"]
+        }
+      },
+      {
+        "fact_id": "fact-003",
+        "behavior": "self_deletion",
+        "order": 3,
+        "description": "程序随后删除 C:\\Users\\Public\\resume.tmp。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-545fc06734d5"]
+        }
+      }
+    ],
+    "entities": [
+      {
+        "entity_id": "entity-001",
+        "entity_type": "file",
+        "value": "C:\\Users\\Public\\resume.tmp",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-545fc06734d5"]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "relation-001",
+        "source_id": "fact-002",
+        "predicate": "creates",
+        "target_id": "entity-001",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-545fc06734d5"]
+        }
+      },
+      {
+        "relation_id": "relation-002",
+        "source_id": "fact-003",
+        "predicate": "deletes",
+        "target_id": "entity-001",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-545fc06734d5"]
+        }
+      }
+    ],
+    "report_iocs": []
+  },
+  "fact_audit": {
+    "summary": "三个来源行为及文件绑定完整，无外部 IOC。",
+    "ledger_complete": true
+  },
+  "simulation_completion": {
+    "completions": [
+      {
+        "request_id": "complete-fact-0001-process-image",
+        "target_id": "fact-0001",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\attachment-program.exe",
+        "origin": "ai_completed",
+        "reason": "为来源明确但未命名的附件程序提供隔离实验进程主体。",
+        "compatible": true,
+        "compatibility_explanation": "仅补全内部进程镜像，不新增行为、命令或外部 IOC。"
+      },
+      {
+        "request_id": "complete-fact-0002-process-image",
+        "target_id": "fact-0002",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\attachment-program.exe",
+        "origin": "ai_completed",
+        "reason": "为来源明确的文件创建行为提供隔离实验进程主体。",
+        "compatible": true,
+        "compatibility_explanation": "只建立文件所有权，不改变来源文件路径。"
+      },
+      {
+        "request_id": "complete-fact-0003-process-image",
+        "target_id": "fact-0003",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\attachment-program.exe",
+        "origin": "ai_completed",
+        "reason": "为来源明确的文件删除行为提供隔离实验进程主体。",
+        "compatible": true,
+        "compatibility_explanation": "只建立删除行为所有权，不新增攻击阶段。"
+      }
+    ]
+  }
+}

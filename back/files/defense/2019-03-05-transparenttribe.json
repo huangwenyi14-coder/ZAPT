@@ -1,0 +1,1432 @@
+[
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00001",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBoAHIAbwBtAGUA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0dd19623c9cc0c13838a7510",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 16,
+      "timestamp": "2019-03-04T18:09:01.0230769Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00002",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBoAHIAbwBtAGUA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-35e61fbfb1a4c663488eda97",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 24,
+      "timestamp": "2019-03-04T18:09:01.5330003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00003",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBoAHIAbwBtAGUA"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c18492ee4980019b93b977c1",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 34,
+      "timestamp": "2019-03-04T18:09:01.929000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00004",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6074,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在105510.0秒内产生27条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.543，传播分=0.543；边关系惊异度=0.760, 主机内行为稀有度=0.378。"
+    },
+    "location": {
+      "physical_record_id": "pr-aee61cf6a27f01c52ca8a5e5",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 27,
+      "timestamp": "2019-03-04T18:11:23.3424862Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00005",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7241,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在109338.0秒内产生122条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.616，传播分=0.616；边关系惊异度=0.690, 主机内行为稀有度=0.154。"
+    },
+    "location": {
+      "physical_record_id": "pr-be5cd6e81c1ef24c3e30413f",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 207,
+      "timestamp": "2019-03-04T18:15:40.778000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00006",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8635,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=kernel32.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在2031.7秒内产生4条直接观测；覆盖2类关系（load、terminate）和2类遥测（ecar、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f718727b8675d973b1695eb6",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 484,
+      "timestamp": "2019-03-04T19:03:50.542000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00007",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7317,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在101785.1秒内产生59条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.628，传播分=0.628；边关系惊异度=0.690, 主机内行为稀有度=0.196。"
+    },
+    "location": {
+      "physical_record_id": "pr-91e8ce8af775a96d0f85c89e",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 495,
+      "timestamp": "2019-03-04T19:25:39.231000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00008",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8775,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在108961.1秒内产生46条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4944ac0b175e39111171e939",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 388,
+      "timestamp": "2019-03-04T19:31:37.548000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00009",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8065,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:mail-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在110002.8秒内产生691条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.745，传播分=0.745；边关系惊异度=0.580, 主机内行为稀有度=0.229。"
+    },
+    "location": {
+      "physical_record_id": "pr-8bd42cb1c02fc511d1880c95",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 498,
+      "timestamp": "2019-03-04T19:52:05.613000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00010",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7385,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在104999.2秒内产生43条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.739，传播分=0.739；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ca2ab5a92faac29ab7c9f412",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 197,
+      "timestamp": "2019-03-04T20:09:39.5217150Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00011",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7666,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在107000.5秒内产生46条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.767，传播分=0.767；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b23533932a6d7264bb577afd",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 381,
+      "timestamp": "2019-03-04T20:33:54.5972231Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00012",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6170,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在41434.7秒内产生9条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ad52eed6eb2a86df9982faff",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 209,
+      "timestamp": "2019-03-04T20:37:05.1750840Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00013",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAAyADUA"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-30929f18c4b95f05ce6fcea6",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 695,
+      "timestamp": "2019-03-04T21:39:00.308000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00014",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAAyADUA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4f9ac82fc15060cc4764f815",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 482,
+      "timestamp": "2019-03-04T21:39:00.3850001Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00015",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBFAHYAZQBuAHQATABvAGcAIAAtAEwAbwBnAE4AYQBtAGUAIABTAHkAcwB0AGUAbQAgAC0ATgBlAHcAZQBzAHQAIAAyADUA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ae9fe6a02df2541746c05049",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 252,
+      "timestamp": "2019-03-04T21:39:00.9511371Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00016",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6356,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\anjali.menon\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在97785.6秒内产生27条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.603，传播分=0.603；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-b74e64e6dc99c2a1096e8929",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 3341,
+      "timestamp": "2019-03-04T21:42:44.1360008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00017",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7865,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在99872.3秒内产生19条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.713，传播分=0.713；边关系惊异度=0.690, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-4fdacbcae1e8c2a1b316965d",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 814,
+      "timestamp": "2019-03-04T22:13:43.919000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00018",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7209,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "hostname"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在107373.2秒内产生12条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-eadffc021f8b65f817de10db",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 20,
+      "timestamp": "2019-03-04T22:43:06Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00019",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8775,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在108174.3秒内产生70条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4ea718d5d7fc8ec120f6f044",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 2455,
+      "timestamp": "2019-03-05T00:35:59.097000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00020",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7209,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cat /etc/hostname"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在86943.7秒内产生13条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5a96a3efbd14ec6295f76823",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 21,
+      "timestamp": "2019-03-05T00:44:42Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00021",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.8070,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "20.8.109.52.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在110356.4秒内产生331条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.807，传播分=0.807；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f7ef3464ec48a86446b44212",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 858,
+      "timestamp": "2019-03-05T02:09:48.124288Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00022",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7762,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "12.30.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在109098.3秒内产生98条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fba7ae7d538b8e3190f747b0",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 648,
+      "timestamp": "2019-03-05T02:09:48.4216441Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00023",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8775,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在107976.0秒内产生23条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4868bdf82c0ee2b456db4fbc",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1880,
+      "timestamp": "2019-03-05T04:28:43.517000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00024",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7385,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在107925.2秒内产生74条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.739，传播分=0.739；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6b1cd680ff453f92c8172b49",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 821,
+      "timestamp": "2019-03-05T05:27:54.8853114Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00025",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARABoAGMAcAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a1dc4e69e9baf7ec95e9510a",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1969,
+      "timestamp": "2019-03-05T06:12:55.313000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00026",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARABoAGMAcAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-304af1b45fb91fd963fb0770",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 823,
+      "timestamp": "2019-03-05T06:12:55.4034303Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00027",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGUAcgB2AGkAYwBlACAALQBOAGEAbQBlACAARABoAGMAcAA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5f6957018b7de9fed036c00b",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1239,
+      "timestamp": "2019-03-05T06:12:55.8530003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00028",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-3b6e51920d1415d5d9e1585e",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1051,
+      "timestamp": "2019-03-05T08:22:34.4703120Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00029",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-a42ea360d20bb8d0f6558261",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 1640,
+      "timestamp": "2019-03-05T08:22:34.5710008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00030",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-c8f4aab12e27429b533526f5",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2545,
+      "timestamp": "2019-03-05T08:22:34.791000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00031",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6943,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "89.67.45.23.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在105286.0秒内产生29条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.679，传播分=0.679；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2880c7671f9a24d969419212",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2184,
+      "timestamp": "2019-03-05T09:10:31.3841107Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00032",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8498,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在92484.5秒内产生25条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.812，传播分=0.812；边关系惊异度=0.690, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-8abf87e920db502195ce9f83",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2713,
+      "timestamp": "2019-03-05T09:55:02.882000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00033",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-19cc22625a1b2e94f2e60617",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 4697,
+      "timestamp": "2019-03-05T10:39:21.254000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00034",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-8f6f02ca06ec9ddec916dfba",
+      "relative_path": "WEB-01.example.local/windows_event_security.xml",
+      "record_index": 2205,
+      "timestamp": "2019-03-05T10:39:21.4500008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00035",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8010,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-144d77a94fe0b8e89b4f62fa",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1648,
+      "timestamp": "2019-03-05T10:39:21.6412686Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00036",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6356,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\anjali.menon\\AppData\\Local\\slack\\Slack.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在62934.5秒内产生27条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.603，传播分=0.603；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-85dec13e1ba16a5a8298a27e",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 2418,
+      "timestamp": "2019-03-05T11:02:22.2041429Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00037",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6727,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.10.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在106214.1秒内产生55条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.645，传播分=0.645；边关系惊异度=0.550, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-253fa74683506663d055d3de",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1740,
+      "timestamp": "2019-03-05T11:27:36.1352334Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00038",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7413,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在77783.8秒内产生6条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.741，传播分=0.741；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-95893d60a6de47b0a12d2158",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1324,
+      "timestamp": "2019-03-05T11:56:14.4225634Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00039",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7677,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在90423.1秒内产生23条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.768，传播分=0.768；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-62131b6d6e49eabf7ec7d4af",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1708,
+      "timestamp": "2019-03-05T12:46:27.5509341Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00040",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7286,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\neha.gupta\\AppData\\Local\\Temp\\dotnet-sdk-installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在86242.5秒内产生39条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.603，传播分=0.729；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-d4fef834456bc52300255582",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1488,
+      "timestamp": "2019-03-05T13:05:50.8233580Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00041",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.9340,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=software\\microsoft\\windows\\currentversion\\run\\(default)"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在73017.8秒内产生11条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.934，传播分=0.934；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-145afae2aa9beb6418e8c69e",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1489,
+      "timestamp": "2019-03-05T13:05:54.6647543Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00042",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.7701,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:wks-fin-014:pid:9180 -> net:216.176.190.98:3386; n=19 mean=665.1s cv=0.289"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.688，传播分=0.688；边关系惊异度=0.580, 主机内行为稀有度=0.229。"
+    },
+    "location": {
+      "physical_record_id": "pr-f34b05c33a1aaf539e27bd45",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 2829,
+      "timestamp": "2019-03-05T14:04:12.8868516Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00043",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.7723,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:wks-fin-014:f1c4b862-eaae-48e4-8319-a5cbb15a7372 -> net:216.176.190.98:3386; n=19 mean=665.1s cv=0.290"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.691，传播分=0.691；边关系惊异度=0.580, 主机内行为稀有度=0.229。"
+    },
+    "location": {
+      "physical_record_id": "pr-0af098f23ba72f3f053fc178",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 4116,
+      "timestamp": "2019-03-05T14:04:13.541000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00044",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6216,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.4秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.622，传播分=0.622；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ea6d0f739c44fd0dde3261e0",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 18141,
+      "timestamp": "2019-03-05T14:50:44.2010003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00045",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUgB1AG4AbgBpAG4AZwAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3011bfc778d11ad9e0c61bbc",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1580,
+      "timestamp": "2019-03-05T15:04:22.5202751Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00046",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUgB1AG4AbgBpAG4AZwAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2a66070dcc9a9adcf4d3d369",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 2667,
+      "timestamp": "2019-03-05T15:04:22.6720006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00047",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUgB1AG4AbgBpAG4AZwAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d5cd4f2319a70f48dafeb138",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 3917,
+      "timestamp": "2019-03-05T15:04:22.892000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00048",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ec3ff79c9a8ce333865ba3d9",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 15766,
+      "timestamp": "2019-03-05T15:11:47.124000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00049",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9aa81c5d5de5849dbd22e600",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3068,
+      "timestamp": "2019-03-05T15:11:47.4291293Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00050",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5aff4bb05ba4311736c08652",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 18406,
+      "timestamp": "2019-03-05T15:11:47.4350009Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00051",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.8817,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "net:10.20.20.14:* -> net:216.176.190.98:80; n=18 mean=419.1s cv=0.100"
+        }
+      ],
+      "graph_reason": "同一主机、同一flow身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（zeek_conn），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.862，传播分=0.862；边关系惊异度=0.580, 主机内行为稀有度=0.236。"
+    },
+    "location": {
+      "physical_record_id": "pr-29594f91a9263eaffd4b9fe1",
+      "relative_path": "SENSOR-NET-01/conn.json",
+      "record_index": 13465,
+      "timestamp": "2019-03-05T15:27:14.187252Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00052",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.8052,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:wks-fin-014:pid:9596 -> net:216.176.190.98:80; n=18 mean=419.1s cv=0.100"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.743，传播分=0.743；边关系惊异度=0.580, 主机内行为稀有度=0.236。"
+    },
+    "location": {
+      "physical_record_id": "pr-ea2f5b4efc1771a80e9b3a02",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3091,
+      "timestamp": "2019-03-05T15:27:14.2042525Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00053",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.8083,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:wks-fin-014:80988300-7cb7-4c5f-b1c1-f3cfe30d3c4a -> net:216.176.190.98:80; n=18 mean=419.1s cv=0.100"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.747，传播分=0.747；边关系惊异度=0.580, 主机内行为稀有度=0.236。"
+    },
+    "location": {
+      "physical_record_id": "pr-74e5c8e581c9978da60d29d5",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 4491,
+      "timestamp": "2019-03-05T15:27:15.640000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00054",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6668,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在104820.2秒内产生32条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.636，传播分=0.636；边关系惊异度=0.550, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-bfb0d4cbf09be5924cc7f4df",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1852,
+      "timestamp": "2019-03-05T15:44:36.9934059Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00055",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 1.0000,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:wks-hr-009（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在14261.2秒内产生10条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=1.045，传播分=1.045；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-46cfe47148c2303f915784ee",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 16275,
+      "timestamp": "2019-03-05T15:44:45.448000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00056",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-93ae170e899eb02c097a2ee8",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 19524,
+      "timestamp": "2019-03-05T16:11:50.3400008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00057",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-145ff1b34538ff66492e7cf3",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 16720,
+      "timestamp": "2019-03-05T16:11:50.370000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00058",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5cc024f8d66c46dbdd3ec4bd",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3231,
+      "timestamp": "2019-03-05T16:11:50.7380551Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00059",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7070,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\vikram.singh\\AppData\\Local\\Temp\\msi_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在101271.9秒内产生47条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.707，传播分=0.707；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c34fd78d7fce69afdc445e6b",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 2930,
+      "timestamp": "2019-03-05T16:13:42.3161256Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00060",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7672,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在108275.1秒内产生18条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.767，传播分=0.767；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8464ccff3892e132a06e88f1",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2009,
+      "timestamp": "2019-03-05T17:29:01.6799949Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00061",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7580,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在102254.2秒内产生79条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.758，传播分=0.758；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c3f24465a4919239ba86e558",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1976,
+      "timestamp": "2019-03-05T19:14:09.3028519Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00062",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8640,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=process name=mstsc.exe zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在101817.1秒内产生237条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b724a88de9db58744e349a3a",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 5855,
+      "timestamp": "2019-03-05T20:39:50.172000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00063",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8640,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=process name=mstsc.exe zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在110739.2秒内产生304条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5f7d6e1a813067f1b0eadbd1",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 5831,
+      "timestamp": "2019-03-06T00:08:00.247000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00064",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7413,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在86049.8秒内产生9条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.741，传播分=0.741；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d82dc6d69ee72b5620d1182f",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2625,
+      "timestamp": "2019-03-06T00:27:50.4079503Z"
+    }
+  },
+  {
+    "alert_id": "BA-2019-03-05-transparenttribe-00065",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6170,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c systeminfo"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在40646.6秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f651abf65c88bb723e762c29",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 6482,
+      "timestamp": "2019-03-06T00:41:22.330000Z"
+    }
+  }
+]

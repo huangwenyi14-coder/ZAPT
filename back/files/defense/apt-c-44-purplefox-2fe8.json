@@ -1,0 +1,1278 @@
+[
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00001",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7188,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在138753.6秒内产生158条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.607，传播分=0.607；边关系惊异度=0.690, 主机内行为稀有度=0.126。"
+    },
+    "location": {
+      "physical_record_id": "pr-05459c6c54c464bd05c85fe7",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 142,
+      "timestamp": "2023-12-31T03:14:59.703000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00002",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6323,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在128568.9秒内产生13条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.582，传播分=0.582；边关系惊异度=0.760, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-ffcdf0610abcfe51248b27c6",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 25,
+      "timestamp": "2023-12-31T03:24:11.8934796Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00003",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7321,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在126450.3秒内产生65条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.628，传播分=0.628；边关系惊异度=0.690, 主机内行为稀有度=0.200。"
+    },
+    "location": {
+      "physical_record_id": "pr-5adb290294cfbd882648f5f1",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 546,
+      "timestamp": "2023-12-31T04:46:54.182000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00004",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7314,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在136993.5秒内产生72条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.627，传播分=0.627；边关系惊异度=0.690, 主机内行为稀有度=0.196。"
+    },
+    "location": {
+      "physical_record_id": "pr-dd9c93fe8db6ad28e0eee1a5",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 397,
+      "timestamp": "2023-12-31T04:54:36.093000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00005",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7675,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在137368.3秒内产生26条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.768，传播分=0.768；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d9f6ccc4acce73355552f736",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 195,
+      "timestamp": "2023-12-31T05:14:10.6100730Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00006",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7504,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在129440.3秒内产生26条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.657，传播分=0.657；边关系惊异度=0.690, 主机内行为稀有度=0.302。"
+    },
+    "location": {
+      "physical_record_id": "pr-b00e187bc6c0b0d1a9ef9a60",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 562,
+      "timestamp": "2023-12-31T06:51:59.492000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00007",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7295,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在135473.2秒内产生79条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.624，传播分=0.624；边关系惊异度=0.690, 主机内行为稀有度=0.186。"
+    },
+    "location": {
+      "physical_record_id": "pr-be7090748a7fe9a2627d5282",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 1324,
+      "timestamp": "2023-12-31T07:46:53.581000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00008",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7409,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.10.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在135252.7秒内产生104条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.741，传播分=0.741；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f86de13ba24279b27c7ac056",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 439,
+      "timestamp": "2023-12-31T08:37:19.3972135Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00009",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-2235f16db2d17a943b03fb89",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 3934,
+      "timestamp": "2023-12-31T09:26:08.687000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00010",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-7f3b2e0d7b9599c982333d04",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 871,
+      "timestamp": "2023-12-31T09:26:09.1459637Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00011",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-6b47f4b5d2f0724d6c33063d",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 4342,
+      "timestamp": "2023-12-31T09:26:09.2938780Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00012",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6926,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在107712.6秒内产生12条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.691，传播分=0.691；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-24894ebb897edcdf0d3200c7",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 6279,
+      "timestamp": "2023-12-31T13:18:55.084000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00013",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.7954,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在139923.9秒内产生972条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.727，传播分=0.727；边关系惊异度=0.580, 主机内行为稀有度=0.186。"
+    },
+    "location": {
+      "physical_record_id": "pr-c1f90b525cfccaa8e86bea49",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1962,
+      "timestamp": "2023-12-31T13:38:22.706000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00014",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5468,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c netstat -an | findstr LISTENING"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在82938.8秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.488，传播分=0.547；边关系惊异度=0.720, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-68d3aac3101eb5128dc397c6",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 1899,
+      "timestamp": "2023-12-31T15:53:02.837000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00015",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7675,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在98463.8秒内产生12条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.768，传播分=0.768；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-41ba346c3ef21dd19a28294d",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1028,
+      "timestamp": "2023-12-31T16:01:36.2058892Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00016",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8637,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=kernel32.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在133712.8秒内产生287条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6b8d2b1dcc7601f9a4c548b0",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2186,
+      "timestamp": "2023-12-31T18:05:03.844000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00017",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7665,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在126830.3秒内产生33条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.767，传播分=0.767；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f02131cc2dfc707373951c51",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1434,
+      "timestamp": "2023-12-31T19:17:53.9608994Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00018",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7409,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在138550.6秒内产生76条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.741，传播分=0.741；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6d6f1d333a61c9bd0ee3cfe9",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1079,
+      "timestamp": "2023-12-31T20:49:48.8771509Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00019",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7417,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在123281.7秒内产生4条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.742，传播分=0.742；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f9978567427485fbc6561a22",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1160,
+      "timestamp": "2023-12-31T22:12:40.6019594Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00020",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6958,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "29.220.184.93.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在73962.9秒内产生10条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.681，传播分=0.681；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5407cf6eeb1897805c291a86",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2891,
+      "timestamp": "2024-01-01T00:27:06.4273545Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00021",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8771,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在138008.2秒内产生27条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.855，传播分=0.855；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b018d5f13b519a10d56f38fc",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 3218,
+      "timestamp": "2024-01-01T00:54:54.439000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00022",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4d29cbd7ba866d973d5da62c",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 3294,
+      "timestamp": "2024-01-01T01:25:12.642000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00023",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-536e540a28f09a5a2811aac8",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 1974,
+      "timestamp": "2024-01-01T01:25:12.8210008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00024",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/readiness\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c14c188c7c398fe06cb77838",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1304,
+      "timestamp": "2024-01-01T01:25:12.9311642Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00025",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-203b1537d388f2fa9d1ea55d",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1978,
+      "timestamp": "2024-01-01T04:59:09.5363534Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00026",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-47e1822d61dfef8576bb5f0e",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3222,
+      "timestamp": "2024-01-01T04:59:09.7890008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00027",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/metrics\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4ebe0e8f439b86047dd10e09",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 4748,
+      "timestamp": "2024-01-01T04:59:09.883000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00028",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6170,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net user /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在93084.0秒内产生15条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-dd8a24d0d1686ce5c12c1f10",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 3806,
+      "timestamp": "2024-01-01T05:24:43.009000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00029",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUgBlAGEAZAB5ACcAfQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-219e64cb333a5f4a01b91d5a",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 2336,
+      "timestamp": "2024-01-01T06:01:04.1000003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00030",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUgBlAGEAZAB5ACcAfQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e2ca019a7353361aba536b03",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1608,
+      "timestamp": "2024-01-01T06:01:04.3292963Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00031",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBTAGMAaABlAGQAdQBsAGUAZABUAGEAcwBrACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUgBlAGEAZAB5ACcAfQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c73e5a31a4219d07996f97ad",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 3975,
+      "timestamp": "2024-01-01T06:01:04.646000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00032",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6875,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在139184.6秒内产生39条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.668，传播分=0.668；边关系惊异度=0.550, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-db3ae32b6fccd4c63e8449da",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2367,
+      "timestamp": "2024-01-01T06:01:24.1871533Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00033",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7377,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "12.30.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在138395.5秒内产生56条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.738，传播分=0.738；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7e704688b45c42c19dcfbc70",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2361,
+      "timestamp": "2024-01-01T06:03:27.4206545Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00034",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFQAZQBtAHAAIAAtAFIAZQBjAHUAcgBzAGUAIAB8ACAATQBlAGEAcwB1AHIAZQAtAE8AYgBqAGUAYwB0AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ae8e7f777a96090f498ff37e",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1778,
+      "timestamp": "2024-01-01T08:20:39.5233493Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00035",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFQAZQBtAHAAIAAtAFIAZQBjAHUAcgBzAGUAIAB8ACAATQBlAGEAcwB1AHIAZQAtAE8AYgBqAGUAYwB0AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1a0d3e2c80f14ed7336d6f40",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 4402,
+      "timestamp": "2024-01-01T08:20:39.577000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00036",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGgAaQBsAGQASQB0AGUAbQAgAC0AUABhAHQAaAAgAEMAOgBcAFQAZQBtAHAAIAAtAFIAZQBjAHUAcgBzAGUAIAB8ACAATQBlAGEAcwB1AHIAZQAtAE8AYgBqAGUAYwB0AA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-33d9898c293d1f0f96dcf475",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 2624,
+      "timestamp": "2024-01-01T08:20:39.8880005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00037",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-60fc4fefc7e23b040d235514",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3796,
+      "timestamp": "2024-01-01T08:46:05.8990002Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00038",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-32b8a883b7a6a0ecba216b96",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 5529,
+      "timestamp": "2024-01-01T08:46:05.925000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00039",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8582,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwAA=="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.825，传播分=0.825；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f5c82f6068cfad09229a5e89",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 2302,
+      "timestamp": "2024-01-01T08:46:06.0413671Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00040",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6992,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\priya.patel\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在130038.5秒内产生53条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.699，传播分=0.699；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-93116d1fe90557a706aae68d",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 3830,
+      "timestamp": "2024-01-01T08:55:03.5575035Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00041",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.9247,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:wks-eng-021（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在21024.5秒内产生12条直接观测；覆盖2类关系（connect、spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.925，传播分=0.925；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b63fc4b3dc20007d97e5a4b7",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 6255,
+      "timestamp": "2024-01-01T10:02:19.247000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00042",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6929,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\diego.ramirez\\AppData\\Local\\Temp\\ChromeSetup.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在120033.2秒内产生30条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.692，传播分=0.692；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f7f7398e99c6655e4d3282b9",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3007,
+      "timestamp": "2024-01-01T10:15:25.7015765Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00043",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7671,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在123549.0秒内产生24条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.767，传播分=0.767；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7216c5911ad635e970ad97fb",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2786,
+      "timestamp": "2024-01-01T10:18:44.2098025Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00044",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5628,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在111507.0秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.527，传播分=0.563；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-4fdcc3615d5890e67b8e0825",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 6090,
+      "timestamp": "2024-01-01T10:21:00.282000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00045",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.8017,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在138740.8秒内产生273条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.802，传播分=0.802；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-51bd07c71192bbd910b01dcf",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 3161,
+      "timestamp": "2024-01-01T10:49:34.949737Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00046",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7671,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在138648.6秒内产生82条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.767，传播分=0.767；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-09a31fb94a4448a089ff9862",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 1976,
+      "timestamp": "2024-01-01T10:49:35.3369870Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00047",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.5868,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在138365.3秒内产生55条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.506，传播分=0.511；边关系惊异度=0.760, 主机内行为稀有度=0.267。"
+    },
+    "location": {
+      "physical_record_id": "pr-955a5936935cfbace413fe7e",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 4520,
+      "timestamp": "2024-01-01T11:37:51.6297699Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00048",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8636,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在5334.6秒内产生9条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.834，传播分=0.834；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2987c484a5d12188313e596a",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 9163,
+      "timestamp": "2024-01-01T11:44:39.826000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00049",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.9115,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在118325.9秒内产生31条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.909，传播分=0.909；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4280652996c56ab02595849b",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 7287,
+      "timestamp": "2024-01-01T13:46:41.200000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00050",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.9387,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:fs-01 {\"event_id\": 4688, \"provider\": \"microsoft-windows-security-auditing\", \"eventrecordid\": \"488799\", \"channel\": \"security\", \"subjectusername\": \"lucas.martinez\", \"newprocessname\":"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在136479.5秒内产生249条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.939，传播分=0.939；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a6236e067d23a54942eea86c",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 3755,
+      "timestamp": "2024-01-01T13:56:37.4712356Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00051",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7004,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "ps -ef"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在58272.0秒内产生13条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.700，传播分=0.700；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-984eea520a91c2143aec98aa",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 147,
+      "timestamp": "2024-01-01T14:02:49Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00052",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6170,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net user /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在30382.3秒内产生9条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a6dfedf2439543fd183fb254",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 23330,
+      "timestamp": "2024-01-01T14:08:44.787000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00053",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7409,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在134979.2秒内产生33条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.741，传播分=0.741；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-dc6e5a7b50069809f1acf3d8",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 3265,
+      "timestamp": "2024-01-01T15:03:40.8183776Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00054",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7117,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aisha.johnson\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在124852.2秒内产生42条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.712，传播分=0.712；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-714cbd38795480f949f63dd4",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 2400,
+      "timestamp": "2024-01-01T15:19:52.7620881Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00055",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-d4d5b456c516eb727931f72e",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 5571,
+      "timestamp": "2024-01-01T17:41:57.9511896Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00056",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-306b86eeca2f99c927c609e9",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 26932,
+      "timestamp": "2024-01-01T17:41:58.067000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00057",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-51aa37af047c78c97ddab07c",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 31161,
+      "timestamp": "2024-01-01T17:41:58.6058971Z"
+    }
+  },
+  {
+    "alert_id": "BA-2022-03-25-apt-c-44-purplefox-2fe8-00058",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7209,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "whoami"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在101535.2秒内产生29条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e87e3284dcf43711206d9a4b",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 258,
+      "timestamp": "2024-01-01T17:55:05Z"
+    }
+  }
+]

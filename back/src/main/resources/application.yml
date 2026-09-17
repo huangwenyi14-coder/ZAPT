@@ -1,0 +1,28 @@
+server:
+  port: 9999
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.23.111.192:3306/aptweb?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: "0731"   # 必须加引号:YAML会把前导零的0731按八进制解析成473,导致数据库拒绝连接
+
+# MyBatis ??
+mybatis-plus:
+  mapper-locations: classpath:mappers/*.xml  # Mapper XML ????
+  configuration:
+    map-underscore-to-camel-case: true  # ???????? user_name ? userName?
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # ?? SQL ???????
+# 数据生成引擎(EvidenceForge)配置,部署到其他机器需改 uv-path
+eforge:
+  uv-path: uv
+  home: scripts/APTChain-Benchmark
+  key-file: scripts/minimax-key.txt
+  # 模型与API基地址(留空则用凭据文件/引擎默认: MiniMax-M2.7 + api.minimaxi.com)
+  model: ""
+  base-url: 

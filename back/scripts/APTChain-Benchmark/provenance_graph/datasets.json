@@ -1,0 +1,33 @@
+{
+  "datasets": [
+    {
+      "name": "2024-11-26-apt-c-48-cnc",
+      "source": "output/2024-11-26-apt-c-48-cnc"
+    },
+    {
+      "name": "2024-10-12-bitter-apt-q-37",
+      "source": "output/2024-10-12-bitter-apt-q-37"
+    },
+    {
+      "name": "2023-07-04-spyder",
+      "source": "output/2023-07-04-spyder"
+    },
+    {
+      "name": "2021-11-23-donot-apt-q-38",
+      "source": "output/2021-11-23-donot-apt-q-38"
+    },
+    {
+      "name": "2021-01-30-lazarus",
+      "source": "output/2021-01-30-lazarus"
+    },
+    {
+      "name": "2015-12-31-darkhotel",
+      "source": "output/2015-12-31-darkhotel"
+    },
+    {
+      "name": "2018-09-20-apt-c-01",
+      "source": "output/2018-09-20-apt-c-01"
+    }
+  ]
+}
+

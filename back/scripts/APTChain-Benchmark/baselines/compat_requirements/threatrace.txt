@@ -1,0 +1,7 @@
+# ThreaTrace documents Python 3.6/PyG 1.4.3, which uv and current macOS no
+# longer support. This stack is only for an explicit API-port probe.
+numpy==1.26.4
+pandas==2.2.2
+psutil==6.1.1
+torch==2.7.1
+torch-geometric==2.6.1

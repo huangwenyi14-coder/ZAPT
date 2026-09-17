@@ -1,0 +1,1036 @@
+[
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00001",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6507,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在53817.5秒内产生14条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.610，传播分=0.610；边关系惊异度=0.760, 主机内行为稀有度=0.577。"
+    },
+    "location": {
+      "physical_record_id": "pr-2a1630c69c23a828b52c3e83",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 72,
+      "timestamp": "2014-06-30T02:45:20.4276881Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00002",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-04549c8a750281a9889c199b",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 72,
+      "timestamp": "2014-06-30T03:09:23.6524953Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00003",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2a78970889e3105450052a3c",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 97,
+      "timestamp": "2014-06-30T03:09:23.6860000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00004",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2499321fe7407a311bb3e93c",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 156,
+      "timestamp": "2014-06-30T03:09:23.865000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00005",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6959,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "138.52.167.199.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在49875.9秒内产生12条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.681，传播分=0.681；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d35b068ab31ae515b0dc9844",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 190,
+      "timestamp": "2014-06-30T03:17:21.8247534Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00006",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6762,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在48441.5秒内产生2条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.650，传播分=0.650；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-a8a19e3fe319d79e8fa22f1f",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 85,
+      "timestamp": "2014-06-30T03:27:02.0107795Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00007",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7758,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows nt\\currentversion\\winlogon\\shell"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在23828.0秒内产生3条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d8486be07ced7fff88231362",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 156,
+      "timestamp": "2014-06-30T03:58:15.3228305Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00008",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7214,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "ps -ef"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在50875.5秒内产生17条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0ba2e6b76ebed323fd0cdcb7",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 9,
+      "timestamp": "2014-06-30T03:58:56Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00009",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7611,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在55793.6秒内产生28条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.674，传播分=0.674；边关系惊异度=0.690, 主机内行为稀有度=0.354。"
+    },
+    "location": {
+      "physical_record_id": "pr-2aefd88ff1719018e4c339ca",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 431,
+      "timestamp": "2014-06-30T04:00:45.734000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00010",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6174,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在15914.7秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a40b2fba21cd05434164fca6",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 1608,
+      "timestamp": "2014-06-30T04:26:44.357000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00011",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7944,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.40.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在57344.2秒内产生218条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.794，传播分=0.794；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fb6ea8798e5adc7d477879ab",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 224,
+      "timestamp": "2014-06-30T04:27:49.040751Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00012",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7764,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在54142.2秒内产生24条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-011d20e7e7fa7acbba2329e8",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 209,
+      "timestamp": "2014-06-30T04:27:49.1732108Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00013",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5401,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c systeminfo"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.7秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.528，传播分=0.540；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-6dd14e69e933d81be4a5d5fd",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 427,
+      "timestamp": "2014-06-30T06:13:05.1460000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00014",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-63da7a382855b3f6017b6359",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 259,
+      "timestamp": "2014-06-30T06:16:22.4861004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00015",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-bceb766e0892cdf55632571d",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 428,
+      "timestamp": "2014-06-30T06:16:22.4930008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00016",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBDAGkAbQBJAG4AcwB0AGEAbgBjAGUAIABXAGkAbgAzADIAXwBTAGUAcgB2AGkAYwBlACAAfAAgAFcAaABlAHIAZQAtAE8AYgBqAGUAYwB0ACAAewAkAF8ALgBTAHQAYQB0AGUAIAAtAGUAcQAgACcAUwB0AG8AcABwAGUAZAAnAH0A"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e76dd2834de648ec73135bd3",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 681,
+      "timestamp": "2014-06-30T06:16:22.525000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00017",
+    "alert": "检测到周期性网络信标",
+    "confidence_score": 0.7617,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "周期性网络信标",
+          "description": "检测具有稳定时间间隔或重复通信特征的周期性网络信标。",
+          "match_reason": "proc:dc-01:pid:2368 -> net:204.79.197.203:80; n=5 mean=4416.3s cv=0.246"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（connect）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.675，传播分=0.675；边关系惊异度=0.580, 主机内行为稀有度=0.447。"
+    },
+    "location": {
+      "physical_record_id": "pr-6aa3f8ccde586a84f77ed251",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 3424,
+      "timestamp": "2014-06-30T07:11:57.7151039Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00018",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7070,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\sarah.oconnell\\AppData\\Local\\Microsoft\\Teams\\current\\Teams.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在15947.8秒内产生12条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.707，传播分=0.707；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6a7a301287f451f6a7fff678",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 336,
+      "timestamp": "2014-06-30T07:14:15.5841263Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00019",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8788,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在57321.2秒内产生64条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.858，传播分=0.858；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5dd755b28fa9761861d2ab5a",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 3970,
+      "timestamp": "2014-06-30T07:55:27.030000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00020",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9280387dae0e12943c7d6784",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 428,
+      "timestamp": "2014-06-30T08:12:06.0283582Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00021",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-8058db447febdddcd02a7274",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 747,
+      "timestamp": "2014-06-30T08:12:06.5970008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00022",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/api/v1/check\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ff287bbb07f54f42ad9dcacf",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 1116,
+      "timestamp": "2014-06-30T08:12:06.616000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00023",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7389,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.40.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在57001.1秒内产生49条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.739，传播分=0.739；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4e05aa0bacdb97e6cf3a33b1",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 450,
+      "timestamp": "2014-06-30T08:29:46.2496116Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00024",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8249,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在38664.6秒内产生8条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.773，传播分=0.773；边关系惊异度=0.690, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-a078df92758689f422c77f48",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1244,
+      "timestamp": "2014-06-30T09:00:50.360000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00025",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7457,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在14040.9秒内产生2条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.746，传播分=0.746；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-307eacf3aa0a6e3868c4d60e",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 461,
+      "timestamp": "2014-06-30T09:10:14.1557925Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00026",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8788,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在56094.0秒内产生28条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.858，传播分=0.858；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e2337c772475be76185b91a2",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 2242,
+      "timestamp": "2014-06-30T09:39:54.281000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00027",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8788,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在54284.8秒内产生33条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.858，传播分=0.858；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0cbdfe563187b476039d13d3",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 2536,
+      "timestamp": "2014-06-30T09:43:46.867000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00028",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6744,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在53012.2秒内产生21条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.647，传播分=0.647；边关系惊异度=0.550, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-96e2b73d76a05f1d20cfc739",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 693,
+      "timestamp": "2014-06-30T10:14:53.5658719Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00029",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6359,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\lucas.martinez\\AppData\\Local\\Temp\\msi_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.6秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.603，传播分=0.603；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-29269abf7d3ad19348b3d363",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1349,
+      "timestamp": "2014-06-30T10:31:27.2434987Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00030",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6772,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在42359.7秒内产生12条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.652，传播分=0.652；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-49c8af27aa189718cf2a0376",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 780,
+      "timestamp": "2014-06-30T11:16:55.4199966Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00031",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6931,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aisha.johnson\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在43810.8秒内产生24条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.692，传播分=0.692；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cb87731f60588c29504d69af",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1499,
+      "timestamp": "2014-06-30T11:49:25.7075399Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00032",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8649,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=sechost.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在52358.9秒内产生383条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3e2c08f4286427e2ea80f222",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 2429,
+      "timestamp": "2014-06-30T13:01:43.401000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00033",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBvAGQAZQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-742d18adf92cb5f6a7b3d76d",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 8637,
+      "timestamp": "2014-06-30T13:10:03.535000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00034",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBvAGQAZQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f555f9d046818e3b14dad87b",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1757,
+      "timestamp": "2014-06-30T13:10:03.7864258Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00035",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8585,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBQAHIAbwBjAGUAcwBzACAALQBOAGEAbQBlACAAYwBvAGQAZQA="
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c69d0893123f7d388d54d91f",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 9668,
+      "timestamp": "2014-06-30T13:10:03.8940005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00036",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7429,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在55255.1秒内产生59条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.743，传播分=0.743；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-505a36ee4237a396362a63c6",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1067,
+      "timestamp": "2014-06-30T13:29:39.9970449Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00037",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7429,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在55895.5秒内产生39条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.743，传播分=0.743；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f3dea8993352239b7aa989da",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 882,
+      "timestamp": "2014-06-30T14:25:04.1968717Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00038",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7429,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.60.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在55359.0秒内产生41条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.743，传播分=0.743；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-36dca4cc1081d7468c96840f",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1300,
+      "timestamp": "2014-06-30T14:30:56.4550289Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00039",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8652,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在54963.7秒内产生96条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-1885416a801fa73db4c5982f",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 2775,
+      "timestamp": "2014-06-30T14:43:33.555000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00040",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8652,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:fs-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在55470.1秒内产生204条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2ef4f9ad5ece213de7823f7a",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2803,
+      "timestamp": "2014-06-30T14:46:32.011000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00041",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.9408,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01 {\"hostname\": \"mail-01\", \"object\": \"process\", \"action\": \"create\", \"objectid\": \"a99c9449-d9f9-4cb7-8457-d77991a88ef6\", \"actorid\": \"1a9240b1-a8f0-472f-aca3-c05169260c8d\", \"pid\":"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在14039.2秒内产生14条直接观测；覆盖3类关系（connect、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.941，传播分=0.941；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6f9af1871fd32532d2cda23d",
+      "relative_path": "MAIL-01.example.local/windows_event_security.xml",
+      "record_index": 1748,
+      "timestamp": "2014-06-30T15:18:15.0180028Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00042",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7070,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\priya.patel\\AppData\\Local\\Temp\\msi_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在51277.1秒内产生30条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.707，传播分=0.707；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fdfbea16ced6fd5c116d831c",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 3034,
+      "timestamp": "2014-06-30T15:18:56.928000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00043",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7214,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "whoami"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在41453.3秒内产生7条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.721，传播分=0.721；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-dc60c82c8869f7ddd7ed32d2",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 39,
+      "timestamp": "2014-06-30T16:19:15Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00044",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.9265,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在45602.3秒内产生5条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.926，传播分=0.926；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-01e8f1f1e68efc37649981a8",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 3383,
+      "timestamp": "2014-06-30T16:20:06.644000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00045",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7441,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在49900.1秒内产生11条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.744，传播分=0.744；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-aaebfcb38a86798a1d4c97e9",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1377,
+      "timestamp": "2014-06-30T17:42:46.0137403Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00046",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7774,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在54383.8秒内产生24条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.777，传播分=0.777；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b2592cbc8311900b97618011",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 2467,
+      "timestamp": "2014-06-30T17:43:08.7016658Z"
+    }
+  },
+  {
+    "alert_id": "BA-2014-06-30-dragonfly-energetic-bear-00047",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8777,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在52314.7秒内产生14条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.856，传播分=0.856；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-4dab76c09840d56ebed1ff57",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 3612,
+      "timestamp": "2014-06-30T17:48:12.045000Z"
+    }
+  }
+]

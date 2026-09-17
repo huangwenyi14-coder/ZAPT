@@ -1,0 +1,9 @@
+# CPU/Python 3.11 adapter environment for the locked KAIROS TGN source.
+numpy==1.26.4
+psycopg2-binary==2.9.10
+pytz==2024.2
+scikit-learn==1.2.0
+torch==2.7.1
+torch-geometric==2.6.1
+tqdm==4.69.0
+xxhash==3.6.0

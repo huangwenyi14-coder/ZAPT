@@ -1,0 +1,1080 @@
+[
+  {
+    "alert_id": "BA-2024-11-21-chimera-00001",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7632,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows nt\\currentversion\\winlogon\\shell"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在66264.8秒内产生7条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.763，传播分=0.763；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d1aef0b9566141597227d8c0",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 15,
+      "timestamp": "2023-12-31T22:15:09.4323271Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00002",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.8022,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在69441.7秒内产生213条直接观测；覆盖1类关系（dns）和1类遥测（zeek_dns），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.802，传播分=0.802；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-31ac1b115b2878c0dc4f8a0a",
+      "relative_path": "SENSOR-NET-01/dns.json",
+      "record_index": 34,
+      "timestamp": "2023-12-31T22:19:30.483725Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00003",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7763,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在69290.7秒内产生27条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.776，传播分=0.776；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-a67460f64ba7d5387b6f69a6",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 28,
+      "timestamp": "2023-12-31T22:19:30.6959281Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00004",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7395,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在70793.0秒内产生45条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.640，传播分=0.640；边关系惊异度=0.690, 主机内行为稀有度=0.236。"
+    },
+    "location": {
+      "physical_record_id": "pr-ffdbd732a80f404bed34d2fa",
+      "relative_path": "FS-01.example.local/ecar.json",
+      "record_index": 224,
+      "timestamp": "2023-12-31T22:38:38.045000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00005",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.7632,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows nt\\currentversion\\winlogon\\shell"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在62744.7秒内产生20条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.763，传播分=0.763；边关系惊异度=0.760, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e036dbf8aab80f20b5cc3d94",
+      "relative_path": "FS-01.example.local/windows_event_sysmon.xml",
+      "record_index": 60,
+      "timestamp": "2023-12-31T22:39:35.0380526Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00006",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8784,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在56594.6秒内产生7条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.857，传播分=0.857；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-84737ac7a3273d9d682817d8",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 130,
+      "timestamp": "2023-12-31T23:01:40.575000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00007",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7279,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在69403.5秒内产生83条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.622，传播分=0.622；边关系惊异度=0.690, 主机内行为稀有度=0.171。"
+    },
+    "location": {
+      "physical_record_id": "pr-656960dd8cfeaabeeb2da2da",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 749,
+      "timestamp": "2023-12-31T23:15:00.479000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00008",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-ed2373a1ab2dff8753fa099f",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 224,
+      "timestamp": "2023-12-31T23:20:59.283000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00009",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-3b6f62430d00c814797890e5",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 151,
+      "timestamp": "2023-12-31T23:20:59.4160006Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00010",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/health\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-e14f1f0999115cf43d7282d4",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 86,
+      "timestamp": "2023-12-31T23:20:59.6342922Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00011",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.6116,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "12.30.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在67286.8秒内产生35条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.549，传播分=0.549；边关系惊异度=0.550, 主机内行为稀有度=0.408。"
+    },
+    "location": {
+      "physical_record_id": "pr-438e4252d9d4f85f955ac182",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 213,
+      "timestamp": "2024-01-01T00:30:39.2207620Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00012",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7217,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "hostname -f"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在54371.4秒内产生12条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.722，传播分=0.722；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-d7e645692e9086bec1250134",
+      "relative_path": "DB-01.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 0,
+      "timestamp": "2024-01-01T00:42:12Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00013",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8012,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-e50be57de02d93e441990830",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 366,
+      "timestamp": "2024-01-01T00:55:11.9488036Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00014",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8012,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-24efef1b8a4c054e9367bf56",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 2035,
+      "timestamp": "2024-01-01T00:55:12.1495520Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00015",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8012,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-0105b473bb7b5bf0c3c57265",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 1788,
+      "timestamp": "2024-01-01T00:55:12.683000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00016",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6757,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在60565.5秒内产生10条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.649，传播分=0.649；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-2e55ba3b317b57c0da5b6930",
+      "relative_path": "WEB-01.example.local/windows_event_sysmon.xml",
+      "record_index": 270,
+      "timestamp": "2024-01-01T01:01:22.9756525Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00017",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7513,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在69516.7秒内产生34条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.658，传播分=0.658；边关系惊异度=0.690, 主机内行为稀有度=0.302。"
+    },
+    "location": {
+      "physical_record_id": "pr-71cb9123667b3026c56681b3",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 878,
+      "timestamp": "2024-01-01T01:16:56.707000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00018",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7508,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在24785.9秒内产生11条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.657，传播分=0.657；边关系惊异度=0.690, 主机内行为稀有度=0.302。"
+    },
+    "location": {
+      "physical_record_id": "pr-90e62511b1a4c4f75af29f8e",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 636,
+      "timestamp": "2024-01-01T01:34:23.592000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00019",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.7540,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.24010.12-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在67289.7秒内产生37条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.662，传播分=0.662；边关系惊异度=0.690, 主机内行为稀有度=0.316。"
+    },
+    "location": {
+      "physical_record_id": "pr-49173c9a8812dfd79c63e8f0",
+      "relative_path": "MAIL-01.example.local/ecar.json",
+      "record_index": 1164,
+      "timestamp": "2024-01-01T02:58:11.782000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00020",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6931,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\diego.ramirez\\AppData\\Local\\Temp\\vs_installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在46006.7秒内产生12条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.692，传播分=0.692；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-2588f4795960df55c7f9c37b",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_security.xml",
+      "record_index": 602,
+      "timestamp": "2024-01-01T03:27:47.6590005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00021",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8248,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在71524.2秒内产生468条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.773，传播分=0.773；边关系惊异度=0.580, 主机内行为稀有度=0.302。"
+    },
+    "location": {
+      "physical_record_id": "pr-f455938ceb01eda0b4d52587",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1067,
+      "timestamp": "2024-01-01T03:47:39.323000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00022",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6876,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在64782.1秒内产生31条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.668，传播分=0.668；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-f7408102d53053f1a1526ec6",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 980,
+      "timestamp": "2024-01-01T05:15:14.4446803Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00023",
+    "alert": "检测到可写目录模块加载",
+    "confidence_score": 0.8245,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "可写目录模块加载",
+          "description": "检测进程从用户可写或其他高风险目录加载模块的行为。",
+          "match_reason": "C:\\ProgramData\\Microsoft\\Windows Defender\\Platform\\4.18.2301.6-0\\MpClient.dll"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在61412.1秒内产生5条直接观测；覆盖1类关系（load）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.773，传播分=0.773；边关系惊异度=0.690, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-d07d81fd3b4fa297e7859c21",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 1185,
+      "timestamp": "2024-01-01T05:47:14.065000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00024",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6766,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在6187.8秒内产生2条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.651，传播分=0.651；边关系惊异度=0.760, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-6f93a765a85de35796ce0d67",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 614,
+      "timestamp": "2024-01-01T05:54:36.6668360Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00025",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-7bccaf078903c1c339c4ae15",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 726,
+      "timestamp": "2024-01-01T06:16:26.2760004Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00026",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-93f495ab7f4fb11d7a1b6e61",
+      "relative_path": "WKS-HR-009.example.local/ecar.json",
+      "record_index": 1218,
+      "timestamp": "2024-01-01T06:16:26.654000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00027",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -NonInteractive -Command \"Invoke-RestMethod -Uri https://internal-api.example.local/status\""
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-fcf48722468b15ed5ac126bb",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 467,
+      "timestamp": "2024-01-01T06:16:26.7680591Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00028",
+    "alert": "检测到注册表自启动/劫持",
+    "confidence_score": 0.6332,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "注册表自启动/劫持",
+          "description": "检测通过注册表启动项或劫持位置建立持久化的行为。",
+          "match_reason": "type=registry value=hklm\\software\\microsoft\\windows\\currentversion\\run\\securityhealthsystray"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在56799.5秒内产生17条直接观测；覆盖1类关系（registry）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.583，传播分=0.583；边关系惊异度=0.760, 主机内行为稀有度=0.500。"
+    },
+    "location": {
+      "physical_record_id": "pr-c01980fc93514d0d95d8d244",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 793,
+      "timestamp": "2024-01-01T06:34:08.0629448Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00029",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8012,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-c95b9df3f4b35eba5b3edcc5",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_security.xml",
+      "record_index": 1118,
+      "timestamp": "2024-01-01T07:17:39.4460008Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00030",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8012,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-66f52f5360bf67c74220561e",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 732,
+      "timestamp": "2024-01-01T07:17:39.5112159Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00031",
+    "alert": "检测到脚本下载或内存执行链",
+    "confidence_score": 0.8012,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "脚本下载或内存执行链",
+          "description": "检测脚本从网络获取内容并继续执行或载入内存的行为链。",
+          "match_reason": "powershell.exe -Command Invoke-WebRequest -Uri https://packages.nuget.org/api/v2 -UseBasicParsing"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.736，传播分=0.736；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-3b5d1dedce01b55c9d3f07cb",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 1694,
+      "timestamp": "2024-01-01T07:17:39.718000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00032",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.5279,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c net group \"Domain Admins\" /domain"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在14315.2秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.528，传播分=0.528；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-39b842fece7f46804dd42b25",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 1591,
+      "timestamp": "2024-01-01T07:48:44.491000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00033",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.7217,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "whoami"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在34142.3秒内产生8条直接观测；覆盖2类关系（command、spawn）和2类遥测（bash_history、ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.722，传播分=0.722；边关系惊异度=0.780, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9eae38d3e7eff4e18882d386",
+      "relative_path": "APP-LNX-02.example.local/bash_history/priya.patel.bash_history",
+      "record_index": 31,
+      "timestamp": "2024-01-01T08:24:48Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00034",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7515,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在70651.2秒内产生46条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.752，传播分=0.752；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-815c9891a160b315af0dc4a3",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 871,
+      "timestamp": "2024-01-01T08:43:31.1877654Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00035",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7515,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在69651.6秒内产生55条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.752，传播分=0.752；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-9252c111c539bc31281cb2e0",
+      "relative_path": "WKS-FIN-014.example.local/windows_event_sysmon.xml",
+      "record_index": 716,
+      "timestamp": "2024-01-01T09:24:17.4607657Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00036",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7009,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "36.141.84.52.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在64182.4秒内产生10条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.689，传播分=0.689；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-c5bfdb1e7580184e17f29544",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1617,
+      "timestamp": "2024-01-01T09:43:26.6703024Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00037",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.7066,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\priya.patel\\AppData\\Local\\Temp\\dotnet-sdk-installer.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在56220.5秒内产生39条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.707，传播分=0.707；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-b8bbe30fd13fbfca072c75d2",
+      "relative_path": "WKS-ENG-021.example.local/ecar.json",
+      "record_index": 2654,
+      "timestamp": "2024-01-01T10:09:21.218000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00038",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.9402,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=mstsc.exe zone=system type=module name=user32.dll ext=.dll zone=system（检测器原始命中摘要已截断）"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在70335.3秒内产生163条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.940，传播分=0.940；边关系惊异度=0.580, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-942d0be93c2e880a1c9f1a09",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 1375,
+      "timestamp": "2024-01-01T10:10:00.6673478Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00039",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process_guid身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-0caa0d513221f189f8706948",
+      "relative_path": "DC-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1825,
+      "timestamp": "2024-01-01T10:53:10.6501806Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00040",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一actor_id身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（ecar），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-6797c6772678a920b0e24bf5",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 9183,
+      "timestamp": "2024-01-01T10:53:10.668000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00041",
+    "alert": "检测到PowerShell/脚本编码命令",
+    "confidence_score": 0.8584,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "PowerShell/脚本编码命令",
+          "description": "检测 PowerShell 或其他脚本解释器使用编码参数执行命令的行为。",
+          "match_reason": "powershell.exe -EncodedCommand RwBlAHQALQBIAG8AdABGAGkAeAAgAHwAIABTAG8AcgB0AC0ATwBiAGoAZQBjAHQAIABJAG4AcwB0AGEAbABsAGUAZABPAG4AIAAtAEQAZQBzAGMAZQBuAGQAaQBuAGcAIAB8ACAAUwBlAGwAZQBjAHQALQBPAGIAagBlAGMAdAAgAC0ARgBpAHIAcwB0ACAAMQAwADAA"
+        }
+      ],
+      "graph_reason": "同一主机、同一process身份在0.0秒内产生1条直接观测；覆盖1类关系（spawn）和1类遥测（windows_event_security），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.826，传播分=0.826；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-cb07e98507bcabc376efbed8",
+      "relative_path": "DC-01.example.local/windows_event_security.xml",
+      "record_index": 10633,
+      "timestamp": "2024-01-01T10:53:10.7820005Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00042",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6174,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c ipconfig /all"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在20480.7秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-91326a71e769ab1e2d09b3cd",
+      "relative_path": "WKS-ENG-021.example.local/windows_event_sysmon.xml",
+      "record_index": 1186,
+      "timestamp": "2024-01-01T11:18:15.0261799Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00043",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8649,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:dc-01 {\"event_id\": 4688, \"provider\": \"microsoft-windows-security-auditing\", \"eventrecordid\": \"482310\", \"channel\": \"security\", \"subjectusername\": \"lucas.martinez\", \"newprocessname\":"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在9509.2秒内产生8条直接观测；覆盖3类关系（connect、load、spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-34dc20b4adbcf0ea2ed74355",
+      "relative_path": "WEB-01.example.local/ecar.json",
+      "record_index": 3922,
+      "timestamp": "2024-01-01T11:49:04.485000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00044",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6358,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Windows\\Temp\\KB5034441_update.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在27952.4秒内产生6条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.603，传播分=0.603；边关系惊异度=0.720, 主机内行为稀有度=0.707。"
+    },
+    "location": {
+      "physical_record_id": "pr-076cc7ca6b47144d6259f2ce",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 10341,
+      "timestamp": "2024-01-01T12:14:23.032000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00045",
+    "alert": "检测到远程执行或横向移动",
+    "confidence_score": 0.8648,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "远程执行或横向移动",
+          "description": "检测远程桌面、远程命令执行或其他横向移动行为。",
+          "match_reason": "type=process name=explorer.exe zone=other type=process name=mstsc.exe zone=system parent=explorer.exe cmd=mstsc.exe /v:fs-01 {\"event_id\": 4688, \"provider\": \"microsoft-windows-security-auditing\", \"eventrecordid\": \"488891\", \"channel\": \"security\", \"subjectusername\": \"lucas.martinez\", \"newprocessname\":"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在68995.2秒内产生172条直接观测；覆盖4类关系（connect、load、spawn、terminate）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.836，传播分=0.836；边关系惊异度=0.690, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-f45c5b40f60a5227257882b3",
+      "relative_path": "WKS-FIN-014.example.local/ecar.json",
+      "record_index": 2965,
+      "timestamp": "2024-01-01T12:55:04.261000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00046",
+    "alert": "检测到系统/网络发现命令",
+    "confidence_score": 0.6174,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "系统/网络发现命令",
+          "description": "检测执行账号、主机、网络配置或其他环境发现命令的行为。",
+          "match_reason": "cmd.exe /c tasklist /svc"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.4秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.617，传播分=0.617；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-444103dffe98d7358a6d0914",
+      "relative_path": "DC-01.example.local/ecar.json",
+      "record_index": 11062,
+      "timestamp": "2024-01-01T13:02:07.123000Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00047",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7417,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "_ldap._tcp.dc._msdcs.example.local"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在67279.5秒内产生28条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.742，传播分=0.742；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-68c0d31f16513a396d21ec59",
+      "relative_path": "MAIL-01.example.local/windows_event_sysmon.xml",
+      "record_index": 1566,
+      "timestamp": "2024-01-01T13:19:15.8994093Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00048",
+    "alert": "检测到用户可写目录执行",
+    "confidence_score": 0.6931,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "用户可写目录执行",
+          "description": "检测从用户可写目录启动可执行文件或脚本的行为。",
+          "match_reason": "C:\\Users\\aisha.johnson\\AppData\\Roaming\\Zoom\\bin\\Zoom.exe"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在0.7秒内产生3条直接观测；覆盖1类关系（spawn）和3类遥测（ecar、windows_event_security、windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.692，传播分=0.692；边关系惊异度=0.720, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-45c3300a91e9e7a737dff8bc",
+      "relative_path": "WKS-HR-009.example.local/windows_event_security.xml",
+      "record_index": 2200,
+      "timestamp": "2024-01-01T14:07:29.2651936Z"
+    }
+  },
+  {
+    "alert_id": "BA-2024-11-21-chimera-00049",
+    "alert": "检测到高熵/超长 DNS 查询",
+    "confidence_score": 0.7489,
+    "alert_reason": {
+      "rules": [
+        {
+          "rule_name": "高熵/超长 DNS 查询",
+          "description": "检测长度、字符分布或编码特征异常的 DNS 查询，识别潜在隧道或隐蔽通信。",
+          "match_reason": "10.50.20.10.in-addr.arpa"
+        }
+      ],
+      "graph_reason": "同一主机上的同类行为在69343.8秒内产生42条直接观测；覆盖1类关系（dns）和1类遥测（windows_event_sysmon），因此聚合为一个可独立调查的行为告警。",
+      "anomaly_reason": "自监督图模型判定该事件相对无标签行为基线存在偏离：异常分=0.749，传播分=0.749；边关系惊异度=0.550, 主机内行为稀有度=1.000。"
+    },
+    "location": {
+      "physical_record_id": "pr-5fc34a4c265634acd24eec62",
+      "relative_path": "WKS-HR-009.example.local/windows_event_sysmon.xml",
+      "record_index": 1197,
+      "timestamp": "2024-01-01T16:19:55.4101483Z"
+    }
+  }
+]

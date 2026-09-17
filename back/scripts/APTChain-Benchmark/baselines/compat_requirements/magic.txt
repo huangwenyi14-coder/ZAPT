@@ -1,0 +1,10 @@
+# Host-compatible probe of the unmodified MAGIC source on macOS x86_64/Rosetta.
+# CUDA local-version suffixes are intentionally removed; all other published pins remain.
+torch==1.12.1
+torchvision==0.13.1
+torchaudio==0.12.1
+dgl==1.0.0
+packaging==24.2
+scikit-learn==1.2.2
+setuptools==75.3.2
+xxhash==3.6.0

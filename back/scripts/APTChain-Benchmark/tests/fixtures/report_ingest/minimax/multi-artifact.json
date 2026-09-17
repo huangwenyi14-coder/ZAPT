@@ -1,0 +1,294 @@
+{
+  "fact_extraction": {
+    "source_metadata": {
+      "report_name": "多任务、多文件与多 URL 报告",
+      "description": "报告描述两个彼此绑定的下载行为和两个名称、路径、周期各自独立的计划任务。"
+    },
+    "metadata_provenance": {
+      "origin": "source",
+      "source_span_ids": ["span-0001-2391e1a70727"]
+    },
+    "facts": [
+      {
+        "fact_id": "fact-001",
+        "behavior": "payload_download",
+        "order": 1,
+        "description": "从 alpha URL 下载到 C:\\ProgramData\\Lab\\alpha.bin。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "fact_id": "fact-002",
+        "behavior": "payload_download",
+        "order": 2,
+        "description": "从 beta URL 下载到 %LOCALAPPDATA%\\Lab\\beta.bin。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "fact_id": "fact-003",
+        "behavior": "persistence_scheduled_task",
+        "order": 3,
+        "description": "创建 UpdaterTelemetry，每 20 分钟运行 alpha.bin。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "fact_id": "fact-004",
+        "behavior": "persistence_scheduled_task",
+        "order": 4,
+        "description": "创建 UserCacheRefresh，每 30 分钟运行 beta.bin。",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      }
+    ],
+    "entities": [
+      {
+        "entity_id": "entity-001",
+        "entity_type": "url",
+        "value": "https://cdn-lab.example.test/drop/alpha.bin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "entity_id": "entity-002",
+        "entity_type": "file",
+        "value": "C:\\ProgramData\\Lab\\alpha.bin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "entity_id": "entity-003",
+        "entity_type": "url",
+        "value": "https://cdn-lab.example.test/drop/beta.bin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "entity_id": "entity-004",
+        "entity_type": "file",
+        "value": "%LOCALAPPDATA%\\Lab\\beta.bin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "entity_id": "entity-005",
+        "entity_type": "domain",
+        "value": "cdn-lab.example.test",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "entity_id": "entity-006",
+        "entity_type": "ip",
+        "value": "203.0.113.80",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "entity_id": "entity-007",
+        "entity_type": "scheduled_task",
+        "value": "UpdaterTelemetry",
+        "attributes": {
+          "binary": "C:\\ProgramData\\Lab\\alpha.bin",
+          "trigger": "每 20 分钟"
+        },
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "entity_id": "entity-008",
+        "entity_type": "scheduled_task",
+        "value": "UserCacheRefresh",
+        "attributes": {
+          "binary": "%LOCALAPPDATA%\\Lab\\beta.bin",
+          "trigger": "每 30 分钟"
+        },
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      }
+    ],
+    "relations": [
+      {
+        "relation_id": "relation-001",
+        "source_id": "fact-001",
+        "predicate": "downloads_from",
+        "target_id": "entity-001",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "relation_id": "relation-002",
+        "source_id": "fact-001",
+        "predicate": "creates",
+        "target_id": "entity-002",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "relation_id": "relation-003",
+        "source_id": "fact-002",
+        "predicate": "downloads_from",
+        "target_id": "entity-003",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "relation_id": "relation-004",
+        "source_id": "fact-002",
+        "predicate": "creates",
+        "target_id": "entity-004",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "relation_id": "relation-005",
+        "source_id": "entity-005",
+        "predicate": "resolves_to",
+        "target_id": "entity-006",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "relation_id": "relation-006",
+        "source_id": "fact-003",
+        "predicate": "creates",
+        "target_id": "entity-007",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "relation_id": "relation-007",
+        "source_id": "fact-004",
+        "predicate": "creates",
+        "target_id": "entity-008",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      }
+    ],
+    "report_iocs": [
+      {
+        "indicator_id": "ioc-001",
+        "kind": "url",
+        "value": "https://cdn-lab.example.test/drop/alpha.bin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "indicator_id": "ioc-002",
+        "kind": "url",
+        "value": "https://cdn-lab.example.test/drop/beta.bin",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "indicator_id": "ioc-003",
+        "kind": "domain",
+        "value": "cdn-lab.example.test",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      },
+      {
+        "indicator_id": "ioc-004",
+        "kind": "ip",
+        "value": "203.0.113.80",
+        "provenance": {
+          "origin": "source",
+          "source_span_ids": ["span-0001-2391e1a70727"]
+        }
+      }
+    ]
+  },
+  "fact_audit": {
+    "summary": "两个下载各自绑定一个 URL 和文件，两个计划任务各自保留名称、二进制和周期。",
+    "ledger_complete": true
+  },
+  "simulation_completion": {
+    "completions": [
+      {
+        "request_id": "complete-fact-0001-process-image",
+        "target_id": "fact-0001",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\download-client.exe",
+        "origin": "ai_completed",
+        "reason": "为第一个来源下载行为提供内部仿真进程主体。",
+        "compatible": true,
+        "compatibility_explanation": "不修改 alpha URL 或目标文件绑定。"
+      },
+      {
+        "request_id": "complete-fact-0002-process-image",
+        "target_id": "fact-0002",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\download-client.exe",
+        "origin": "ai_completed",
+        "reason": "为第二个来源下载行为提供内部仿真进程主体。",
+        "compatible": true,
+        "compatibility_explanation": "不修改 beta URL 或目标文件绑定。"
+      },
+      {
+        "request_id": "complete-fact-0003-process-image",
+        "target_id": "fact-0003",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\task-creator.exe",
+        "origin": "ai_completed",
+        "reason": "为 UpdaterTelemetry 创建行为提供内部仿真进程主体。",
+        "compatible": true,
+        "compatibility_explanation": "不修改任务名、二进制或周期。"
+      },
+      {
+        "request_id": "complete-fact-0004-process-image",
+        "target_id": "fact-0004",
+        "field_path": "process.image",
+        "value": "C:\\ProgramData\\ReportLab\\task-creator.exe",
+        "origin": "ai_completed",
+        "reason": "为 UserCacheRefresh 创建行为提供内部仿真进程主体。",
+        "compatible": true,
+        "compatibility_explanation": "不修改任务名、二进制或周期。"
+      }
+    ]
+  }
+}

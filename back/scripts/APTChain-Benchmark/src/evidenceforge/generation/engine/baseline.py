@@ -1,0 +1,9954 @@
+# Copyright (c) 2026 Cisco Systems, Inc. and its affiliates
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+# SPDX-License-Identifier: MIT
+
+"""Baseline generation loop (hour-by-hour iteration).
+
+Contains the BaselineMixin with methods for:
+- Hour-by-hour baseline generation
+- Event calculation and distribution
+- Work-hour multiplier with sigmoid transitions
+- User activity generation
+- System traffic generation (DNS, NTP, SMB, Kerberos, syslog, etc.)
+- Process termination and session logoff
+"""
+
+import logging
+import math
+import random
+import shlex
+import string
+from datetime import UTC, datetime, timedelta
+from typing import Any
+
+from evidenceforge.config import get_activity_directory
+from evidenceforge.config.overlay import load_with_overlay, merge_keyed_list
+from evidenceforge.generation.actions import (
+    BrowserSessionActionBundle,
+    BrowserSessionRequest,
+    IdsAlertActionBundle,
+    IdsAlertRequest,
+    ScheduledScanOverlapActionBundle,
+    ScheduledScanOverlapRequest,
+    dhcp_renewal_interval_seconds,
+)
+from evidenceforge.generation.activity.auth_noise import (
+    scheduled_stale_credentials_config,
+    service_account_delegation_config,
+)
+from evidenceforge.generation.activity.create_remote_thread_patterns import (
+    load_create_remote_thread_noise_config,
+    load_create_remote_thread_patterns,
+    pick_create_remote_thread_pattern,
+)
+from evidenceforge.generation.activity.email_background import (
+    pick_email_background_domain,
+    pick_email_background_local_part,
+)
+from evidenceforge.generation.activity.generator import (
+    _dns_base_ttl,
+    _dns_is_internal_name,
+    _dns_rtt,
+    _linux_foreground_lifetime,
+    _linux_uid_for_user,
+    _nmap_probe_profile,
+    _nmap_target_exposes_port,
+    _ntp_association_poll_seconds,
+    _service_for_port,
+    _windows_foreground_lifetime,
+)
+from evidenceforge.generation.activity.helpers import _get_os_category
+from evidenceforge.generation.activity.host_activity_profiles import (
+    firewall_deny_hash_values,
+    pick_firewall_deny_offset,
+    resolve_host_activity_profile,
+    scale_count_range,
+    scale_interval_range,
+)
+from evidenceforge.generation.activity.ids_signatures import (
+    load_ids_signatures,
+    render_dns_query_template,
+)
+from evidenceforge.generation.activity.linux_interfaces import linux_primary_interface
+from evidenceforge.generation.activity.network import _generate_random_external_ip, _is_private_ip
+from evidenceforge.generation.activity.network_params import external_scanner_port_for_source
+from evidenceforge.generation.activity.process_access_patterns import (
+    load_process_access_patterns,
+    pick_granted_access,
+)
+from evidenceforge.generation.activity.suspicious_benign import (
+    generate_after_hours_admin,
+    generate_failed_logon_burst,
+    generate_scheduled_scan_overlap,
+    generate_service_account_anomaly,
+    generate_suspicious_cli,
+    generate_suspicious_dns,
+    generate_temp_dir_execution,
+    generate_unusual_outbound,
+    generate_unusual_powershell,
+    get_suspicious_event_count,
+    pick_suspicious_pattern,
+)
+from evidenceforge.generation.world_model import (
+    host_services_support_database_service,
+    normalize_database_service,
+)
+from evidenceforge.models.scenario import EmailMessageEventSpec, Persona, System, User
+from evidenceforge.utils.rng import _get_rng, _stable_seed, stable_uuid
+
+logger = logging.getLogger(__name__)
+
+_LINUX_REMOTE_ADMIN_HOURLY_BASE_PROBABILITY = 0.28
+_LINUX_REMOTE_ADMIN_SECOND_SESSION_PROBABILITY = 0.18
+_LINUX_AMBIENT_SSH_NOISE_BAND = 0.006
+_BASELINE_GUARDED_SUCCESS_PORTS = {445, 3389}
+_BASELINE_RDP_SERVICE_ALIASES = {"rdp", "termservice", "terminal-services", "xrdp"}
+_BASELINE_SMB_SERVICE_ALIASES = {"smb", "samba", "smbd", "lanmanserver", "ad-ds"}
+_BASELINE_EMAIL_PROFILE_PORTS = {25, 465, 587, 993, 995}
+_BASELINE_WEBMAIL_PROFILE_TERMS = ("owa", "webmail", "mailbox", "mail client", "email")
+_BASELINE_SUCCESS_FALLBACK_PORTS = (22, 80, 443, 8080, 3306, 5432, 53)
+_BASELINE_INTERACTIVE_STARTUP_WINDOW_SECONDS = 300.0
+_BASELINE_INTERACTIVE_STARTUP_INITIAL_DELAY_SECONDS = (35.0, 95.0)
+_BASELINE_INTERACTIVE_STARTUP_GAP_SECONDS = (12.0, 45.0)
+_BASELINE_SERVER_ADMIN_PERSONA_TYPES = {"server", "domain_controller"}
+_BASELINE_SERVER_ADMIN_PERSONA_ROLES = {
+    "app_server",
+    "database",
+    "dns_server",
+    "domain_controller",
+    "file_server",
+    "forward_proxy",
+    "log_server",
+    "mail_server",
+    "monitoring",
+    "web_server",
+}
+
+
+def _ufw_block_syn_packet_len(src_ip: str) -> int:
+    """Return a stable valid IP total length for a header-only blocked TCP SYN."""
+    rng = random.Random(_stable_seed(f"ufw_syn_packet_len:{src_ip}"))
+    return rng.choices((40, 44, 48, 52, 60), weights=(20, 18, 26, 24, 12), k=1)[0]
+
+
+def _ufw_block_ttl(src_ip: str) -> int:
+    """Return a stable plausible arrival TTL for an inbound scanner source."""
+    rng = random.Random(_stable_seed(f"ufw_arrival_ttl:{src_ip}"))
+    if _is_private_ip(src_ip):
+        initial = rng.choices((64, 128), weights=(65, 35), k=1)[0]
+        hops = rng.randint(1, 8)
+    else:
+        initial = rng.choices((64, 128, 255), weights=(58, 36, 6), k=1)[0]
+        hops = rng.randint(7, 30) if initial == 255 else rng.randint(5, 24)
+    return max(32, initial - hops)
+
+
+def _baseline_inbound_ids_probe_profile(
+    *,
+    rng: random.Random,
+    proto: str,
+    dst_port: int,
+    target_system: System | None,
+    policy_denied: bool,
+    deny_conn_state: str,
+) -> tuple[str, str | None, float, int, int]:
+    """Return service/connection fields for an inbound IDS companion connection."""
+    if proto != "tcp":
+        return "", None, rng.uniform(0.001, 5.0), rng.randint(40, 2000), rng.randint(0, 1000)
+
+    if policy_denied or not _nmap_target_exposes_port(dst_port, target_system):
+        conn_state = "REJ" if deny_conn_state == "REJ" else "S0"
+        if conn_state == "REJ":
+            return (
+                "",
+                conn_state,
+                rng.uniform(0.003, 0.18),
+                rng.randint(40, 120),
+                rng.randint(40, 96),
+            )
+        return "", conn_state, rng.uniform(1.2, 7.0), rng.randint(40, 96), 0
+
+    service = _service_for_port(dst_port) or {443: "ssl", 80: "http", 53: "dns"}.get(dst_port, "")
+    return service, None, rng.uniform(0.001, 5.0), rng.randint(40, 2000), rng.randint(0, 1000)
+
+
+def _baseline_inventory_tokens(values: list[str] | tuple[str, ...] | None) -> set[str]:
+    """Normalize inventory service/role names for service-capability checks."""
+    return {value.lower().replace(" ", "-").replace("_", "-") for value in (values or []) if value}
+
+
+def _baseline_guarded_success_port_allowed(target_system: System, port: int) -> bool:
+    """Return whether a generic successful baseline connection may use a guarded port."""
+    services = _baseline_inventory_tokens(target_system.services)
+    if port == 3389:
+        if services & _BASELINE_RDP_SERVICE_ALIASES:
+            return True
+        return _get_os_category(target_system.os) == "windows" and target_system.type in {
+            "server",
+            "domain_controller",
+        }
+    if port == 445:
+        if services & _BASELINE_SMB_SERVICE_ALIASES:
+            return True
+        return _get_os_category(target_system.os) == "windows"
+    return True
+
+
+def _baseline_database_service_supported(target_system: System, service: str | None) -> bool:
+    """Return whether a database host can receive the requested DB engine traffic."""
+    if normalize_database_service(service) is None:
+        return True
+    return host_services_support_database_service(
+        target_system.services,
+        _get_os_category(target_system.os),
+        service,
+    )
+
+
+def _baseline_service_for_success_port(port: int) -> str | None:
+    """Return the service label for a generic successful baseline connection."""
+    return _service_for_port(port) or {443: "ssl", 80: "http", 53: "dns"}.get(port)
+
+
+def _baseline_success_port_for_target(
+    target_system: System,
+    requested_port: int,
+    requested_service: str | None,
+    rng: random.Random,
+) -> tuple[int, str | None] | None:
+    """Return a target-compatible port/service for generic successful baseline traffic.
+
+    Compound protocols such as RDP and SMB need target-side service evidence. If a
+    generic noise pattern selected one of those ports for an incompatible host,
+    remap to an inventory-supported service so the logs do not imply a successful
+    RDP/SMB session without the owning session/service bundle.
+    """
+    if requested_port not in _BASELINE_GUARDED_SUCCESS_PORTS:
+        return requested_port, requested_service
+    if _baseline_guarded_success_port_allowed(target_system, requested_port):
+        return requested_port, requested_service
+
+    candidates = [
+        port
+        for port in _BASELINE_SUCCESS_FALLBACK_PORTS
+        if _nmap_target_exposes_port(port, target_system)
+        and port not in _BASELINE_GUARDED_SUCCESS_PORTS
+    ]
+    if not candidates:
+        return None
+    fallback_port = rng.choice(candidates)
+    return fallback_port, _baseline_service_for_success_port(fallback_port)
+
+
+def _baseline_success_target_for_guarded_port(
+    systems: list[System],
+    source_system: System,
+    target_system: System | None,
+    requested_port: int,
+    rng: random.Random,
+) -> System | None:
+    """Return a target that can plausibly accept a guarded successful connection."""
+    if requested_port not in _BASELINE_GUARDED_SUCCESS_PORTS:
+        return target_system
+    if target_system is not None and _baseline_guarded_success_port_allowed(
+        target_system,
+        requested_port,
+    ):
+        return target_system
+
+    candidates = [
+        system
+        for system in systems
+        if system.ip != source_system.ip
+        and _baseline_guarded_success_port_allowed(system, requested_port)
+    ]
+    if not candidates:
+        return None
+    return rng.choice(candidates)
+
+
+def _ntp_sync_interval_seconds(
+    hostname: str,
+    ntp_ip: str,
+    sequence: int,
+    poll_seconds: int,
+) -> float:
+    """Return the next observed NTP sync interval for a client/server association."""
+    poll = max(300, poll_seconds)
+    rng = random.Random(_stable_seed(f"ntp_interval:{hostname}:{ntp_ip}:{sequence}"))
+    interval = poll * rng.uniform(0.82, 1.18)
+    if rng.random() < 0.10:
+        interval += poll * rng.uniform(0.35, 1.25)
+    if rng.random() < 0.05:
+        interval = max(300.0, poll * rng.uniform(0.45, 0.80))
+    return max(300.0, interval)
+
+
+def _ntp_observed_second(
+    hostname: str,
+    ntp_ip: str,
+    sequence: int,
+    scheduled_second: float,
+) -> float:
+    """Return a small source-observation offset for an NTP sync."""
+    rng = random.Random(_stable_seed(f"ntp_observed:{hostname}:{ntp_ip}:{sequence}"))
+    return scheduled_second + rng.uniform(-1.5, 2.5)
+
+
+def _ntp_sync_seconds_for_hour(
+    hostname: str,
+    ntp_ip: str,
+    generation_epoch: datetime,
+    current_hour: datetime,
+    poll_seconds: int,
+) -> list[float]:
+    """Return observed NTP sync seconds from generation epoch for one hour."""
+    hour_start_sec = (current_hour - generation_epoch).total_seconds()
+    hour_end_sec = hour_start_sec + 3600
+    phase_rng = random.Random(_stable_seed(f"ntp_phase:{hostname}:{ntp_ip}:{poll_seconds}"))
+    scheduled_second = phase_rng.uniform(0, min(3600, poll_seconds))
+    sequence = 0
+    max_interval = poll_seconds * 2.45
+    if scheduled_second < hour_start_sec:
+        skip_count = max(0, int((hour_start_sec - scheduled_second) // max_interval) - 2)
+        for _ in range(skip_count):
+            scheduled_second += _ntp_sync_interval_seconds(
+                hostname,
+                ntp_ip,
+                sequence,
+                poll_seconds,
+            )
+            sequence += 1
+    while scheduled_second < hour_start_sec:
+        scheduled_second += _ntp_sync_interval_seconds(
+            hostname,
+            ntp_ip,
+            sequence,
+            poll_seconds,
+        )
+        sequence += 1
+
+    observed_seconds: list[float] = []
+    while scheduled_second < hour_end_sec:
+        observed_second = _ntp_observed_second(
+            hostname,
+            ntp_ip,
+            sequence,
+            scheduled_second,
+        )
+        if hour_start_sec <= observed_second < hour_end_sec:
+            observed_seconds.append(observed_second)
+        scheduled_second += _ntp_sync_interval_seconds(
+            hostname,
+            ntp_ip,
+            sequence,
+            poll_seconds,
+        )
+        sequence += 1
+    return observed_seconds
+
+
+def _ntp_sync_seconds_for_hour_from_state(
+    hostname: str,
+    ntp_ip: str,
+    hour_start_sec: float,
+    poll_seconds: int,
+    state: dict[str, float | int],
+) -> list[float]:
+    """Return observed NTP sync seconds for one hour using carried scheduler state."""
+    hour_end_sec = hour_start_sec + 3600
+    scheduled_second = float(state["scheduled_second"])
+    sequence = int(state["sequence"])
+
+    while scheduled_second < hour_start_sec:
+        scheduled_second += _ntp_sync_interval_seconds(
+            hostname,
+            ntp_ip,
+            sequence,
+            poll_seconds,
+        )
+        sequence += 1
+
+    observed_seconds: list[float] = []
+    while scheduled_second < hour_end_sec:
+        observed_second = _ntp_observed_second(
+            hostname,
+            ntp_ip,
+            sequence,
+            scheduled_second,
+        )
+        if hour_start_sec <= observed_second < hour_end_sec:
+            observed_seconds.append(observed_second)
+        scheduled_second += _ntp_sync_interval_seconds(
+            hostname,
+            ntp_ip,
+            sequence,
+            poll_seconds,
+        )
+        sequence += 1
+
+    state["scheduled_second"] = scheduled_second
+    state["sequence"] = sequence
+    return observed_seconds
+
+
+def _dhcp_renewal_epochs_for_hour(
+    *,
+    last_renewal: float,
+    lease_time: float,
+    current_hour: datetime,
+    rng: random.Random,
+    next_renewal: float | None = None,
+) -> tuple[list[tuple[float, float]], float, float | None]:
+    """Return DHCP renewal epochs and advertised next-renewal intervals due in this hour."""
+    base_renewal = max(60.0, lease_time / 2)
+    hour_start_epoch = current_hour.timestamp()
+    hour_end_epoch = (current_hour + timedelta(hours=1)).timestamp()
+    due: list[tuple[float, float]] = []
+    schedule_anchor = last_renewal
+    previous_visible_index: int | None = None
+    pending_next_renewal: float | None = None
+
+    max_iterations = max(
+        8,
+        int((hour_end_epoch - last_renewal) / max(60.0, base_renewal * 0.8)) + 4,
+    )
+    for _ in range(max_iterations):
+        if next_renewal is None:
+            candidate_renewal = schedule_anchor + dhcp_renewal_interval_seconds(
+                lease_time,
+                rng,
+            )
+        else:
+            candidate_renewal = next_renewal
+            next_renewal = None
+
+        if candidate_renewal >= hour_end_epoch and previous_visible_index is None:
+            pending_next_renewal = candidate_renewal
+            break
+        if candidate_renewal >= hour_start_epoch:
+            if previous_visible_index is not None:
+                previous_epoch = due[previous_visible_index][0]
+                due[previous_visible_index] = (
+                    previous_epoch,
+                    max(60.0, candidate_renewal - previous_epoch),
+                )
+            if candidate_renewal >= hour_end_epoch:
+                pending_next_renewal = candidate_renewal
+                break
+            due.append((candidate_renewal, base_renewal))
+            previous_visible_index = len(due) - 1
+        schedule_anchor = candidate_renewal
+        if candidate_renewal >= hour_end_epoch:
+            break
+
+    return due, schedule_anchor, pending_next_renewal
+
+
+def _linux_baseline_session_initiator(
+    user: str,
+    *,
+    rng: random.Random,
+    system_type: str = "server",
+) -> tuple[str, str, str]:
+    """Return a plausible PAM initiator for ambient logind session noise."""
+    if system_type == "server":
+        if user == "root":
+            service = rng.choices(("login", "sudo", "su"), weights=(3, 70, 27), k=1)[0]
+        else:
+            service = rng.choices(("login", "sudo"), weights=(5, 95), k=1)[0]
+    elif user == "root":
+        service = rng.choices(("login", "sudo", "su"), weights=(45, 35, 20), k=1)[0]
+    else:
+        service = rng.choices(("login", "sudo"), weights=(76, 24), k=1)[0]
+    app_name = service
+    opener = "LOGIN(uid=0)" if service == "login" else "(uid=0)"
+    message = (
+        f"pam_unix({service}:session): session opened for user "
+        f"{user}(uid={_linux_uid_for_user(user)}) by {opener}"
+    )
+    return app_name, service, message
+
+
+def _linux_ambient_logind_probability(system_type: str) -> float:
+    """Return thinning probability for generic ambient logind session noise."""
+    if system_type == "server":
+        return 0.05
+    return 0.42
+
+
+def _extra_syslog_service_values(
+    system_services: list[str] | None, fallback: list[str]
+) -> list[str]:
+    """Return safe service placeholder values for extra syslog sudo commands."""
+    contextual: list[str] = []
+    for service in system_services or []:
+        normalized = service.strip().lower()
+        if not normalized or normalized in {"dns-client", "systemd"} or "{" in normalized:
+            continue
+        if normalized == "ssh":
+            normalized = "sshd"
+        contextual.append(normalized)
+    return contextual or fallback
+
+
+def _render_extra_sudo_command_template(
+    template: str,
+    rng: random.Random,
+    *,
+    system_services: list[str] | None,
+    fallback_services: list[str],
+    params: dict[str, Any] | None = None,
+) -> str:
+    """Resolve a sudo command template with host-aware service names."""
+    if "{" not in template:
+        return template
+    resolved_params = params or {}
+    render_values: dict[str, str] = {}
+    for _literal, field_name, _format_spec, _conversion in string.Formatter().parse(template):
+        if not field_name:
+            continue
+        field = field_name.split(".", 1)[0].split("[", 1)[0]
+        if field in render_values:
+            continue
+        if field == "service":
+            pool = _extra_syslog_service_values(system_services, fallback_services)
+        else:
+            values = resolved_params.get(field, [])
+            if isinstance(values, list):
+                pool = [str(value) for value in values if str(value).strip()]
+            elif isinstance(values, str) and values.strip():
+                pool = [values]
+            else:
+                pool = []
+        if pool:
+            render_values[field] = rng.choice(pool)
+    try:
+        return template.format(**render_values)
+    except (KeyError, IndexError, ValueError):
+        return template
+
+
+def _linux_baseline_pam_open_lead(rng: random.Random) -> timedelta:
+    """Return lead time for ambient PAM open rows before logind records."""
+    return timedelta(milliseconds=rng.randint(3000, 8000))
+
+
+def _linux_baseline_pam_close_lead(rng: random.Random) -> timedelta:
+    """Return lead time for ambient PAM close rows before logind removal records."""
+    return timedelta(milliseconds=rng.randint(1200, 4200))
+
+
+def _linux_sudo_command_runtime(command: str, rng: random.Random) -> timedelta:
+    """Return a source-native sudo session runtime for one COMMAND value."""
+    try:
+        tokens = shlex.split(command)
+    except ValueError:
+        tokens = command.split()
+    exe = tokens[0].rsplit("/", 1)[-1].lower() if tokens else ""
+
+    if exe in {"vmstat", "iostat"}:
+        numeric_args: list[float] = []
+        for token in tokens[1:]:
+            try:
+                numeric_args.append(float(token))
+            except ValueError:
+                continue
+        if len(numeric_args) >= 2:
+            delay = max(0.25, numeric_args[-2])
+            count = max(1.0, numeric_args[-1])
+            return timedelta(seconds=delay * count + rng.uniform(0.18, 0.95))
+        if len(numeric_args) == 1:
+            return timedelta(seconds=max(0.8, numeric_args[0]) + rng.uniform(0.2, 1.4))
+
+    normalized = " ".join(tokens).lower()
+    if any(marker in normalized for marker in ("apt-get", "apt list", "needrestart")):
+        return timedelta(seconds=rng.uniform(3.5, 18.0))
+    if any(marker in normalized for marker in ("systemctl restart", "service ") if marker):
+        return timedelta(seconds=rng.uniform(2.5, 15.0))
+    if "journalctl" in normalized or "find " in f" {normalized} ":
+        return timedelta(seconds=rng.uniform(1.2, 9.5))
+    if any(marker in normalized for marker in ("lsof", "iptables", "systemd-analyze")):
+        return timedelta(seconds=rng.uniform(1.0, 6.5))
+    if any(marker in normalized for marker in ("systemctl status", "systemctl list-")):
+        return timedelta(seconds=rng.uniform(0.9, 5.5))
+    if exe in {"df", "free", "ss", "lsblk", "tail", "grep", "du", "apt-cache"}:
+        return timedelta(seconds=rng.uniform(0.35, 3.2))
+    return timedelta(seconds=rng.uniform(0.25, 2.8))
+
+
+def _linux_transient_syslog_pid(
+    state_manager: Any,
+    system_hostname: str,
+    event_time: datetime,
+    rng: random.Random,
+) -> int:
+    """Allocate a source-native PID for one short-lived Linux syslog invocation."""
+    allocator = getattr(state_manager, "allocate_transient_linux_pid", None)
+    if callable(allocator):
+        return allocator(system_hostname, event_time)
+    return rng.randint(1200, 9500)
+
+
+def _sample_lock_duration(rng: random.Random, kind: str) -> timedelta:
+    """Return a human-shaped workstation lock duration with non-minute texture."""
+    if kind == "lunch":
+        seconds = int(rng.triangular(22 * 60, 76 * 60, 43 * 60))
+        seconds += rng.randint(-95, 125)
+    else:
+        bucket = rng.random()
+        if bucket < 0.18:
+            seconds = rng.randint(65, 260)
+        elif bucket < 0.82:
+            seconds = int(rng.triangular(4 * 60, 24 * 60, 9 * 60))
+        else:
+            seconds = int(rng.triangular(18 * 60, 52 * 60, 31 * 60))
+        seconds += rng.randint(-35, 85)
+    seconds = max(127, seconds)
+    return timedelta(seconds=seconds, milliseconds=rng.randint(17, 987))
+
+
+def _extra_syslog_limit_key(system_hostname: str, entry: dict[str, Any]) -> str:
+    """Return the per-host generation-limit key for an extra syslog entry."""
+    messages = entry.get("messages") if isinstance(entry.get("messages"), list) else []
+    marker = "|".join(str(message) for message in messages[:2])
+    return f"{system_hostname}:{entry.get('app', '<unknown>')}:{marker}"
+
+
+def _networkmanager_message_timestamp(ts: datetime) -> str:
+    """Return the source-native NetworkManager bracket timestamp."""
+    timestamp = ts if ts.tzinfo is not None else ts.replace(tzinfo=UTC)
+    return f"{timestamp.timestamp():.4f}"
+
+
+def _session_started_by(session: Any, time: datetime) -> bool:
+    """Return whether a session exists at the given activity time."""
+    session_start = session.start_time
+    if session_start.tzinfo is None:
+        session_start = session_start.replace(tzinfo=UTC)
+    else:
+        session_start = session_start.astimezone(UTC)
+    activity_time = time.replace(tzinfo=UTC) if time.tzinfo is None else time.astimezone(UTC)
+    return session_start <= activity_time
+
+
+def _eligible_for_hourly_module_load(proc: Any, time: datetime) -> bool:
+    """Return whether broad hourly DLL noise may attach to a process at ``time``."""
+    if "\\" not in proc.image or proc.start_time > time:
+        return False
+    lifetime = _windows_foreground_lifetime(proc.image, proc.command_line)
+    if lifetime is None:
+        return True
+    max_follow_on = proc.start_time + timedelta(seconds=lifetime[1] + 5.0)
+    return time <= max_follow_on
+
+
+def _bounded_lognormal_seconds(
+    rng: random.Random,
+    *,
+    minimum: float,
+    median: float,
+    p95: float,
+    maximum: float,
+) -> float:
+    """Return a bounded heavy-tailed duration in seconds."""
+    sigma = max(0.18, math.log(max(p95, median + 1.0) / max(median, 1.0)) / 1.645)
+    sample = rng.lognormvariate(math.log(max(median, 1.0)), sigma)
+    if rng.random() < 0.08:
+        sample *= rng.uniform(1.2, 2.6)
+    return max(minimum, min(sample, maximum))
+
+
+def _windows_background_process_lifetime_seconds(
+    image: str,
+    command_line: str,
+    rng: random.Random,
+) -> float | None:
+    """Return a source-native background Windows process lifetime when bounded."""
+    foreground_lifetime = _windows_foreground_lifetime(image, command_line)
+    if foreground_lifetime is not None:
+        return rng.uniform(*foreground_lifetime)
+
+    exe_name = image.rsplit("\\", 1)[-1].rsplit("/", 1)[-1].lower()
+    command = command_line.lower()
+    if exe_name == "mpcmdrun.exe":
+        if "-signatureupdate" in command:
+            return _bounded_lognormal_seconds(
+                rng, minimum=4.0, median=28.0, p95=180.0, maximum=420.0
+            )
+        return _bounded_lognormal_seconds(
+            rng, minimum=90.0, median=480.0, p95=1800.0, maximum=3600.0
+        )
+    if exe_name == "cleanmgr.exe":
+        return _bounded_lognormal_seconds(
+            rng, minimum=35.0, median=260.0, p95=900.0, maximum=1500.0
+        )
+    if exe_name == "compattelrunner.exe":
+        return _bounded_lognormal_seconds(rng, minimum=12.0, median=95.0, p95=420.0, maximum=900.0)
+    if exe_name in {"hpimageassistant.exe", "dcu-cli.exe"}:
+        return _bounded_lognormal_seconds(
+            rng, minimum=45.0, median=420.0, p95=1800.0, maximum=3600.0
+        )
+    if exe_name in {
+        "adobearm.exe",
+        "adobearmservice.exe",
+        "dropboxupdate.exe",
+        "googleupdate.exe",
+        "zoomupdate.exe",
+        "onedrivestandaloneupdater.exe",
+        "usoclient.exe",
+    }:
+        return _bounded_lognormal_seconds(rng, minimum=4.0, median=45.0, p95=360.0, maximum=900.0)
+    if exe_name == "tiworker.exe":
+        return _bounded_lognormal_seconds(
+            rng, minimum=90.0, median=900.0, p95=3600.0, maximum=7200.0
+        )
+    if exe_name == "wsqmcons.exe":
+        return _bounded_lognormal_seconds(rng, minimum=2.0, median=12.0, p95=75.0, maximum=180.0)
+    if exe_name == "conhost.exe":
+        return _bounded_lognormal_seconds(rng, minimum=1.0, median=18.0, p95=240.0, maximum=900.0)
+    if exe_name == "dllhost.exe":
+        return _bounded_lognormal_seconds(rng, minimum=3.0, median=75.0, p95=900.0, maximum=3600.0)
+    if exe_name == "wmiprvse.exe":
+        return _bounded_lognormal_seconds(
+            rng, minimum=30.0, median=420.0, p95=5400.0, maximum=14400.0
+        )
+    return None
+
+
+def _windows_stale_process_target_lifetime(
+    image: str,
+    command_line: str,
+    rng: random.Random,
+) -> float:
+    """Return a broad target lifetime for stale Windows process cleanup."""
+    bounded = _windows_background_process_lifetime_seconds(image, command_line, rng)
+    if bounded is not None:
+        return bounded
+
+    exe_name = image.rsplit("\\", 1)[-1].rsplit("/", 1)[-1].lower()
+    if exe_name in {"chrome.exe", "firefox.exe", "msedge.exe", "outlook.exe", "teams.exe"}:
+        return _bounded_lognormal_seconds(
+            rng,
+            minimum=20 * 60.0,
+            median=3 * 3600.0,
+            p95=9 * 3600.0,
+            maximum=14 * 3600.0,
+        )
+    if exe_name in {"dropbox.exe", "onedrive.exe", "slack.exe", "zoom.exe", "code.exe"}:
+        return _bounded_lognormal_seconds(
+            rng,
+            minimum=15 * 60.0,
+            median=2.5 * 3600.0,
+            p95=8 * 3600.0,
+            maximum=12 * 3600.0,
+        )
+    return _bounded_lognormal_seconds(
+        rng,
+        minimum=10 * 60.0,
+        median=90 * 60.0,
+        p95=6 * 3600.0,
+        maximum=10 * 3600.0,
+    )
+
+
+def _is_windows_singleton_service_image(image: str) -> bool:
+    """Return whether an image is a configured singleton Windows service."""
+    from evidenceforge.generation.activity.system_processes import (
+        get_windows_singleton_service_paths,
+    )
+
+    normalized = image.replace("/", "\\").lower()
+    exe_name = normalized.rsplit("\\", 1)[-1]
+    return normalized in get_windows_singleton_service_paths().get(exe_name, set())
+
+
+def _kernel_uptime_stamp(boot_uptime: float, scenario_start: datetime, timestamp: datetime) -> str:
+    """Return source-native kernel monotonic uptime for a syslog timestamp."""
+    event_time = timestamp if timestamp.tzinfo is not None else timestamp.replace(tzinfo=UTC)
+    start_time = (
+        scenario_start if scenario_start.tzinfo is not None else scenario_start.replace(tzinfo=UTC)
+    )
+    uptime = boot_uptime + (event_time - start_time).total_seconds()
+    return f"{uptime:.6f}"
+
+
+def _session_logoff_time(
+    session: Any,
+    current_hour: datetime,
+    planned_logoffs: dict[tuple[str, str], float] | None,
+) -> datetime | None:
+    """Return the planned visible logoff time for a session in this hour."""
+    if not planned_logoffs:
+        return None
+    offset = planned_logoffs.get((session.system, session.logon_id))
+    if offset is None:
+        return None
+    return current_hour + timedelta(seconds=offset)
+
+
+def _session_activity_deadline(
+    session: Any,
+    current_hour: datetime,
+    planned_logoffs: dict[tuple[str, str], float] | None,
+) -> datetime:
+    """Return the latest timestamp that may own user-mode session activity."""
+
+    deadline = current_hour + timedelta(hours=1)
+    logoff_time = _session_logoff_time(session, current_hour, planned_logoffs)
+    if logoff_time is not None:
+        deadline = min(deadline, logoff_time)
+
+    network_close_time = getattr(session, "network_close_time", None)
+    if network_close_time is not None:
+        network_close_time = (
+            network_close_time.replace(tzinfo=UTC)
+            if network_close_time.tzinfo is None
+            else network_close_time.astimezone(UTC)
+        )
+        deadline = min(deadline, network_close_time)
+
+    return deadline
+
+
+def _session_active_at(
+    session: Any,
+    time: datetime,
+    current_hour: datetime,
+    planned_logoffs: dict[tuple[str, str], float] | None,
+) -> bool:
+    """Return whether a session should be used for activity at ``time``."""
+    if not _session_started_by(session, time):
+        return False
+    activity_time = time.replace(tzinfo=UTC) if time.tzinfo is None else time.astimezone(UTC)
+    return activity_time < _session_activity_deadline(session, current_hour, planned_logoffs)
+
+
+def _dns_context_for_ids_signature(
+    signature: dict[str, Any],
+    rng: random.Random,
+    *,
+    ad_domain: str,
+    dns_server_ip: str,
+) -> Any | None:
+    """Build canonical DNS payload for DNS IDS signatures."""
+    dns_query = render_dns_query_template(signature, rng)
+    if not dns_query:
+        token = "".join(rng.choice("abcdefghijklmnopqrstuvwxyz0123456789") for _ in range(8))
+        dns_query = f"host-{token}.{ad_domain}"
+
+    from evidenceforge.events.contexts import DnsContext
+
+    response_rng = random.Random(_stable_seed(f"ids_dns_response:{dns_query}"))
+    tld = dns_query.lower().rstrip(".").rsplit(".", 1)[-1]
+    odd_tld_outcomes: dict[str, tuple[tuple[str, int, list[str]], ...]] = {
+        "bit": (
+            ("NXDOMAIN", 3, []),
+            ("NXDOMAIN", 3, []),
+            ("NXDOMAIN", 3, []),
+            ("SERVFAIL", 2, []),
+            ("REFUSED", 5, []),
+        ),
+        "cloud": (
+            ("NOERROR", 0, ["0.0.0.0"]),
+            ("NOERROR", 0, ["0.0.0.0"]),
+            ("NXDOMAIN", 3, []),
+            ("NXDOMAIN", 3, []),
+            ("SERVFAIL", 2, []),
+        ),
+        "tk": (
+            ("NXDOMAIN", 3, []),
+            ("NXDOMAIN", 3, []),
+            ("SERVFAIL", 2, []),
+            ("NOERROR", 0, ["0.0.0.0"]),
+        ),
+        "to": (
+            ("NXDOMAIN", 3, []),
+            ("NXDOMAIN", 3, []),
+            ("SERVFAIL", 2, []),
+            ("NOERROR", 0, ["0.0.0.0"]),
+        ),
+        "top": (
+            ("NXDOMAIN", 3, []),
+            ("NXDOMAIN", 3, []),
+            ("SERVFAIL", 2, []),
+            ("NOERROR", 0, ["0.0.0.0"]),
+        ),
+    }
+    response_options = odd_tld_outcomes.get(tld)
+    if response_options is None:
+        rcode, rcode_num, answers = "NOERROR", 0, [_generate_random_external_ip(rng)]
+    else:
+        rcode, rcode_num, answers = response_rng.choice(response_options)
+    is_internal = _dns_is_internal_name(dns_query, ad_domain)
+    return DnsContext(
+        query=dns_query,
+        trans_id=rng.randint(1, 65535),
+        qtype=1,
+        query_type="A",
+        rcode=rcode,
+        rcode_num=rcode_num,
+        answers=list(answers),
+        TTLs=[
+            float(
+                _dns_base_ttl(
+                    dns_query,
+                    is_internal,
+                )
+            )
+        ]
+        if answers
+        else [],
+        rtt=_dns_rtt(rng, dns_server_ip),
+    )
+
+
+# Day-of-week intensity multipliers (0=Monday, 6=Sunday).
+# Models weekly rhythm: Monday login storms, Friday early departures,
+# weekend near-zero (only sysadmin/oncall personas active).
+_DAY_OF_WEEK_MULTIPLIERS = {
+    0: 1.15,  # Monday: login storms, catching up
+    1: 1.05,  # Tuesday: peak productivity
+    2: 1.05,  # Wednesday: peak productivity
+    3: 1.00,  # Thursday: normal
+    4: 0.85,  # Friday: early departures, lighter load
+    5: 0.08,  # Saturday: near-zero
+    6: 0.05,  # Sunday: near-zero
+}
+
+# Personas that are active on weekends (IT operations, oncall)
+_WEEKEND_ACTIVE_PERSONAS = {"sysadmin", "security_analyst", "help_desk"}
+
+# Per-persona cluster configuration (legacy — used as fallback only)
+PERSONA_CLUSTER_CONFIG = {
+    "developer": {"cluster_size": (5, 15), "inter_gap_mean": 600},
+    "executive": {"cluster_size": (2, 6), "inter_gap_mean": 300},
+    "analyst": {"cluster_size": (4, 10), "inter_gap_mean": 480},
+    "sysadmin": {"cluster_size": (3, 8), "inter_gap_mean": 360},
+    "default": {"cluster_size": (3, 10), "inter_gap_mean": 420},
+}
+
+# Hawkes process parameters derived from risk_profile.
+# No hardcoded persona names — new personas work automatically.
+# Ratios tuned to produce CV > 1.0 for users with 30+ events.
+_HAWKES_RISK_PARAMS = {
+    "high": {"alpha_beta_ratio": 0.60, "beta": 0.06},  # moderate bursts, ~17s decay
+    "medium": {"alpha_beta_ratio": 0.50, "beta": 0.07},  # mild bursts, ~14s decay
+    "low": {"alpha_beta_ratio": 0.35, "beta": 0.10},  # gentle bursts, ~10s decay
+}
+
+
+def _pick_non_colliding_account_name(
+    rng: random.Random,
+    existing_accounts: set[str],
+    base_names: list[str],
+    max_numeric_suffix: int = 9,
+) -> str:
+    """Pick a synthetic account name that does not collide with scenario-defined accounts.
+
+    Selection is deterministic for a given RNG state and never loops forever:
+    1. Choose from unsuffixed base names when available.
+    2. Fall back to deterministic underscore suffixes with a bounded search.
+    """
+    available = [candidate for candidate in base_names if candidate not in existing_accounts]
+    if available:
+        return rng.choice(available)
+
+    for suffix in range(1, max_numeric_suffix + 1):
+        for base_name in base_names:
+            candidate = f"{base_name}_{suffix}"
+            if candidate not in existing_accounts:
+                return candidate
+
+    for suffix in range(max_numeric_suffix + 1, 10_001):
+        for base_name in base_names:
+            candidate = f"{base_name}_{suffix}"
+            if candidate not in existing_accounts:
+                return candidate
+
+    msg = "Unable to select non-colliding synthetic account name after bounded fallback search"
+    raise ValueError(msg)
+
+
+def _as_int(value: Any, default: int) -> int:
+    """Return an integer config value or a default."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _as_probability(value: Any, default: float) -> float:
+    """Return a clamped probability config value."""
+    try:
+        probability = float(value)
+    except (TypeError, ValueError):
+        probability = default
+    return max(0.0, min(probability, 0.95))
+
+
+def _weighted_interval_minutes(
+    rng: random.Random,
+    interval_ranges: list[dict[str, Any]],
+) -> int:
+    """Pick an interval in minutes from weighted config ranges."""
+    ranges = [entry for entry in interval_ranges if isinstance(entry, dict)]
+    if not ranges:
+        ranges = [
+            {"min_minutes": 55, "max_minutes": 95, "weight": 30},
+            {"min_minutes": 105, "max_minutes": 155, "weight": 45},
+            {"min_minutes": 170, "max_minutes": 260, "weight": 25},
+        ]
+    weights = [max(1, _as_int(entry.get("weight"), 1)) for entry in ranges]
+    selected = rng.choices(ranges, weights=weights, k=1)[0]
+    min_minutes = max(1, _as_int(selected.get("min_minutes"), 60))
+    max_minutes = max(min_minutes, _as_int(selected.get("max_minutes"), min_minutes))
+    return rng.randint(min_minutes, max_minutes)
+
+
+def _scheduled_stale_failure_offsets(
+    *,
+    scenario_name: str,
+    account_name: str,
+    hostname: str,
+    hour_idx: int,
+    config: dict[str, Any],
+) -> list[int]:
+    """Return stale scheduled-credential failure offsets for this generation hour."""
+    if hour_idx < 0:
+        return []
+
+    profile_key = f"sched_fail_profile:{scenario_name}:{account_name}:{hostname}"
+    profile_rng = random.Random(_stable_seed(profile_key))
+    first_min = max(0, _as_int(config.get("first_occurrence_seconds_min"), 0))
+    first_max = max(first_min, _as_int(config.get("first_occurrence_seconds_max"), 2700))
+    first_offset = profile_rng.randint(first_min, first_max)
+
+    jitter_min = _as_int(config.get("jitter_seconds_min"), -420)
+    jitter_max = max(jitter_min, _as_int(config.get("jitter_seconds_max"), 780))
+    skip_probability = _as_probability(config.get("skip_probability"), 0.16)
+    backoff_probability = _as_probability(config.get("backoff_probability"), 0.10)
+    backoff_min = max(0, _as_int(config.get("backoff_seconds_min"), 900))
+    backoff_max = max(backoff_min, _as_int(config.get("backoff_seconds_max"), 3600))
+    interval_ranges = config.get("interval_ranges")
+    if not isinstance(interval_ranges, list):
+        interval_ranges = []
+
+    window_start = hour_idx * 3600
+    window_end = window_start + 3600
+    offsets: list[int] = []
+    nominal_second = first_offset
+    occurrence_idx = 0
+    while nominal_second < window_end + max(0, -jitter_min) + backoff_max:
+        occurrence_rng = random.Random(_stable_seed(f"{profile_key}:occurrence:{occurrence_idx}"))
+        observed_second = nominal_second + occurrence_rng.randint(jitter_min, jitter_max)
+        if occurrence_rng.random() < backoff_probability:
+            observed_second += occurrence_rng.randint(backoff_min, backoff_max)
+        if (
+            occurrence_rng.random() >= skip_probability
+            and window_start <= observed_second < window_end
+        ):
+            offsets.append(int(observed_second - window_start))
+
+        interval_minutes = _weighted_interval_minutes(occurrence_rng, interval_ranges)
+        nominal_second += interval_minutes * 60
+        occurrence_idx += 1
+        if occurrence_idx > 10_000:
+            break
+
+    return sorted(set(offsets))
+
+
+def _hawkes_params_from_persona(persona: Persona | None) -> dict:
+    """Derive Hawkes kernel parameters from persona risk_profile.
+
+    Returns dict with alpha_beta_ratio and beta. Caller computes:
+        alpha = alpha_beta_ratio * beta
+        mu = num_events / duration * (1 - alpha/beta)
+    """
+    risk = persona.risk_profile if persona and persona.risk_profile else "medium"
+    return _HAWKES_RISK_PARAMS.get(risk, _HAWKES_RISK_PARAMS["medium"])
+
+
+def _signature_for_loaded_module(path: str) -> str:
+    """Infer a plausible signer for a generic baseline DLL path."""
+    lower = path.lower()
+    if "google\\chrome" in lower:
+        return "Google LLC"
+    if "mozilla firefox" in lower:
+        return "Mozilla Corporation"
+    if "adobe" in lower:
+        return "Adobe Inc."
+    if "vmware" in lower:
+        return "VMware, Inc."
+    if "dell" in lower:
+        return "Dell Inc."
+    if "cisco" in lower:
+        return "Cisco Systems, Inc."
+    if "git\\" in lower:
+        return "Git for Windows"
+    if "videolan" in lower:
+        return "VideoLAN"
+    if "notepad++" in lower:
+        return "Notepad++"
+    if "7-zip" in lower:
+        return "-"
+    return "Microsoft Corporation"
+
+
+def _module_matches_process(exe_name: str, module_path: str) -> bool:
+    """Return whether a generic DLL path plausibly belongs to a process."""
+    exe = exe_name.lower()
+    path = module_path.lower()
+    if "google\\chrome" in path:
+        return exe == "chrome.exe"
+    if "microsoft\\edge" in path:
+        return exe == "msedge.exe"
+    if "mozilla firefox" in path:
+        return exe == "firefox.exe"
+    if "microsoft onedrive" in path:
+        return exe in {"onedrive.exe", "explorer.exe"}
+    if "microsoft office" in path or "clicktorun" in path:
+        return exe in {"outlook.exe", "winword.exe", "excel.exe", "powerpnt.exe", "onedrive.exe"}
+    if "7-zip" in path or "notepad++" in path:
+        return exe == "explorer.exe"
+    if "windows defender" in path:
+        return exe in {"msmpeng.exe", "svchost.exe", "taskhostw.exe"}
+    if "vmware tools" in path or "dell\\supportassist" in path:
+        return exe in {"services.exe", "svchost.exe", "taskhostw.exe"}
+    if "cisco\\cisco anyconnect" in path:
+        return exe in {"vpnui.exe", "vpnagent.exe", "svchost.exe"}
+    if "git\\mingw64" in path:
+        return exe in {"git.exe", "code.exe", "powershell.exe", "cmd.exe"}
+    if "videolan" in path:
+        return exe == "vlc.exe"
+    if "microsoft vs code" in path:
+        return exe == "code.exe"
+    return "windows\\system32" in path
+
+
+def _registry_writer_candidates(
+    key: str,
+    sys_pids: dict[str, int],
+    desktop_user: str | None,
+) -> list[tuple[int, str, str]]:
+    """Choose plausible registry writer processes for a key family."""
+    key_lower = key.lower()
+
+    def _candidate(pid_key: str, image: str, user: str = "SYSTEM") -> tuple[int, str, str] | None:
+        pid = sys_pids.get(pid_key)
+        if pid is None:
+            return None
+        return pid, image, user
+
+    candidates: list[tuple[int, str, str] | None]
+    if key.startswith("HKCU\\"):
+        if desktop_user is None:
+            return []
+        candidates = [
+            _candidate("explorer", r"C:\Windows\explorer.exe", desktop_user),
+            _candidate("runtime_broker", r"C:\Windows\System32\RuntimeBroker.exe", desktop_user),
+        ]
+    elif "windows defender" in key_lower:
+        candidates = [
+            _candidate(
+                "msmpeng", r"C:\ProgramData\Microsoft\Windows Defender\Platform\MsMpEng.exe"
+            ),
+            _candidate(
+                "mpcmdrun",
+                r"C:\ProgramData\Microsoft\Windows Defender\Platform\MpCmdRun.exe",
+            ),
+            _candidate("svchost_local_system", r"C:\Windows\System32\svchost.exe"),
+        ]
+    elif "windowsupdate" in key_lower or "component based servicing" in key_lower:
+        candidates = [
+            _candidate("svchost_wusvcs", r"C:\Windows\System32\svchost.exe"),
+            _candidate("msiexec", r"C:\Windows\System32\msiexec.exe"),
+            _candidate("services", r"C:\Windows\System32\services.exe"),
+        ]
+    elif "wbem" in key_lower or "cimom" in key_lower:
+        candidates = [
+            _candidate("wmiprvse", r"C:\Windows\System32\wbem\WmiPrvSE.exe", "NETWORK SERVICE"),
+            _candidate("svchost_dcom", r"C:\Windows\System32\svchost.exe"),
+        ]
+    elif "schedule\\taskcache" in key_lower:
+        candidates = [
+            _candidate("taskhostw", r"C:\Windows\System32\taskhostw.exe"),
+            _candidate("svchost_local_system", r"C:\Windows\System32\svchost.exe"),
+        ]
+    elif "installer" in key_lower or "uninstall" in key_lower or "app paths" in key_lower:
+        candidates = [
+            _candidate("msiexec", r"C:\Windows\System32\msiexec.exe"),
+            _candidate("services", r"C:\Windows\System32\services.exe"),
+        ]
+    elif "tcpip" in key_lower or "w32time" in key_lower or "netlogon" in key_lower:
+        candidates = [
+            _candidate("svchost_netsvcs", r"C:\Windows\System32\svchost.exe", "NETWORK SERVICE"),
+            _candidate("services", r"C:\Windows\System32\services.exe"),
+        ]
+    else:
+        candidates = [
+            _candidate("services", r"C:\Windows\System32\services.exe"),
+            _candidate("svchost_netsvcs", r"C:\Windows\System32\svchost.exe", "NETWORK SERVICE"),
+            _candidate("dllhost", r"C:\Windows\System32\dllhost.exe"),
+        ]
+
+    return [candidate for candidate in candidates if candidate is not None]
+
+
+def _materialize_registry_value_for_time(
+    target: str,
+    value: str,
+    event_time: datetime,
+    rng: random.Random,
+) -> str:
+    """Adjust time-like registry values so they cannot point after the event."""
+    if "\\Office\\16.0\\Word\\Reading Locations\\" not in target or not target.endswith(
+        "\\Datetime"
+    ):
+        return value
+    prior_time = event_time - timedelta(minutes=rng.randint(2, 180), seconds=rng.randint(0, 59))
+    return prior_time.strftime("%Y-%m-%dT%H:%M:%S")
+
+
+def _is_dhcp_managed_registry_value(
+    key: str,
+    value_name: str,
+    policy: dict[str, Any] | None = None,
+) -> bool:
+    """Return whether a registry value belongs to DHCP lease state."""
+    if policy is None:
+        from evidenceforge.generation.activity.endpoint_noise import registry_noise_config
+
+        policy = registry_noise_config().get("dhcp_interface_values", {})
+    key_lower = key.lower()
+    if r"services\tcpip\parameters" not in key_lower:
+        return False
+    managed_names = {str(name).lower() for name in policy.get("value_names", [])}
+    return value_name.lower() in managed_names
+
+
+def _is_static_inventory_registry_value(key: str, value_name: str, policy: dict[str, Any]) -> bool:
+    """Return whether a registry value describes static software inventory."""
+    inventory_names = {str(name).lower() for name in policy.get("value_names", [])}
+    key_substrings = [str(part).lower() for part in policy.get("key_substrings", [])]
+    key_lower = key.lower()
+    return value_name.lower() in inventory_names and any(
+        part in key_lower for part in key_substrings
+    )
+
+
+def _system_suppresses_dhcp_registry_noise(system: Any, policy: dict[str, Any]) -> bool:
+    """Return whether DHCP registry noise should be suppressed for this static host."""
+    system_type = str(getattr(system, "type", "") or "").lower()
+    roles = {str(role).lower() for role in (getattr(system, "roles", []) or [])}
+    suppressed_types = {str(value).lower() for value in policy.get("suppress_system_types", [])}
+    suppressed_roles = {str(value).lower() for value in policy.get("suppress_roles", [])}
+    return system_type in suppressed_types or bool(roles.intersection(suppressed_roles))
+
+
+def _ambient_registry_entry_allowed(
+    system: Any,
+    key: str,
+    value_name: str,
+    dhcp_state: dict[str, Any] | None,
+    registry_cfg: dict[str, Any] | None = None,
+) -> bool:
+    """Return whether an ambient registry pool entry can emit for this host."""
+    if registry_cfg is None:
+        from evidenceforge.generation.activity.endpoint_noise import registry_noise_config
+
+        registry_cfg = registry_noise_config()
+    inventory_policy = registry_cfg.get("static_inventory_values", {})
+    if inventory_policy.get("suppress_in_ambient_noise", True) and (
+        _is_static_inventory_registry_value(key, value_name, inventory_policy)
+    ):
+        return False
+    policy = registry_cfg.get("dhcp_interface_values", {})
+    if not _is_dhcp_managed_registry_value(key, value_name, policy):
+        return True
+    if policy.get("emit_on_lease_events", True):
+        return False
+    if _system_suppresses_dhcp_registry_noise(system, policy):
+        return False
+    return bool(dhcp_state) if policy.get("require_dhcp_state", True) else True
+
+
+def _windows_scheduled_task_offsets(
+    current_hour: datetime,
+    system: Any,
+    rng: random.Random,
+    count_multiplier: float = 1.0,
+) -> list[float]:
+    """Return config-driven Windows scheduled/background task offsets for this hour."""
+    from evidenceforge.generation.activity.endpoint_noise import windows_scheduled_process_config
+
+    cfg = windows_scheduled_process_config()
+    count_min = max(0, int(cfg.get("count_min", 2)))
+    count_max = max(count_min, int(cfg.get("count_max", 5)))
+    count_min, count_max = scale_count_range(count_min, count_max, count_multiplier)
+    start = max(0, min(3599, int(cfg.get("trigger_window_start_seconds", 90))))
+    end = max(start + 1, min(3599, int(cfg.get("trigger_window_end_seconds", 3510))))
+    spacing = max(1, int(cfg.get("slot_spacing_seconds", 300)))
+    phase_window = max(1, int(cfg.get("host_phase_window_seconds", 900)))
+    jitter_min = float(cfg.get("jitter_seconds_min", -42))
+    jitter_max = float(cfg.get("jitter_seconds_max", 73))
+    if jitter_min > jitter_max:
+        jitter_min, jitter_max = jitter_max, jitter_min
+    skip_probability = max(0.0, min(1.0, float(cfg.get("skip_probability", 0.08))))
+    window_len = max(1, end - start)
+    candidate_slots = list(range(0, max(1, window_len), spacing)) or [0]
+    num_tasks = rng.randint(count_min, count_max) if count_max > 0 else 0
+    num_tasks = min(num_tasks, len(candidate_slots))
+    if num_tasks <= 0:
+        return []
+
+    host_phase = _stable_seed(
+        f"task_phase:{system.hostname}:{current_hour.date().isoformat()}"
+    ) % min(phase_window, window_len)
+    selected_slots = sorted(rng.sample(candidate_slots, num_tasks))
+    offsets: list[float] = []
+    for slot in selected_slots:
+        if rng.random() < skip_probability:
+            continue
+        offset = start + ((slot + host_phase) % window_len) + rng.uniform(jitter_min, jitter_max)
+        offsets.append(max(float(start), min(float(end), offset)))
+    return sorted(offsets)
+
+
+# Synthetic SYSTEM user for baseline Event 8/10 generation
+_SYSTEM_USER = User(
+    username="SYSTEM",
+    full_name="NT AUTHORITY\\SYSTEM",
+    email="system@system.local",
+)
+
+
+_SCHEDULES_PATH = get_activity_directory() / "systemd_schedules.yaml"
+_CACHED_SCHEDULES: list[dict[str, Any]] | None = None
+
+_DAY_NAME_TO_INT = {
+    "monday": 0,
+    "tuesday": 1,
+    "wednesday": 2,
+    "thursday": 3,
+    "friday": 4,
+    "saturday": 5,
+    "sunday": 6,
+}
+
+_DC_KERBEROS_MEMBER_SVC_DIST = (
+    ("cifs", 52),
+    ("host", 16),
+    ("http", 12),
+    ("ldap", 8),
+    ("rpcss", 5),
+    ("wsman", 4),
+    ("termsrv", 3),
+)
+_DC_KERBEROS_LOCAL_SVC_DIST = (
+    ("ldap", 42),
+    ("cifs", 22),
+    ("host", 18),
+    ("DNS", 12),
+    ("rpcss", 4),
+    ("http", 2),
+)
+_KERBEROS_MEMBER_SERVICE_MARKERS = {
+    "app-server",
+    "crm",
+    "exchange",
+    "file-server",
+    "iis",
+    "mssql",
+    "print",
+    "sharepoint",
+    "smb",
+    "sql-server",
+    "web",
+    "web-server",
+    "windows-search",
+}
+
+
+def _merge_systemd_schedules(default: dict, overlay: dict) -> dict:
+    """Merge overlay systemd schedules into defaults (keyed by service name)."""
+    result = dict(default)
+    if "schedules" in overlay:
+        result["schedules"] = merge_keyed_list(
+            default.get("schedules", []),
+            overlay["schedules"],
+            key_field="service",
+        )
+    return result
+
+
+def _load_systemd_schedules() -> list[dict[str, Any]]:
+    """Load systemd/cron schedule definitions from YAML. Cached after first call."""
+    global _CACHED_SCHEDULES
+    if _CACHED_SCHEDULES is not None:
+        return _CACHED_SCHEDULES
+
+    data = load_with_overlay(
+        _SCHEDULES_PATH, "activity/systemd_schedules.yaml", _merge_systemd_schedules
+    )
+    _CACHED_SCHEDULES = data.get("schedules", [])
+    return _CACHED_SCHEDULES
+
+
+def _deterministic_probability_enabled(key: str, probability: float | None) -> bool:
+    """Return whether a stable per-key probability gate is enabled."""
+    if probability is None:
+        return True
+    clamped = max(0.0, min(1.0, float(probability)))
+    if clamped <= 0.0:
+        return False
+    if clamped >= 1.0:
+        return True
+    return (_stable_seed(key) % 10_000) / 10_000.0 < clamped
+
+
+def _cron_shell_command_line(command: str) -> str:
+    """Return a source-native shell command line for cron-executed commands."""
+    return f"/bin/sh -c {shlex.quote(command)}"
+
+
+def _resolve_cron_command(
+    cron_commands: Any,
+    *,
+    is_rhel_like: bool,
+) -> str | None:
+    """Return the selected cron command when it is a non-empty string."""
+    if not isinstance(cron_commands, dict):
+        return None
+
+    if is_rhel_like:
+        command = cron_commands.get("rhel", cron_commands.get("all", ""))
+    else:
+        command = cron_commands.get("debian", cron_commands.get("all", ""))
+
+    if not isinstance(command, str):
+        return None
+
+    stripped_command = command.strip()
+    if not stripped_command:
+        return None
+
+    return stripped_command
+
+
+def _cron_workload_process(
+    command: str,
+    is_rhel_like: bool,
+) -> tuple[str, str, tuple[float, float]] | None:
+    """Resolve the concrete workload process normally spawned by a cron shell."""
+    command_lower = command.lower()
+    if "debian-sa1" in command_lower:
+        return "/usr/lib/sysstat/debian-sa1", "debian-sa1 1 1", (1.05, 2.4)
+    if "logrotate" in command_lower:
+        return "/usr/sbin/logrotate", "/usr/sbin/logrotate /etc/logrotate.conf", (0.8, 4.5)
+    if "run-parts" in command_lower:
+        process_path = "/usr/bin/run-parts" if not is_rhel_like else "/bin/run-parts"
+        command_line = "run-parts --report /etc/cron.daily"
+        if is_rhel_like:
+            command_line = "run-parts /etc/cron.daily"
+        return process_path, command_line, (1.0, 6.0)
+    return None
+
+
+def _schedule_applies_to_system(sched: dict[str, Any], system: Any, has_web_role: bool) -> bool:
+    """Return whether a Linux schedule matches host role and service/package state."""
+    roles = {str(role).lower() for role in (getattr(system, "roles", []) or [])}
+    services = {str(service).lower() for service in (getattr(system, "services", []) or [])}
+
+    legacy_role = sched.get("role")
+    if legacy_role:
+        role = str(legacy_role).lower()
+        if role == "web_server":
+            if role not in roles and not has_web_role:
+                return False
+        elif role not in roles:
+            return False
+
+    required_roles = {str(role).lower() for role in (sched.get("roles") or [])}
+    if required_roles and not roles.intersection(required_roles):
+        return False
+
+    excluded_roles = {str(role).lower() for role in (sched.get("exclude_roles") or [])}
+    if excluded_roles and roles.intersection(excluded_roles):
+        return False
+
+    required_services = {str(service).lower() for service in (sched.get("services_any") or [])}
+    if required_services and not services.intersection(required_services):
+        return False
+
+    service = sched.get("service", "")
+    return _deterministic_probability_enabled(
+        f"sched_host_enabled:{getattr(system, 'hostname', '')}:{service}",
+        sched.get("host_probability"),
+    )
+
+
+def _machine_account_tgs_gap_ms(rng: random.Random, *, first: bool) -> int:
+    """Return a realistic gap before machine-account service-ticket requests."""
+    if first:
+        roll = rng.random()
+        if roll < 0.55:
+            return rng.randint(120, 1_200)
+        if roll < 0.90:
+            return rng.randint(2_000, 45_000)
+        return rng.randint(60_000, 900_000)
+    roll = rng.random()
+    if roll < 0.70:
+        return rng.randint(500, 5_000)
+    if roll < 0.95:
+        return rng.randint(5_000, 60_000)
+    return rng.randint(60_000, 600_000)
+
+
+def _machine_account_ntlm_offset_seconds(tgt_offset_seconds: float, rng: random.Random) -> float:
+    """Place baseline NTLM validation away from same-second Kerberos cycles."""
+    candidate = rng.uniform(0, 3599)
+    if abs(candidate - tgt_offset_seconds) < 2.0:
+        direction = -1 if tgt_offset_seconds > 1800 else 1
+        candidate = tgt_offset_seconds + direction * rng.uniform(30, 300)
+    return max(0.0, min(3599.0, candidate))
+
+
+def _dc_kerberos_cycle_range(multiplier: float) -> tuple[int, int]:
+    """Return per-client DC Kerberos cycle bounds without letting DC roles explode volume."""
+    return scale_count_range(1, 3, min(max(multiplier, 0.25), 2.5))
+
+
+def _dc_kerberos_tgs_range(multiplier: float) -> tuple[int, int]:
+    """Return service-ticket burst bounds for one machine-account Kerberos cycle."""
+    return scale_count_range(1, 2, min(max(multiplier, 0.25), 1.5))
+
+
+def _pick_dc_kerberos_service(rng: random.Random, *, target_is_dc: bool) -> str:
+    """Pick a Kerberos service class with source-native skew instead of uniform buckets."""
+    dist = _DC_KERBEROS_LOCAL_SVC_DIST if target_is_dc else _DC_KERBEROS_MEMBER_SVC_DIST
+    values = [entry[0] for entry in dist]
+    weights = [entry[1] for entry in dist]
+    return rng.choices(values, weights=weights, k=1)[0]
+
+
+def _pick_dc_kerberos_target(
+    rng: random.Random,
+    member_servers: list[str],
+    dc_hostname: str,
+) -> tuple[str, bool]:
+    """Pick a service-ticket target, favoring member services over the DC itself."""
+    if member_servers and rng.random() < 0.82:
+        return rng.choice(member_servers), False
+    return dc_hostname, True
+
+
+def _is_kerberos_member_server(system: Any) -> bool:
+    """Return whether a Windows host should receive routine machine-account TGS traffic."""
+    host_type = str(getattr(system, "type", "")).lower()
+    if host_type not in {"server", "workstation"}:
+        return False
+    services = {str(value).lower().replace("_", "-") for value in getattr(system, "services", [])}
+    roles = {
+        str(value).lower().replace("_", "-") for value in (getattr(system, "roles", None) or [])
+    }
+    return bool((services | roles) & _KERBEROS_MEMBER_SERVICE_MARKERS)
+
+
+class BaselineMixin:
+    """Mixin providing baseline activity generation methods."""
+
+    # Make PERSONA_CLUSTER_CONFIG accessible as class attribute
+    PERSONA_CLUSTER_CONFIG = PERSONA_CLUSTER_CONFIG
+
+    def _storyline_account_lifecycle(self) -> dict[str, tuple[datetime | None, datetime | None]]:
+        """Return storyline-created/deleted account lifecycle bounds by username."""
+        cached = getattr(self, "_storyline_account_lifecycle_cache", None)
+        if cached is not None:
+            return cached
+
+        created: dict[str, datetime] = {}
+        deleted: dict[str, datetime] = {}
+        for entry in getattr(self.scenario, "storyline", []):
+            event_time = self._parse_storyline_time(entry.time)
+            for spec in getattr(entry, "events", []):
+                event_type = getattr(spec, "type", "")
+                username = getattr(spec, "target_username", "")
+                if not username:
+                    continue
+                key = username.lower()
+                if event_type == "account_created":
+                    created[key] = min(created.get(key, event_time), event_time)
+                elif event_type == "account_deleted":
+                    deleted[key] = min(deleted.get(key, event_time), event_time)
+
+        lifecycle = {
+            key: (created.get(key), deleted.get(key)) for key in set(created) | set(deleted)
+        }
+        self._storyline_account_lifecycle_cache = lifecycle
+        return lifecycle
+
+    def _service_account_available_at(self, username: str, when: datetime) -> bool:
+        """Return whether baseline may use a service account at a given time."""
+        created, deleted = self._storyline_account_lifecycle().get(
+            username.lower(),
+            (None, None),
+        )
+        if created is not None and when < created:
+            return False
+        if deleted is not None and when >= deleted:
+            return False
+        return True
+
+    def _service_account_eligible_for_baseline_noise(self, username: str) -> bool:
+        """Return whether generic baseline noise may use a durable service account."""
+
+        return username.lower() not in self._storyline_account_lifecycle()
+
+    def _pick_service_account_delegation_process(
+        self,
+        svc_name: str,
+        rng: random.Random,
+        hostname: str = "",
+    ) -> dict[str, Any]:
+        """Return a role-specific caller process for service-account 4648 noise."""
+        fallback = {
+            "image": r"C:\Windows\System32\taskhostw.exe",
+            "command_line": "taskhostw.exe /Run",
+            "parent_key": "svchost_netsvcs",
+            "weight": 1,
+        }
+        config = service_account_delegation_config()
+        profiles = config.get("caller_profiles", [])
+        if not isinstance(profiles, list) or not profiles:
+            return fallback
+
+        account = svc_name.lower()
+        matching_profiles: list[dict[str, Any]] = []
+        fallback_profiles: list[dict[str, Any]] = []
+        for profile in profiles:
+            if not isinstance(profile, dict):
+                continue
+            terms = [str(term).lower() for term in profile.get("account_terms", [])]
+            if "svc" in terms:
+                fallback_profiles.append(profile)
+            if any(term and term in account for term in terms):
+                matching_profiles.append(profile)
+
+        candidates = (
+            matching_profiles
+            or fallback_profiles
+            or [profile for profile in profiles if isinstance(profile, dict)]
+        )
+        if not candidates:
+            return fallback
+        profile = rng.choices(
+            candidates,
+            weights=[max(1, int(profile.get("weight", 1))) for profile in candidates],
+            k=1,
+        )[0]
+        processes = [
+            process for process in profile.get("processes", []) if isinstance(process, dict)
+        ]
+        if not processes:
+            return fallback
+        choice = rng.choices(
+            processes,
+            weights=[max(1, int(process.get("weight", 1))) for process in processes],
+            k=1,
+        )[0]
+        image = str(choice.get("image", "")).strip()
+        if not image:
+            return fallback
+        command_line = str(choice.get("command_line") or image)
+        command_line = command_line.replace("{account}", svc_name)
+        command_line = command_line.replace("{hostname}", hostname or "localhost")
+        parent_key = str(choice.get("parent_key") or "services")
+        return {
+            "image": image,
+            "command_line": command_line,
+            "parent_key": parent_key,
+            "weight": max(1, int(choice.get("weight", 1))),
+        }
+
+    def _ensure_service_account_delegation_process(
+        self,
+        system: System,
+        svc_name: str,
+        time: datetime,
+        sys_pids: dict[str, int],
+        rng: random.Random,
+    ) -> tuple[str, int]:
+        """Return a live caller process for benign service-account delegation."""
+        choice = self._pick_service_account_delegation_process(
+            svc_name,
+            rng,
+            hostname=system.hostname,
+        )
+        image = choice["image"]
+        normalized_image = image.replace("/", "\\").lower()
+        candidates = []
+        for proc in self.state_manager.get_processes_on_system(system.hostname):
+            if proc.start_time > time:
+                continue
+            if proc.username.upper() != "SYSTEM":
+                continue
+            if proc.image.replace("/", "\\").lower() == normalized_image:
+                candidates.append(proc)
+        if candidates:
+            proc = max(candidates, key=lambda candidate: candidate.start_time)
+            self.state_manager.update_process_activity_time(system.hostname, proc.pid, time)
+            return image, proc.pid
+
+        parent_key = str(choice.get("parent_key") or "services")
+        parent_pid = sys_pids.get(parent_key, sys_pids.get("services", sys_pids.get("wininit", 4)))
+        process_time = time - timedelta(seconds=rng.uniform(5.0, 90.0))
+        scenario_start = getattr(self, "start_time", None)
+        if scenario_start is not None and process_time < scenario_start:
+            process_time = time - timedelta(milliseconds=500)
+        pid = self.activity_generator.generate_system_process(
+            system=system,
+            time=process_time,
+            process_name=image,
+            command_line=str(choice.get("command_line") or image),
+            parent_pid=parent_pid,
+            username="SYSTEM",
+        )
+        return image, pid
+
+    def _next_rsyslog_fd(self, hostname: str, rng: random.Random) -> int:
+        """Return a small process-local fd for rsyslog daemon payloads."""
+        fd_state = getattr(self, "_linux_rsyslog_fds", None)
+        if fd_state is None:
+            fd_state = {}
+            self._linux_rsyslog_fds = fd_state
+        current = fd_state.get(hostname)
+        if current is None:
+            current = 4 + (_stable_seed(f"rsyslog_fd_base:{hostname}") % 8)
+        else:
+            current += rng.choice([1, 1, 2])
+            if current > 64:
+                current = 4 + rng.randint(0, 8)
+        fd_state[hostname] = current
+        return current
+
+    def _next_dbus_bus_id(self, hostname: str, rng: random.Random) -> int:
+        """Return a plausible monotonic system bus name suffix for one host."""
+        bus_state = getattr(self, "_linux_dbus_bus_ids", None)
+        if bus_state is None:
+            bus_state = {}
+            self._linux_dbus_bus_ids = bus_state
+        current = bus_state.get(hostname)
+        if current is None:
+            current = 12 + (_stable_seed(f"dbus_bus_id_base:{hostname}") % 80)
+        else:
+            current += rng.choice([1, 1, 2, 3])
+            if current > 980:
+                current = 12 + rng.randint(0, 80)
+        bus_state[hostname] = current
+        return current
+
+    def _choose_extra_syslog_sudo_command(
+        self,
+        entry: dict[str, Any],
+        rng: random.Random,
+        system: System,
+    ) -> str | None:
+        """Choose sudo COMMAND= text while avoiding cross-host command-pool fingerprints."""
+        params = entry.get("params") or {}
+        templates = [
+            str(command)
+            for command in params.get("sudo_command", [])
+            if isinstance(command, str) and command.strip()
+        ]
+        if not templates:
+            return None
+
+        global_counts = getattr(self, "_extra_syslog_sudo_command_counts", None)
+        if global_counts is None:
+            global_counts = {}
+            self._extra_syslog_sudo_command_counts = global_counts
+        host_counts = getattr(self, "_extra_syslog_sudo_command_host_counts", None)
+        if host_counts is None:
+            host_counts = {}
+            self._extra_syslog_sudo_command_host_counts = host_counts
+
+        fallback_services = [
+            str(service)
+            for service in params.get("service", [])
+            if isinstance(service, str) and service.strip()
+        ]
+        candidates: list[str] = []
+        for _ in range(72):
+            command = _render_extra_sudo_command_template(
+                rng.choice(templates),
+                rng,
+                system_services=system.services,
+                fallback_services=fallback_services,
+                params=params,
+            )
+            candidates.append(command)
+            if (
+                host_counts.get((system.hostname, command), 0) < 1
+                and global_counts.get(command, 0) < 4
+            ):
+                break
+        else:
+            command = min(
+                candidates,
+                key=lambda candidate: (
+                    global_counts.get(candidate, 0),
+                    host_counts.get((system.hostname, candidate), 0),
+                    candidate,
+                ),
+            )
+
+        global_counts[command] = global_counts.get(command, 0) + 1
+        host_counts[(system.hostname, command)] = host_counts.get((system.hostname, command), 0) + 1
+        return command
+
+    def _journald_housekeeping_schedule(
+        self,
+        system: System,
+        rng: random.Random,
+    ) -> list[tuple[datetime, str]]:
+        """Return low-frequency journald housekeeping messages for one host/window."""
+        schedules = getattr(self, "_linux_journald_housekeeping_schedules", None)
+        if schedules is None:
+            schedules = {}
+            self._linux_journald_housekeeping_schedules = schedules
+        cached = schedules.get(system.hostname)
+        if cached is not None:
+            return cached
+
+        start = (
+            self.start_time
+            if self.start_time.tzinfo is not None
+            else self.start_time.replace(tzinfo=UTC)
+        )
+        end = (
+            self.end_time if self.end_time.tzinfo is not None else self.end_time.replace(tzinfo=UTC)
+        )
+        window_seconds = max(0.0, (end - start).total_seconds())
+        if window_seconds < 1800:
+            schedules[system.hostname] = []
+            return []
+
+        host_rng = random.Random(_stable_seed(f"journald_housekeeping:{system.hostname}"))
+        max_events = min(3, max(1, int(window_seconds // 7200) + 1))
+        count_weights = [1, 4, 3, 1][: max_events + 1]
+        count = host_rng.choices(range(max_events + 1), weights=count_weights, k=1)[0]
+        if count <= 0:
+            schedules[system.hostname] = []
+            return []
+
+        machine_id = self._machine_ids.get(system.hostname, "0" * 32)
+        journal_type = host_rng.choice(["Runtime", "System"])
+        max_size = host_rng.choice([256, 512, 1024, 2048, 4096])
+        base_size = max_size * host_rng.uniform(0.12, 0.36)
+        step = max_size * host_rng.uniform(0.025, 0.095)
+
+        entries: list[tuple[datetime, str]] = []
+        kinds = ["capacity", "rotation", "vacuum"]
+        host_rng.shuffle(kinds)
+        segment = window_seconds / count
+        for idx in range(count):
+            slot_start = idx * segment
+            jitter_floor = min(segment * 0.18, 900.0)
+            jitter_ceiling = max(jitter_floor + 1.0, segment * 0.55)
+            offset = slot_start + host_rng.uniform(jitter_floor, jitter_ceiling)
+            ts = start + timedelta(seconds=min(offset, window_seconds - 1.0))
+            kind = kinds[idx % len(kinds)]
+            if kind == "capacity":
+                size = min(max_size * 0.78, base_size + (idx * step))
+                free = max_size - size
+                path = (
+                    f"/run/log/journal/{machine_id}"
+                    if journal_type == "Runtime"
+                    else f"/var/log/journal/{machine_id}"
+                )
+                msg = (
+                    f"{journal_type} Journal ({path}) is {size:.1f}M, "
+                    f"max {max_size}M, {free:.1f}M free."
+                )
+            elif kind == "rotation":
+                msg = "Rotating system journal."
+            else:
+                freed = host_rng.uniform(18.0, 240.0)
+                msg = f"Vacuuming done, freed {freed:.1f}M of archived journals."
+            entries.append((ts, msg))
+
+        schedules[system.hostname] = sorted(entries, key=lambda item: item[0])
+        return schedules[system.hostname]
+
+    def _emit_journald_housekeeping(
+        self,
+        system: System,
+        current_hour: datetime,
+        rng: random.Random,
+        sys_pids: dict[str, int],
+    ) -> None:
+        """Emit sparse journald housekeeping rows whose schedule falls in this hour."""
+        emitted = getattr(self, "_linux_journald_housekeeping_emitted", None)
+        if emitted is None:
+            emitted = set()
+            self._linux_journald_housekeeping_emitted = emitted
+        hour_end = current_hour + timedelta(hours=1)
+        for ts, msg in self._journald_housekeeping_schedule(system, rng):
+            key = (system.hostname, ts.isoformat(), msg)
+            if key in emitted or ts < current_hour or ts >= hour_end:
+                continue
+            self.activity_generator.generate_syslog_event(
+                system=system,
+                time=ts,
+                app_name="systemd-journald",
+                message=msg,
+                pid=sys_pids.get("journald", rng.randint(200, 500)),
+            )
+            emitted.add(key)
+
+    def _polkit_session_pool(self, hostname: str, rng: random.Random) -> list[int]:
+        """Return low, source-native session IDs that can represent pre-existing logind sessions."""
+        pool_state = getattr(self, "_linux_polkit_session_pools", None)
+        if pool_state is None:
+            pool_state = {}
+            self._linux_polkit_session_pools = pool_state
+        pool = pool_state.get(hostname)
+        if pool is None:
+            base = 18 + (_stable_seed(f"polkit_session_base:{hostname}") % 160)
+            pool = [base]
+            for _ in range(3):
+                pool.append(pool[-1] + rng.randint(1, 5))
+            pool_state[hostname] = pool
+        return pool
+
+    def _new_polkit_agent(
+        self,
+        hostname: str,
+        rng: random.Random,
+        entry: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Create source-local polkit agent state for one host."""
+        params = entry.get("params") or {}
+        process_paths = params.get("agent_process_path") or [
+            "/usr/libexec/polkit-gnome-authentication-agent-1",
+            "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
+            "/usr/libexec/kf5/polkit-kde-authentication-agent-1",
+        ]
+        return {
+            "session_id": rng.choice(self._polkit_session_pool(hostname, rng)),
+            "bus_id": self._next_dbus_bus_id(hostname, rng),
+            "process_path": rng.choice(process_paths),
+        }
+
+    @staticmethod
+    def _polkit_action_process_paths() -> dict[str, tuple[str, ...]]:
+        """Return source-native process candidates for common polkit action families."""
+        return {
+            "org.freedesktop.systemd1.manage-units": (
+                "/usr/bin/systemctl",
+                "/usr/bin/systemctl",
+                "/usr/bin/loginctl",
+            ),
+            "org.freedesktop.login1.reboot": (
+                "/usr/bin/systemctl",
+                "/usr/bin/loginctl",
+            ),
+            "org.freedesktop.packagekit.system-update": (
+                "/usr/lib/packagekit/packagekitd",
+                "/usr/bin/pkcon",
+            ),
+            "org.freedesktop.NetworkManager.settings.modify.system": (
+                "/usr/bin/nmcli",
+                "/usr/sbin/NetworkManager",
+            ),
+            "org.freedesktop.timedate1.set-timezone": ("/usr/bin/timedatectl",),
+        }
+
+    def _polkit_action_profile(
+        self,
+        entry: dict[str, Any],
+        rng: random.Random,
+    ) -> tuple[str, str]:
+        """Choose a coherent action/process pair for a polkit authorization message."""
+        params = entry.get("params") or {}
+        allowed = {str(item) for item in params.get("action_id", [])}
+        profiles = [
+            (action, process)
+            for action, processes in self._polkit_action_process_paths().items()
+            if not allowed or action in allowed
+            for process in processes
+        ]
+        if not profiles:
+            action = rng.choice(
+                params.get("action_id") or ["org.freedesktop.systemd1.manage-units"]
+            )
+            process = rng.choice(params.get("process_path") or ["/usr/bin/systemctl"])
+            return str(action), str(process)
+        return rng.choice(profiles)
+
+    def _polkit_process_start_ticks(
+        self,
+        hostname: str,
+        process_id: int,
+        timestamp: datetime,
+    ) -> str:
+        """Return Linux clock ticks since boot for a polkit unix-process subject."""
+        event_time = timestamp if timestamp.tzinfo is not None else timestamp.replace(tzinfo=UTC)
+        boot_time = None
+        get_boot_time = getattr(self.state_manager, "get_boot_time", None)
+        if callable(get_boot_time):
+            boot_time = get_boot_time(hostname)
+
+        if boot_time is not None:
+            boot = boot_time if boot_time.tzinfo is not None else boot_time.replace(tzinfo=UTC)
+            uptime_seconds = max(60.0, (event_time - boot).total_seconds())
+        else:
+            boot_uptime = getattr(self, "_kernel_boot_uptimes", {}).get(hostname)
+            uptime_seconds = (
+                float(boot_uptime)
+                if boot_uptime is not None
+                else float(
+                    3 * 86400 + (_stable_seed(f"polkit_boot_uptime:{hostname}") % (27 * 86400))
+                )
+            )
+
+        rng = random.Random(
+            _stable_seed(f"polkit_process_start:{hostname}:{process_id}:{event_time.isoformat()}")
+        )
+        max_age_seconds = max(0.05, min(900.0, uptime_seconds - 0.01))
+        age_seconds = min(
+            max_age_seconds,
+            max(0.02, rng.lognormvariate(math.log(2.0), 0.85)),
+        )
+        start_ticks = int((uptime_seconds - age_seconds) * 100) + rng.randint(0, 99)
+        return str(max(100, start_ticks))
+
+    @staticmethod
+    def _polkit_action_command_line(action_id: str, process_path: str, rng: random.Random) -> str:
+        """Return a plausible command line for a polkit-authorized process."""
+        executable = process_path.rsplit("/", 1)[-1]
+        if executable == "timedatectl":
+            timezone = rng.choice(
+                [
+                    "America/New_York",
+                    "America/Chicago",
+                    "UTC",
+                    "Etc/UTC",
+                ]
+            )
+            return f"{process_path} set-timezone {timezone}"
+        if executable == "systemctl":
+            if action_id == "org.freedesktop.login1.reboot":
+                return f"{process_path} reboot"
+            unit = rng.choice(["rsyslog", "ssh", "nginx", "systemd-resolved"])
+            verb = rng.choice(["reload", "restart", "status"])
+            return f"{process_path} {verb} {unit}"
+        if executable == "loginctl":
+            return f"{process_path} reboot" if action_id.endswith(".reboot") else process_path
+        if executable == "pkcon":
+            return rng.choice([f"{process_path} refresh", f"{process_path} update"])
+        if executable == "nmcli":
+            return rng.choice(
+                [
+                    f"{process_path} connection reload",
+                    f"{process_path} networking connectivity check",
+                ]
+            )
+        return process_path
+
+    @staticmethod
+    def _polkit_action_message_template(action_id: str, template: str) -> str:
+        """Return a source-native authorization template for a polkit action."""
+        if action_id != "org.freedesktop.login1.reboot":
+            return template
+        if template.startswith("Subject "):
+            return "Subject unix-process:{0}:{monotonic_start} is not authorized for action {action_id}"
+        return (
+            "Operator of unix-process:{0}:{monotonic_start} failed to authenticate as "
+            "unix-user:{auth_user} to gain TEMPORARY authorization for action {action_id} "
+            "for system-bus-name::1.{bus_id} [{process_path}] (owned by unix-user:{subject_user})"
+        )
+
+    @staticmethod
+    def _polkit_action_process_is_user_cli(process_path: str) -> bool:
+        """Return whether a polkit companion process is a foreground CLI client."""
+        executable = process_path.rsplit("/", 1)[-1]
+        return executable in {"loginctl", "nmcli", "pkcon", "systemctl", "timedatectl"}
+
+    def _materialize_polkit_action_process(
+        self,
+        *,
+        system: Any,
+        timestamp: datetime,
+        action_id: str,
+        process_path: str,
+        subject_user: str,
+        rng: random.Random,
+        sys_pids: dict[str, int] | None,
+    ) -> int | None:
+        """Create endpoint process evidence for a polkit action when collection can see it."""
+        activity_generator = getattr(self, "activity_generator", None)
+        if activity_generator is None:
+            return None
+
+        process_time = timestamp - timedelta(milliseconds=120 + rng.randint(0, 760))
+        scenario_start = getattr(self, "start_time", None)
+        if scenario_start is not None:
+            scenario_start = (
+                scenario_start
+                if scenario_start.tzinfo is not None
+                else (scenario_start.replace(tzinfo=UTC))
+            )
+            if process_time < scenario_start:
+                process_time = timestamp - timedelta(milliseconds=40)
+
+        parent_pid = 1
+        if sys_pids:
+            parent_pid = sys_pids.get("systemd", sys_pids.get("dbus", 1))
+        command_line = self._polkit_action_command_line(action_id, process_path, rng)
+        username = subject_user if subject_user else "root"
+        if _get_os_category(system.os) == "linux" and self._polkit_action_process_is_user_cli(
+            process_path
+        ):
+            user_resolver = getattr(activity_generator, "_user_model_for_username", None)
+            if callable(user_resolver):
+                user = user_resolver(username)
+            else:
+                user = User(username=username, full_name=username, email=f"{username}@example.com")
+            visible_parent = None
+            shell_parent = getattr(activity_generator, "ensure_linux_visible_shell_parent", None)
+            if callable(shell_parent):
+                visible_parent = shell_parent(
+                    user=user,
+                    target_system=system,
+                    activity_time=process_time,
+                )
+            if visible_parent is not None:
+                parent_pid = visible_parent
+            try:
+                pid = activity_generator.generate_process(
+                    user=user,
+                    system=system,
+                    time=process_time,
+                    logon_id="",
+                    process_name=process_path,
+                    command_line=command_line,
+                    parent_pid=parent_pid,
+                    suppress_command_file_effect=True,
+                )
+                self._schedule_foreground_process_termination(
+                    user=user,
+                    system=system,
+                    start_time=process_time,
+                    pid=pid,
+                    process_name=process_path,
+                    command_line=command_line,
+                    logon_id="",
+                    rng=rng,
+                )
+                return pid
+            except AttributeError:
+                return None
+        try:
+            return activity_generator.generate_system_process(
+                system=system,
+                time=process_time,
+                process_name=process_path,
+                command_line=command_line,
+                parent_pid=parent_pid,
+                username=username,
+                emit_linux_syslog=False,
+            )
+        except AttributeError:
+            return None
+
+    def _render_polkit_syslog_message(
+        self,
+        entry: dict[str, Any],
+        rng: random.Random,
+        *,
+        system: Any,
+        timestamp: datetime,
+        sys_pids: dict[str, int] | None = None,
+    ) -> str:
+        """Render polkit messages with coherent session and D-Bus state."""
+        from evidenceforge.generation.activity.extra_syslog import render_extra_syslog_message
+
+        hostname = system.hostname
+        active_agents = getattr(self, "_linux_polkit_agents", None)
+        if active_agents is None:
+            active_agents = {}
+            self._linux_polkit_agents = active_agents
+        host_agents = active_agents.setdefault(hostname, [])
+
+        template = rng.choice(entry.get("messages", [""]))
+        if template.startswith("Unregistered") and host_agents:
+            agent = host_agents.pop(0)
+        else:
+            agent = self._new_polkit_agent(hostname, rng, entry)
+            if template.startswith("Registered"):
+                host_agents.append(agent)
+
+        action_id, action_process_path = self._polkit_action_profile(entry, rng)
+        subject_user = rng.choice(
+            (entry.get("params") or {}).get("subject_user") or ["root", "admin", "deploy"]
+        )
+        template = self._polkit_action_message_template(action_id, template)
+        process_id = None
+        if "action {action_id}" in template:
+            process_id = self._materialize_polkit_action_process(
+                system=system,
+                timestamp=timestamp,
+                action_id=action_id,
+                process_path=action_process_path,
+                subject_user=str(subject_user),
+                rng=rng,
+                sys_pids=sys_pids,
+            )
+        if process_id is None:
+            process_id = self.state_manager.allocate_transient_linux_pid(
+                hostname, timestamp, os_category=_get_os_category(system.os)
+            )
+        values = {
+            "action_id": action_id,
+            "bus_id": agent["bus_id"],
+            "monotonic_start": self._polkit_process_start_ticks(hostname, process_id, timestamp),
+            "process_path": action_process_path
+            if "action {action_id}" in template
+            else agent["process_path"],
+            "subject_user": str(subject_user),
+        }
+        positional = agent["session_id"] if "unix-session:{0}" in template else process_id
+        return render_extra_syslog_message(
+            {**entry, "messages": [template]},
+            rng,
+            positional_value=positional,
+            system_services=system.services,
+            values=values,
+        )
+
+    def _schedule_foreground_process_termination(
+        self,
+        *,
+        user: User,
+        system: Any,
+        start_time: datetime,
+        pid: int,
+        process_name: str,
+        command_line: str,
+        logon_id: str,
+        rng: random.Random,
+    ) -> None:
+        """Terminate bounded foreground commands near their observed runtime."""
+        if _get_os_category(system.os) == "windows":
+            lifetime = _windows_foreground_lifetime(process_name, command_line)
+        else:
+            lifetime = _linux_foreground_lifetime(process_name, command_line)
+        if lifetime is None:
+            return
+        self.activity_generator.generate_process_termination(
+            user=user,
+            system=system,
+            time=start_time + timedelta(seconds=rng.uniform(*lifetime)),
+            pid=pid,
+            process_name=process_name,
+            logon_id=logon_id,
+        )
+
+    def _resolve_traffic_rate(self, traffic_type: str) -> tuple[int, int]:
+        """Get (lo, hi) rate for a traffic type — scenario override > config default."""
+        from evidenceforge.config.traffic_rates import get_rates_for_intensity
+
+        overrides = self.scenario.baseline_activity.traffic_rates
+        if overrides and traffic_type in overrides:
+            val = overrides[traffic_type]
+            if isinstance(val, int):
+                return (val, val)
+            if isinstance(val, list):
+                return (val[0], val[1])
+            if isinstance(val, str):
+                return tuple(get_rates_for_intensity(val)[traffic_type])
+
+        intensity = self.scenario.baseline_activity.intensity
+        defaults = get_rates_for_intensity(intensity)
+        rate = defaults[traffic_type]
+        return (rate[0], rate[1])
+
+    def _activity_roles_for_system(self, system: Any) -> list[str]:
+        """Return canonical roles for host activity profile resolution."""
+        if hasattr(self, "world_model") and system.hostname in self.world_model.hosts:
+            roles = list(self.world_model.hosts[system.hostname].canonical_roles)
+        else:
+            roles = [r.lower() for r in (getattr(system, "roles", None) or [])]
+        host_type = (getattr(system, "type", None) or "workstation").lower()
+        if host_type == "domain_controller" and "domain_controller" not in roles:
+            roles.append("domain_controller")
+        return roles
+
+    def _is_server_admin_persona_source(self, system: Any) -> bool:
+        """Return whether persona traffic should avoid workstation-style process owners."""
+
+        host_type = (getattr(system, "type", None) or "workstation").lower()
+        if host_type in _BASELINE_SERVER_ADMIN_PERSONA_TYPES:
+            return True
+        return bool(
+            set(self._activity_roles_for_system(system)) & _BASELINE_SERVER_ADMIN_PERSONA_ROLES
+        )
+
+    def _use_server_admin_persona(self, system: Any, session: Any) -> bool:
+        """Return whether this session should use the server-admin traffic overlay."""
+
+        host_type = (getattr(system, "type", None) or "workstation").lower()
+        assigned_user = getattr(system, "assigned_user", None)
+        is_own_workstation = host_type == "workstation" and assigned_user == session.username
+        return self._is_server_admin_persona_source(system) or (
+            not is_own_workstation and session.logon_type in (10, 11)
+        )
+
+    def _resolve_activity_profile(self, system: Any, persona: str | None = None) -> Any:
+        """Resolve and cache host activity profile multipliers."""
+        cache = getattr(self, "_host_activity_profile_cache", None)
+        if cache is None:
+            cache = {}
+            self._host_activity_profile_cache = cache
+        key = (getattr(system, "hostname", ""), persona or "")
+        if key not in cache:
+            cache[key] = resolve_host_activity_profile(
+                scenario_name=getattr(self.scenario, "name", "scenario"),
+                system=system,
+                roles=self._activity_roles_for_system(system),
+                persona=persona,
+            )
+        return cache[key]
+
+    def _activity_multiplier(
+        self,
+        system: Any | None,
+        family: str,
+        persona: str | None = None,
+    ) -> float:
+        """Return host/persona multiplier for a broad activity family."""
+        if system is None:
+            return 1.0
+        return self._resolve_activity_profile(system, persona).multiplier(family)
+
+    def _scaled_count_range(
+        self,
+        system: Any | None,
+        family: str,
+        lo: int,
+        hi: int,
+        *,
+        persona: str | None = None,
+    ) -> tuple[int, int]:
+        """Scale a count range for the host activity profile."""
+        return scale_count_range(lo, hi, self._activity_multiplier(system, family, persona))
+
+    def _scaled_randint(
+        self,
+        rng: random.Random,
+        system: Any | None,
+        family: str,
+        lo: int,
+        hi: int,
+        *,
+        persona: str | None = None,
+    ) -> int:
+        """Draw from a count range after applying host activity profile scaling."""
+        scaled_lo, scaled_hi = self._scaled_count_range(system, family, lo, hi, persona=persona)
+        return rng.randint(scaled_lo, scaled_hi)
+
+    @staticmethod
+    def _utc(value: datetime) -> datetime:
+        """Normalize datetimes for scheduler comparisons."""
+        return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+
+    def _baseline_rdp_hourly_count(self, rng: random.Random, system: Any) -> int:
+        """Return the number of new baseline RDP sessions to consider this hour."""
+        desired = self._scaled_randint(rng, system, "windows_remote_admin", 1, 3)
+        sys_type = (getattr(system, "type", None) or "workstation").lower()
+        if sys_type == "domain_controller":
+            return min(desired, 1)
+        return min(desired, 2)
+
+    def _baseline_rdp_cooldown_allows(
+        self,
+        *,
+        target_hostname: str,
+        source_hostname: str,
+        username: str,
+        planned_time: datetime,
+        cooldown: timedelta = timedelta(minutes=45),
+    ) -> bool:
+        """Return whether baseline may emit a new RDP session for this tuple."""
+        state = getattr(self, "_baseline_rdp_last_session", None)
+        if state is None:
+            state = {}
+            self._baseline_rdp_last_session = state
+
+        key = (target_hostname, source_hostname, username)
+        last_time = state.get(key)
+        if last_time is None:
+            return True
+
+        return self._utc(planned_time) - last_time >= cooldown
+
+    def _remember_baseline_rdp_session(
+        self,
+        *,
+        target_hostname: str,
+        source_hostname: str,
+        username: str,
+        session_time: datetime,
+    ) -> None:
+        """Record the actual time a baseline RDP session was materialized."""
+        state = getattr(self, "_baseline_rdp_last_session", None)
+        if state is None:
+            state = {}
+            self._baseline_rdp_last_session = state
+
+        key = (target_hostname, source_hostname, username)
+        state[key] = self._utc(session_time)
+
+    def _select_windows_scheduled_task(
+        self,
+        *,
+        system: System,
+        rng: random.Random,
+        time: datetime,
+    ) -> tuple[str, str, str] | None:
+        """Pick a scheduled task while honoring per-host caps and cooldowns."""
+        from evidenceforge.generation.activity.system_processes import (
+            get_scheduled_task_entries,
+            materialize_scheduled_task_entry,
+            scheduled_task_key,
+        )
+
+        entries = get_scheduled_task_entries(system)
+        if not entries:
+            return None
+
+        counts = getattr(self, "_windows_scheduled_task_counts", None)
+        if counts is None:
+            counts = {}
+            self._windows_scheduled_task_counts = counts
+        last_seen = getattr(self, "_windows_scheduled_task_last_seen", None)
+        if last_seen is None:
+            last_seen = {}
+            self._windows_scheduled_task_last_seen = last_seen
+
+        candidates: list[tuple[dict[str, Any], int, str]] = []
+        for entry in entries:
+            key = scheduled_task_key(entry)
+            state_key = (system.hostname, key)
+            max_window = int(entry.get("max_per_host_window", 0) or 0)
+            if max_window > 0 and counts.get(state_key, 0) >= max_window:
+                continue
+
+            cooldown_seconds = float(entry.get("cooldown_seconds", 0) or 0)
+            if not cooldown_seconds and entry.get("cooldown_hours") is not None:
+                cooldown_seconds = float(entry.get("cooldown_hours", 0) or 0) * 3600.0
+            previous = last_seen.get(state_key)
+            if previous is not None and (time - previous).total_seconds() < cooldown_seconds:
+                continue
+
+            try:
+                weight = int(entry.get("weight", 1))
+            except (TypeError, ValueError, OverflowError):
+                weight = 1
+            candidates.append((entry, max(1, weight), key))
+
+        if not candidates:
+            return None
+
+        selected_idx = rng.choices(
+            range(len(candidates)),
+            weights=[weight for _entry, weight, _key in candidates],
+            k=1,
+        )[0]
+        entry, _weight, key = candidates[selected_idx]
+        state_key = (system.hostname, key)
+        counts[state_key] = counts.get(state_key, 0) + 1
+        last_seen[state_key] = time
+        return materialize_scheduled_task_entry(entry, rng, system)
+
+    def _scaled_interval_range(
+        self,
+        system: Any | None,
+        family: str,
+        lo: int,
+        hi: int,
+    ) -> tuple[int, int]:
+        """Scale a seconds-between-events range for a host activity profile."""
+        return scale_interval_range(lo, hi, self._activity_multiplier(system, family))
+
+    def _activity_system_for_user(self, user: User) -> Any | None:
+        """Return the primary host whose profile should shape user activity."""
+        systems = self.scenario.environment.systems
+        if user.primary_system:
+            primary = next((s for s in systems if s.hostname == user.primary_system), None)
+            if primary is not None:
+                return primary
+        assigned = next((s for s in systems if s.assigned_user == user.username), None)
+        if assigned is not None:
+            return assigned
+        return systems[0] if systems else None
+
+    def _emit_dhcp_registry_side_effect(
+        self,
+        *,
+        system: Any,
+        time: datetime,
+        rng: random.Random,
+        sys_pids: dict[str, int],
+        dhcp_state: dict[str, Any] | None,
+    ) -> None:
+        """Emit DHCP interface registry writes coupled to a lease/renewal event."""
+        if _get_os_category(system.os) != "windows" or "windows_event_sysmon" not in self.emitters:
+            return
+
+        from evidenceforge.events.base import SecurityEvent
+        from evidenceforge.events.contexts import AuthContext, ProcessContext, RegistryContext
+        from evidenceforge.generation.activity.edr_pools import (
+            get_registry_keys_hklm,
+            materialize_edr_template_group,
+        )
+        from evidenceforge.generation.activity.endpoint_noise import registry_noise_config
+
+        registry_cfg = registry_noise_config()
+        policy = registry_cfg.get("dhcp_interface_values", {})
+        if not policy.get("emit_on_lease_events", True):
+            return
+        if policy.get("require_dhcp_state", True) and not dhcp_state:
+            return
+        if _system_suppresses_dhcp_registry_noise(system, policy):
+            return
+
+        dhcp_entries = [
+            (key, value_name, details)
+            for key, value_name, details in get_registry_keys_hklm()
+            if _is_dhcp_managed_registry_value(key, value_name, policy)
+        ]
+        if not dhcp_entries:
+            return
+
+        _host_ctx = self.activity_generator._build_host_context(system)
+        dns_server_ip = str((dhcp_state or {}).get("server_addr") or "10.0.0.1")
+        count = min(len(dhcp_entries), rng.randint(1, min(2, len(dhcp_entries))))
+        for key_tmpl, value_tmpl, details_tmpl in rng.sample(dhcp_entries, count):
+            reg_ts = time + timedelta(milliseconds=rng.randint(45, 900))
+            key, value_name, details = materialize_edr_template_group(
+                (key_tmpl, value_tmpl, details_tmpl),
+                rng,
+                system.assigned_user or "SYSTEM",
+                host_ip=system.ip,
+                dns_server_ip=dns_server_ip,
+                host_key=system.hostname,
+                host_os=system.os,
+            )
+            writer_candidates = _registry_writer_candidates(
+                key,
+                sys_pids,
+                system.assigned_user,
+            )
+            if writer_candidates:
+                reg_pid, reg_image, reg_user = rng.choice(writer_candidates)
+            else:
+                reg_pid = sys_pids.get("svchost_netsvcs", sys_pids.get("services", 4))
+                reg_image = r"C:\Windows\System32\svchost.exe"
+                reg_user = "NETWORK SERVICE"
+            reg_proc = self.state_manager.get_process(system.hostname, reg_pid)
+            if reg_proc is not None:
+                reg_image = reg_proc.image
+                if reg_proc.start_time and reg_ts <= reg_proc.start_time:
+                    reg_ts = reg_proc.start_time + timedelta(milliseconds=1)
+            target = f"{key}\\{value_name}"
+            self.activity_generator.dispatcher.dispatch(
+                SecurityEvent(
+                    timestamp=reg_ts,
+                    event_type="registry_modify",
+                    src_host=_host_ctx,
+                    auth=AuthContext(
+                        username=reg_user,
+                        user_sid=self.activity_generator._get_sid(reg_user),
+                        logon_id=reg_proc.logon_id if reg_proc is not None else "",
+                    ),
+                    process=ProcessContext(
+                        pid=reg_pid,
+                        parent_pid=reg_proc.parent_pid if reg_proc is not None else 0,
+                        image=reg_image,
+                        command_line=reg_proc.command_line if reg_proc is not None else "",
+                        username=reg_proc.username if reg_proc is not None else reg_user,
+                        logon_id=reg_proc.logon_id if reg_proc is not None else "",
+                        start_time=reg_proc.start_time if reg_proc is not None else None,
+                    ),
+                    registry=RegistryContext(
+                        key=target,
+                        value=_materialize_registry_value_for_time(target, details, reg_ts, rng),
+                        action="modify",
+                        pid=reg_pid,
+                    ),
+                )
+            )
+
+    def _generate_scheduled_tasks(
+        self,
+        current_hour: datetime,
+        system: Any,
+        rng: Any,
+        sys_pids: dict,
+        is_rhel_like: bool,
+        has_web_role: bool,
+    ) -> None:
+        """Generate cron/systemd timer events at realistic frequencies.
+
+        Each scheduled task fires at most once per day (or once per week for
+        weekly tasks) instead of appearing randomly in every hourly loop.
+        Per-host jitter is deterministic so the same host always runs tasks
+        at the same time.
+        """
+
+        schedules = _load_systemd_schedules()
+
+        for sched in schedules:
+            # Filter by distro
+            distro = sched.get("distro", "all")
+            if distro == "debian" and is_rhel_like:
+                continue
+            if distro == "rhel" and not is_rhel_like:
+                continue
+
+            # Filter by role and service/package signals
+            if not _schedule_applies_to_system(sched, system, has_web_role):
+                continue
+
+            service = sched["service"]
+            sched_type = sched.get("type", "systemd_timer")
+            frequency = sched.get("frequency", "daily")
+            typical_hour = sched.get("typical_hour", 6)
+            jitter_minutes = sched.get("jitter_minutes", 30)
+
+            # Deterministic per-host jitter offset
+            jitter_seed = _stable_seed(f"sched_{system.hostname}_{service}")
+            jitter_offset_min = jitter_seed % max(1, jitter_minutes)
+
+            if frequency == "daily":
+                # Compute the actual fire hour for this host
+                fire_hour = (typical_hour + jitter_offset_min // 60) % 24
+                if current_hour.hour != fire_hour:
+                    continue
+                fire_minute = jitter_offset_min % 60
+            elif frequency == "weekly":
+                typical_day = _DAY_NAME_TO_INT.get(sched.get("typical_day", "monday"), 0)
+                # Jitter can shift across days for weekly tasks
+                fire_day = (typical_day + jitter_offset_min // (24 * 60)) % 7
+                remaining = jitter_offset_min % (24 * 60)
+                fire_hour = (typical_hour + remaining // 60) % 24
+                fire_minute = remaining % 60
+                if current_hour.weekday() != fire_day:
+                    continue
+                if current_hour.hour != fire_hour:
+                    continue
+            elif frequency == "30min":
+                # Fires twice per hour at fixed offsets
+                fire_minute_1 = jitter_offset_min % 30
+                fire_minute_2 = fire_minute_1 + 30
+                fire_minute = fire_minute_1  # use first slot
+            else:
+                continue
+
+            # Compute event timestamp
+            if frequency == "30min":
+                # Generate two events per hour
+                for fm in (fire_minute_1, fire_minute_2):
+                    slot_key = (
+                        f"sched_slot:{system.hostname}:{service}:{current_hour.isoformat()}:{fm}"
+                    )
+                    skip_probability = sched.get("slot_skip_probability")
+                    if skip_probability is not None and not _deterministic_probability_enabled(
+                        slot_key, 1.0 - float(skip_probability)
+                    ):
+                        continue
+                    configured_jitter = sched.get("slot_jitter_seconds")
+                    jitter_seconds = (
+                        0.0 if sched_type == "cron" else max(30.0, float(configured_jitter or 30.0))
+                    )
+                    ts = current_hour + timedelta(
+                        minutes=fm,
+                        seconds=0.0 if jitter_seconds == 0.0 else rng.uniform(0, jitter_seconds),
+                    )
+                    self._emit_scheduled_event(sched, system, ts, rng, sys_pids, is_rhel_like)
+            else:
+                ts = current_hour + timedelta(
+                    minutes=fire_minute,
+                    seconds=0.0 if sched_type == "cron" else rng.uniform(0, 59),
+                )
+                self._emit_scheduled_event(sched, system, ts, rng, sys_pids, is_rhel_like)
+
+    def _emit_scheduled_event(
+        self,
+        sched: dict,
+        system: Any,
+        ts: datetime,
+        rng: Any,
+        sys_pids: dict,
+        is_rhel_like: bool,
+    ) -> None:
+        """Emit syslog/process events for a single scheduled task firing."""
+        sched_type = sched.get("type", "systemd_timer")
+        service = sched["service"]
+        systemd_pid = sys_pids.get("systemd", 1)
+
+        self.state_manager.set_current_time(ts)
+
+        if sched_type == "systemd_timer":
+            process_path = sched.get("process_path", f"/usr/lib/systemd/{service}")
+
+            # Optional timer trigger message (from PID 1)
+            timer_msg = sched.get("timer_message")
+            if timer_msg:
+                self.activity_generator.generate_syslog_event(
+                    system=system,
+                    time=ts - timedelta(seconds=rng.uniform(0.1, 1.0)),
+                    app_name="systemd",
+                    message=timer_msg,
+                    pid=1,
+                )
+
+            # Starting message + process create
+            start_msg = sched.get("start_message", f"Starting {service}.service.")
+            svc_pid = self.activity_generator.generate_system_process(
+                system=system,
+                time=ts,
+                process_name=process_path,
+                command_line=process_path,
+                parent_pid=systemd_pid,
+                username="root",
+                syslog_message=start_msg,
+            )
+
+            # Detail messages (e.g., logrotate per-file messages)
+            detail_messages = sched.get("detail_messages")
+            if detail_messages:
+                distro_key = "rhel" if is_rhel_like else "debian"
+                msgs = detail_messages.get(distro_key, [])
+                detail_delay = rng.uniform(0.5, 2.0)
+                for msg in msgs:
+                    detail_ts = ts + timedelta(seconds=detail_delay)
+                    detail_pid = (
+                        svc_pid
+                        if svc_pid
+                        else self.state_manager.allocate_transient_linux_pid(
+                            system.hostname,
+                            detail_ts,
+                            os_category=_get_os_category(system.os),
+                        )
+                    )
+                    self.activity_generator.generate_syslog_event(
+                        system=system,
+                        time=detail_ts,
+                        app_name=service,
+                        message=msg,
+                        pid=detail_pid,
+                    )
+                    detail_delay += rng.uniform(0.2, 1.0)
+
+            # Finished message + process terminate
+            finish_delay = rng.uniform(0.5, 5.0)
+            finish_ts = ts + timedelta(seconds=finish_delay)
+            self.state_manager.set_current_time(finish_ts)
+            finish_msg = sched.get("finish_message", f"Finished {service}.service.")
+            self.activity_generator.generate_system_process_termination(
+                system=system,
+                time=finish_ts,
+                pid=svc_pid,
+                process_name=process_path,
+                parent_pid=systemd_pid,
+                username="root",
+                syslog_message=finish_msg,
+            )
+
+        elif sched_type == "cron":
+            cron_user = sched.get("cron_user", "root")
+            cron_commands = sched.get("cron_commands", {})
+            cmd = _resolve_cron_command(cron_commands, is_rhel_like=is_rhel_like)
+            if cmd is None:
+                return
+
+            cron_parent_pid = sys_pids.get("cron", 0)
+            cron_group_id = (
+                f"cron:{system.hostname}:{service}:{cron_user}:{int(ts.timestamp() * 1000)}"
+            )
+            shell_pid = self.activity_generator.generate_system_process(
+                system=system,
+                time=ts,
+                process_name="/bin/sh",
+                command_line=_cron_shell_command_line(cmd),
+                parent_pid=cron_parent_pid,
+                username=cron_user,
+                emit_linux_syslog=False,
+                concurrency_group_id=cron_group_id,
+            )
+            self.activity_generator.generate_syslog_event(
+                system=system,
+                time=ts + timedelta(milliseconds=rng.randint(10, 120)),
+                app_name="CRON",
+                message=f"({cron_user}) CMD ({cmd})",
+                pid=shell_pid or cron_parent_pid,
+                facility=9,
+                severity=6,
+            )
+            workload = _cron_workload_process(cmd, is_rhel_like)
+            if shell_pid and workload:
+                workload_path, workload_command, lifetime = workload
+                workload_ts = ts + timedelta(milliseconds=rng.randint(60, 350))
+                workload_pid = self.activity_generator.generate_system_process(
+                    system=system,
+                    time=workload_ts,
+                    process_name=workload_path,
+                    command_line=workload_command,
+                    parent_pid=shell_pid,
+                    username=cron_user,
+                    emit_linux_syslog=False,
+                    concurrency_group_id=cron_group_id,
+                )
+                workload_end = workload_ts + timedelta(seconds=rng.uniform(*lifetime))
+                self.activity_generator.generate_system_process_termination(
+                    system=system,
+                    time=workload_end,
+                    pid=workload_pid,
+                    process_name=workload_path,
+                    parent_pid=shell_pid,
+                    username=cron_user,
+                    concurrency_group_id=cron_group_id,
+                )
+                shell_end = workload_end + timedelta(milliseconds=rng.randint(20, 220))
+            else:
+                shell_end = ts + timedelta(seconds=rng.uniform(0.15, 1.5))
+            if shell_pid:
+                self.activity_generator.generate_system_process_termination(
+                    system=system,
+                    time=shell_end,
+                    pid=shell_pid,
+                    process_name="/bin/sh",
+                    parent_pid=cron_parent_pid,
+                    username=cron_user,
+                    concurrency_group_id=cron_group_id,
+                )
+
+    def _emit_anacron_lifecycle(
+        self,
+        system: Any,
+        ts: datetime,
+        rng: random.Random,
+        sys_pids: dict,
+    ) -> None:
+        """Emit one coherent anacron run per host/day instead of random fragments."""
+        if ts < getattr(self, "start_time", ts) or ts >= self.end_time:
+            return
+
+        local_ts = (
+            ts.replace(tzinfo=UTC).astimezone(self._scenario_tz)
+            if getattr(self, "_scenario_tz", None)
+            else ts
+        )
+        run_date = local_ts.date().isoformat()
+        emitted = getattr(self, "_anacron_lifecycle_days", set())
+        key = (system.hostname, run_date)
+        if key in emitted:
+            return
+        emitted.add(key)
+        self._anacron_lifecycle_days = emitted
+
+        pid = sys_pids.get("anacron", rng.randint(10000, 60000))
+        job_name = rng.choice(["cron.daily", "logrotate"])
+        delay_minutes = rng.choice([2, 5, 11])
+        job_start = ts + timedelta(minutes=delay_minutes, seconds=rng.uniform(0.5, 12.0))
+        job_end = job_start + timedelta(seconds=rng.uniform(18.0, 180.0))
+        events = [
+            (ts, f"Anacron 2.3 started on {run_date}"),
+            (
+                ts + timedelta(seconds=rng.uniform(0.3, 2.0)),
+                f"Will run job `{job_name}' in {delay_minutes} min.",
+            ),
+            (job_start, f"Job `{job_name}' started"),
+            (job_end, f"Job `{job_name}' terminated"),
+            (job_end + timedelta(seconds=rng.uniform(0.5, 3.0)), "Normal exit (1 job run)"),
+        ]
+        for event_time, message in events:
+            if event_time >= self.end_time:
+                continue
+            self.activity_generator.generate_syslog_event(
+                system=system,
+                time=event_time,
+                app_name="anacron",
+                message=message,
+                pid=pid,
+                facility=3,
+                severity=6,
+            )
+
+    def _generate_hour(
+        self,
+        current_hour: datetime,
+        enabled_users: list,
+        *,
+        emit_storylines: bool = True,
+        flush_emitters: bool = True,
+    ) -> None:
+        """Generate one hour of baseline activity.
+
+        Used by both the warm-up loop and the real baseline loop. During warm-up,
+        storyline/red-herring execution and emitter flushing are skipped.
+        """
+        self.state_manager.set_current_time(current_hour)
+
+        # Compute local weekday for day-of-week variation
+        if hasattr(self, "_scenario_tz") and self._scenario_tz:
+            local_dt = current_hour.replace(tzinfo=UTC).astimezone(self._scenario_tz)
+        else:
+            local_dt = current_hour
+        local_weekday = local_dt.weekday()  # 0=Monday..6=Sunday
+        is_weekend = local_weekday >= 5
+
+        # Pre-decide logoffs before scheduling this hour's user/system activity
+        # so no dependent activity is timestamped after a visible 4634 for the
+        # same session.
+        planned_logoffs = self._plan_logoffs_for_hour(enabled_users, current_hour)
+        proxy_auth_deadlines: dict[tuple[str, str], datetime] = {}
+        for (system_hostname, logon_id), offset in planned_logoffs.items():
+            session = self.state_manager.get_session(logon_id)
+            if session is not None:
+                proxy_auth_deadlines[(system_hostname, session.username)] = (
+                    current_hour + timedelta(seconds=offset)
+                )
+        self.activity_generator.set_proxy_auth_session_deadlines(proxy_auth_deadlines)
+
+        for user in enabled_users:
+            persona = self._get_user_persona(user)
+            user_offsets = self._user_time_offsets.get(user.username)
+            self._emit_pending_workstation_unlock(user, current_hour, planned_logoffs)
+
+            # Weekend filtering: skip non-IT personas on weekends
+            if is_weekend and persona:
+                persona_key = (persona.name or "").lower()
+                if persona_key not in _WEEKEND_ACTIVE_PERSONAS:
+                    continue
+
+            local_hour = local_dt.hour
+            num_events = self._calculate_events_for_hour(
+                user,
+                current_hour=local_hour,
+                persona=persona,
+                user_offsets=user_offsets,
+                weekday=local_weekday,
+            )
+
+            if num_events > 0:
+                rng = _get_rng()
+                if rng.random() < 0.20:
+                    continue
+
+                persona_name = user.persona if user.persona else None
+                # Visible workstation locks must be planned before foreground
+                # user activity so activity can be kept outside locked intervals.
+                self._generate_lock_unlock_events(
+                    user, current_hour, local_hour, persona_name, planned_logoffs
+                )
+                event_times = self._distribute_events_in_hour(
+                    current_hour,
+                    num_events,
+                    persona_name=persona_name,
+                    username=user.username,
+                )
+
+                for event_time in event_times:
+                    self._generate_user_activity(user, event_time, current_hour, planned_logoffs)
+
+        self._generate_system_traffic(current_hour, planned_logoffs=planned_logoffs)
+        self._generate_baseline_email(current_hour, enabled_users)
+        self._generate_traffic_affinities(current_hour, local_dt, planned_logoffs)
+        self._generate_stale_account_noise(current_hour)
+        self._generate_baseline_failed_logons(current_hour)
+        self._generate_lateral_movement_noise(current_hour)
+        self._generate_suspicious_noise(current_hour)
+        self._generate_firewall_deny_baseline(current_hour)
+
+        if emit_storylines:
+            hour_key = int(current_hour.timestamp())
+            for _event_time, event_idx in self._storyline_by_hour.get(hour_key, []):
+                if event_idx not in self._storyline_executed:
+                    self._execute_single_storyline_event(event_idx)
+                    self._storyline_executed.add(event_idx)
+
+            for _event_time, event_idx in self._red_herring_by_hour.get(hour_key, []):
+                if event_idx not in self._red_herring_executed:
+                    self._execute_single_red_herring_event(event_idx)
+                    self._red_herring_executed.add(event_idx)
+
+        self._terminate_stale_processes(current_hour)
+        self._generate_logoffs_for_hour(enabled_users, current_hour, planned_logoffs)
+
+        if flush_emitters:
+            self._barrier_flush_all_emitters()
+
+    def _generate_baseline_email(self, current_hour: datetime, enabled_users: list) -> None:
+        """Generate low-volume deterministic background email when explicitly configured."""
+        email_config = self.scenario.environment.email
+        if email_config is None or email_config.background_messages_per_user_per_day <= 0:
+            return
+        if self.start_time is not None and current_hour < self.start_time:
+            return
+        recipients = [user for user in enabled_users if user.email]
+        if len(recipients) < 2:
+            return
+        hourly_rate = email_config.background_messages_per_user_per_day / 24.0
+        for user in recipients:
+            rng = random.Random(
+                _stable_seed(f"baseline_email:{self.scenario.name}:{user.username}:{current_hour}")
+            )
+            if rng.random() >= min(1.0, hourly_rate):
+                continue
+            source_system = self._find_system(user.primary_system or "")
+            if source_system is None:
+                source_system = next(
+                    (
+                        system
+                        for system in self.scenario.environment.systems
+                        if system.assigned_user == user.username
+                    ),
+                    None,
+                )
+            if source_system is None:
+                continue
+            event_time = current_hour + timedelta(seconds=rng.uniform(300, 3300))
+            corpus_entries = self.activity_generator._email_background_corpus_entries()
+            corpus_id = None
+            if corpus_entries and rng.random() < min(0.35, len(corpus_entries) / 10.0):
+                corpus_id = rng.choice(corpus_entries).entry_id
+            hour_slot = int(current_hour.timestamp()) // 3600
+            flow = ["internal", "inbound", "outbound"][(hour_slot + recipients.index(user)) % 3]
+            sender = None
+            if flow == "internal":
+                target = rng.choice(
+                    [candidate for candidate in recipients if candidate.username != user.username]
+                )
+                recipients_to = [target.email]
+                actor = user
+                actor_system = source_system
+            elif flow == "inbound":
+                local = rng.choice(recipients)
+                sender_name = pick_email_background_local_part(rng, "inbound_local_parts")
+                sender_domain = pick_email_background_domain(rng)
+                sender = f"{sender_name}@{sender_domain}"
+                recipients_to = [local.email]
+                actor = local
+                actor_system = self._find_system(local.primary_system or "") or source_system
+            else:
+                target_name = pick_email_background_local_part(rng, "outbound_local_parts")
+                target_domain = pick_email_background_domain(rng)
+                recipients_to = [f"{target_name}@{target_domain}"]
+                actor = user
+                actor_system = source_system
+            spec = EmailMessageEventSpec(
+                sender=sender,
+                to=recipients_to,
+                subject=None,
+                body=None,
+                corpus_id=corpus_id,
+                verdict="clean",
+                mail_action="deliver",
+                outcome="delivered",
+            )
+            self.activity_generator.generate_email_message(
+                spec=spec,
+                actor=actor,
+                system=actor_system,
+                time=event_time,
+                activity="Background email",
+                storyline_id="",
+            )
+
+    def _generate_traffic_affinities(
+        self,
+        current_hour: datetime,
+        local_dt: datetime,
+        planned_logoffs: dict[tuple[str, str], float] | None,
+    ) -> None:
+        """Generate scenario-authored benign traffic affinities for this hour."""
+
+        affinities = getattr(self.scenario.baseline_activity, "traffic_affinities", [])
+        if not affinities:
+            return
+
+        for affinity in affinities:
+            if affinity.direction == "inbound":
+                self._generate_inbound_traffic_affinity(affinity, current_hour, local_dt)
+            else:
+                self._generate_user_traffic_affinity(
+                    affinity,
+                    current_hour,
+                    local_dt,
+                    planned_logoffs,
+                )
+
+    def _generate_user_traffic_affinity(
+        self,
+        affinity: Any,
+        current_hour: datetime,
+        local_dt: datetime,
+        planned_logoffs: dict[tuple[str, str], float] | None,
+    ) -> None:
+        """Generate outbound/internal affinity traffic from eligible interactive users."""
+
+        if not self._affinity_cadence_allows_hour(affinity, local_dt):
+            return
+        endpoint = affinity.destination
+        if endpoint is None:
+            return
+        rng = random.Random(
+            _stable_seed(f"traffic_affinity:{self.scenario.name}:{affinity.name}:{current_hour}")
+        )
+        for user in self.scenario.environment.users:
+            if not user.enabled or not self._affinity_audience_matches_user(affinity, user):
+                continue
+            system = self._affinity_user_system(user)
+            if system is None:
+                continue
+            sessions = [
+                session
+                for session in self.state_manager.get_sessions_on_system(system.hostname)
+                if session.username == user.username and session.logon_type in (2, 10, 11)
+            ]
+            if not sessions:
+                continue
+            participant_rng = random.Random(
+                _stable_seed(
+                    f"traffic_affinity_participation:{affinity.name}:{user.username}:"
+                    f"{current_hour.date().isoformat()}"
+                )
+            )
+            if participant_rng.random() > affinity.participation:
+                continue
+            hourly_count = self._affinity_hourly_count(affinity, user.username, current_hour)
+            if hourly_count <= 0:
+                continue
+            session = sessions[0]
+            max_offset = 3599.0
+            if planned_logoffs:
+                max_offset = planned_logoffs.get((system.hostname, session.logon_id), max_offset)
+            for _ in range(hourly_count):
+                offset = min(max_offset, rng.uniform(0, 3599))
+                if offset < 0:
+                    continue
+                event_time = current_hour + timedelta(seconds=offset)
+                adjusted_time = self._activity_time_outside_locked_session(
+                    session=session,
+                    candidate_time=event_time,
+                    activity_key=f"traffic_affinity:{affinity.name}",
+                    current_hour=current_hour,
+                    planned_logoffs=planned_logoffs,
+                )
+                if adjusted_time is None:
+                    continue
+                self._emit_affinity_event(
+                    affinity=affinity,
+                    endpoint=endpoint,
+                    src_ip=system.ip,
+                    source_system=system,
+                    user_obj=user,
+                    session=session,
+                    event_time=adjusted_time,
+                    rng=rng,
+                )
+
+    def _generate_inbound_traffic_affinity(
+        self,
+        affinity: Any,
+        current_hour: datetime,
+        local_dt: datetime,
+    ) -> None:
+        """Generate inbound affinity traffic to a scenario-owned target."""
+
+        if not self._affinity_cadence_allows_hour(affinity, local_dt):
+            return
+        endpoint = affinity.target
+        if endpoint is None:
+            return
+        target_system = self._affinity_target_system(endpoint)
+        if target_system is None:
+            return
+        rng = random.Random(
+            _stable_seed(
+                f"traffic_affinity_inbound:{self.scenario.name}:{affinity.name}:{current_hour}"
+            )
+        )
+        lo, hi = affinity.per_client_sessions
+        count = rng.randint(lo, hi)
+        for _ in range(count):
+            event_time = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+            src_ip = self._generate_external_web_client_ip(rng)
+            self._emit_affinity_event(
+                affinity=affinity,
+                endpoint=endpoint,
+                src_ip=src_ip,
+                source_system=None,
+                user_obj=None,
+                session=None,
+                event_time=event_time,
+                rng=rng,
+                target_system=target_system,
+            )
+
+    def _emit_affinity_event(
+        self,
+        *,
+        affinity: Any,
+        endpoint: Any,
+        src_ip: str,
+        source_system: Any | None,
+        user_obj: Any | None,
+        session: Any | None,
+        event_time: datetime,
+        rng: random.Random,
+        target_system: Any | None = None,
+    ) -> None:
+        """Emit one affinity occurrence through canonical generation paths."""
+
+        resolved = self._resolve_affinity_endpoint(endpoint, source_system, target_system)
+        if resolved["ip"] is None:
+            return
+        self.state_manager.set_current_time(event_time)
+        port = int(endpoint.port)
+        proto = endpoint.proto
+        service = endpoint.service or ("ssl" if port == 443 else "http" if port == 80 else None)
+        if affinity.kind == "web":
+            os_cat = _get_os_category(source_system.os) if source_system is not None else "windows"
+            pid = -1
+            if user_obj is not None and source_system is not None and session is not None:
+                try:
+                    pid = self.world_planner.ensure_connection_process(
+                        user=user_obj,
+                        system=source_system,
+                        session=session,
+                        time=event_time,
+                        service=service or "ssl",
+                        rng=rng,
+                        destination_hostname=resolved["host"],
+                    )
+                except (AttributeError, ValueError):
+                    pid = -1
+            BrowserSessionActionBundle(
+                request=BrowserSessionRequest(
+                    src_ip=src_ip,
+                    dst_ip=resolved["ip"],
+                    time=event_time,
+                    hostname=resolved["host"] or resolved["ip"],
+                    dst_port=port,
+                    proto=proto,
+                    service=service,
+                    source_system=source_system,
+                    pid=pid,
+                    domain_tags=tuple(resolved["tags"]),
+                    source_os=os_cat,
+                    browsing_intensity="normal",
+                    require_browser_like_domain=False,
+                    transfer_variant_key=(
+                        f"{src_ip}:{resolved['host'] or resolved['ip']}:{event_time.isoformat()}"
+                    ),
+                    route_profile=affinity.request_profile,
+                    user_agent=self._affinity_user_agent(
+                        os_cat,
+                        rng,
+                        source_system=source_system,
+                        src_ip=src_ip,
+                        hostname=resolved["host"] or resolved["ip"],
+                        domain_tags=tuple(resolved["tags"]),
+                    ),
+                    same_host_only=True,
+                    source="baseline_traffic_affinity",
+                ),
+                executor=self.activity_generator,
+                rng=rng,
+            ).execute()
+            return
+
+        profile = affinity.connection_profile
+        duration = self._affinity_range_sample(rng, getattr(profile, "durations", None), 0.1, 10.0)
+        orig_bytes = int(
+            self._affinity_range_sample(rng, getattr(profile, "orig_bytes", None), 200, 8000)
+        )
+        resp_bytes = int(
+            self._affinity_range_sample(rng, getattr(profile, "resp_bytes", None), 500, 80000)
+        )
+        conn_states = getattr(profile, "conn_states", {"SF": 1.0})
+        conn_state = rng.choices(
+            list(conn_states),
+            weights=[float(weight) for weight in conn_states.values()],
+            k=1,
+        )[0]
+        self.activity_generator.generate_connection(
+            src_ip=src_ip,
+            dst_ip=resolved["ip"],
+            time=event_time,
+            dst_port=port,
+            proto=proto,
+            service=service,
+            duration=duration,
+            orig_bytes=orig_bytes,
+            resp_bytes=resp_bytes,
+            conn_state=conn_state,
+            emit_dns=bool(resolved["host"]),
+            source_system=source_system,
+            hostname=resolved["host"] or "",
+            preserve_dst_ip=False,
+        )
+
+    def _resolve_affinity_endpoint(
+        self,
+        endpoint: Any,
+        source_system: Any | None,
+        target_system: Any | None = None,
+    ) -> dict[str, Any]:
+        resolver = getattr(self, "network_resolver", None)
+        src_host = getattr(source_system, "hostname", "") if source_system is not None else ""
+        if endpoint.identity and resolver is not None:
+            resolved = resolver.resolve_identity(
+                endpoint.identity, src_host=src_host, host=endpoint.host
+            )
+            return {"host": resolved.host, "ip": resolved.ip or endpoint.ip, "tags": resolved.tags}
+        if endpoint.system:
+            target_system = self._find_system(endpoint.system)
+        host = endpoint.host
+        ip = endpoint.ip
+        if target_system is not None:
+            host = host or (
+                target_system.public_hostnames[0]
+                if getattr(target_system, "public_hostnames", None)
+                else target_system.hostname
+            )
+            ip = ip or target_system.ip
+        if host and not ip and resolver is not None:
+            resolved = resolver.resolve_host(host, src_host=src_host)
+            ip = resolved.ip
+            tags = resolved.tags
+        else:
+            tags = resolver.tags_for_host(host) if resolver is not None else ()
+        return {"host": host, "ip": ip, "tags": tags}
+
+    def _affinity_target_system(self, endpoint: Any) -> Any | None:
+        if getattr(endpoint, "system", None):
+            return self._find_system(endpoint.system)
+        if getattr(endpoint, "ip", None):
+            return getattr(self.activity_generator, "_ip_to_system", {}).get(endpoint.ip)
+        if getattr(endpoint, "identity", None):
+            identity = self.network_resolver.identity(endpoint.identity)
+            for ip in getattr(identity, "ips", []) if identity is not None else []:
+                system = getattr(self.activity_generator, "_ip_to_system", {}).get(ip)
+                if system is not None:
+                    return system
+        return None
+
+    def _affinity_user_system(self, user: User) -> System | None:
+        if user.primary_system:
+            return self._find_system(user.primary_system)
+        return next(
+            (
+                system
+                for system in self.scenario.environment.systems
+                if system.assigned_user == user.username
+            ),
+            None,
+        )
+
+    def _affinity_audience_matches_user(self, affinity: Any, user: User) -> bool:
+        audience = affinity.audience
+        if audience.users and user.username not in audience.users:
+            return False
+        if audience.personas and (user.persona or "") not in audience.personas:
+            return False
+        if audience.groups and not (set(user.groups) & set(audience.groups)):
+            return False
+        system = self._affinity_user_system(user)
+        if audience.systems and (system is None or system.hostname not in audience.systems):
+            return False
+        return True
+
+    def _baseline_destination_allowed_by_suppression(
+        self,
+        *,
+        domain: str | None,
+        requested_tags: tuple[str, ...],
+        source_user: User | None,
+        source_host: str,
+        kind: str,
+        direction: str,
+        rng: random.Random,
+    ) -> bool:
+        suppressions = self.scenario.baseline_activity.traffic_suppression
+        if not suppressions or not domain:
+            return True
+
+        normalized_domain = domain.lower().rstrip(".")
+        domain_tags = set(requested_tags)
+        identity_id = ""
+        resolver = getattr(self, "network_resolver", None)
+        if resolver is not None:
+            identity = resolver.identity_for_host(normalized_domain)
+            if identity is not None:
+                identity_id = identity.id
+                domain_tags.update(identity.tags)
+        if not domain_tags:
+            from evidenceforge.generation.activity.dns_registry import get_domain_tags
+
+            domain_tags.update(get_domain_tags(normalized_domain))
+
+        source_system = self._find_system(source_host) if source_host else None
+        for suppression in suppressions:
+            if suppression.kind is not None and suppression.kind != kind:
+                continue
+            if suppression.direction is not None and suppression.direction != direction:
+                continue
+            if not self._traffic_audience_matches(suppression.audience, source_user, source_system):
+                continue
+            has_selector = bool(suppression.identities or suppression.domains or suppression.tags)
+            matches_selector = not has_selector
+            if suppression.identities and identity_id in suppression.identities:
+                matches_selector = True
+            if suppression.domains and normalized_domain in {
+                value.lower().rstrip(".") for value in suppression.domains
+            }:
+                matches_selector = True
+            if suppression.tags and domain_tags.intersection(suppression.tags):
+                matches_selector = True
+            if not matches_selector:
+                continue
+            if suppression.factor <= 0:
+                return False
+            if suppression.factor < 1.0 and rng.random() > suppression.factor:
+                return False
+        return True
+
+    def _traffic_audience_matches(
+        self,
+        audience: Any,
+        user: User | None,
+        system: System | None,
+    ) -> bool:
+        if audience.users:
+            if user is None or user.username not in audience.users:
+                return False
+        if audience.personas:
+            if user is None or (user.persona or "") not in audience.personas:
+                return False
+        if audience.groups:
+            if user is None or not (set(user.groups) & set(audience.groups)):
+                return False
+        if audience.systems and (system is None or system.hostname not in audience.systems):
+            return False
+        return True
+
+    def _affinity_cadence_allows_hour(self, affinity: Any, local_dt: datetime) -> bool:
+        cadence = affinity.cadence or (
+            "business_hours" if affinity.direction != "inbound" else "diffuse"
+        )
+        if cadence == "business_hours":
+            return local_dt.weekday() <= 4 and 7 <= local_dt.hour <= 19
+        if cadence == "periodic":
+            return local_dt.hour % 2 == 0
+        return True
+
+    def _affinity_hourly_count(self, affinity: Any, client_key: str, current_hour: datetime) -> int:
+        lo, hi = affinity.per_client_sessions
+        if hi <= 0:
+            return 0
+        rng = random.Random(
+            _stable_seed(
+                f"traffic_affinity_count:{affinity.name}:{client_key}:{current_hour.isoformat()}:"
+                f"{affinity.seed if affinity.seed is not None else ''}"
+            )
+        )
+        # Convert scenario-level count intent into sparse hourly activity.
+        daily_count = rng.randint(lo, hi)
+        hourly_probability = min(0.85, max(0.02, daily_count / 16))
+        if rng.random() > hourly_probability:
+            return 0
+        return 1 + (1 if rng.random() < min(0.35, affinity.weight) else 0)
+
+    def _affinity_range_sample(
+        self,
+        rng: random.Random,
+        value_range: Any,
+        default_lo: float,
+        default_hi: float,
+    ) -> float:
+        if value_range and len(value_range) == 2:
+            return rng.uniform(float(value_range[0]), float(value_range[1]))
+        return rng.uniform(default_lo, default_hi)
+
+    def _affinity_user_agent(
+        self,
+        os_cat: str,
+        rng: random.Random,
+        *,
+        source_system: Any | None = None,
+        src_ip: str = "unknown",
+        hostname: str | None = None,
+        domain_tags: tuple[str, ...] = (),
+    ) -> str:
+        return self._source_sticky_browser_user_agent(
+            source_system=source_system,
+            src_ip=src_ip,
+            os_cat=os_cat,
+            rng=rng,
+            hostname=hostname,
+            domain_tags=domain_tags,
+        )
+
+    def _source_sticky_browser_user_agent(
+        self,
+        *,
+        source_system: Any | None,
+        src_ip: str,
+        os_cat: str,
+        rng: random.Random,
+        profile: dict[str, Any] | None = None,
+        hostname: str | None = None,
+        domain_tags: tuple[str, ...] = (),
+    ) -> str:
+        """Return a browser UA that is stable for one source host."""
+
+        from evidenceforge.generation.activity.web_session_profiles import pick_web_user_agent
+
+        source_key = src_ip
+        if source_system is not None:
+            source_key = ":".join(
+                str(part)
+                for part in (
+                    getattr(source_system, "hostname", ""),
+                    getattr(source_system, "ip", ""),
+                    getattr(source_system, "os", ""),
+                    getattr(source_system, "type", ""),
+                )
+            )
+        default_profile = {
+            "user_agent_pool": "browser_any",
+            "user_agent_pool_by_os": {
+                "windows": "browser_windows",
+                "linux": "browser_linux",
+            },
+        }
+        selected_profile = profile or default_profile
+        pool_by_os = selected_profile.get("user_agent_pool_by_os")
+        if isinstance(pool_by_os, dict):
+            pool_name = str(pool_by_os.get(os_cat) or "")
+        else:
+            pool_name = str(selected_profile.get("user_agent_pool") or "")
+        stable_rng = random.Random(
+            _stable_seed(f"baseline_browser_ua:{source_key}:{os_cat}:{pool_name}")
+        )
+        _ = rng  # Keep call sites explicit about caller RNG ownership.
+        user_agent = pick_web_user_agent(stable_rng, selected_profile, source_os=os_cat)
+        proxy_user_agent_for_context = getattr(
+            self.activity_generator,
+            "_proxy_user_agent_for_context",
+            None,
+        )
+        if callable(proxy_user_agent_for_context):
+            return proxy_user_agent_for_context(
+                stable_rng,
+                source_system,
+                hostname=hostname,
+                domain_tags=list(domain_tags),
+                existing_user_agent=user_agent,
+                apply_domain_override=False,
+            )
+        return user_agent
+
+    def _generate_baseline(self) -> None:
+        """Generate baseline activity for all enabled users.
+
+        Iterates hour-by-hour through the time window, generating activity
+        for each enabled user based on their persona, intensity, and variation.
+        Optionally runs a warm-up phase first to pre-populate state.
+        """
+        logger.info("Starting baseline activity generation")
+
+        enabled_users = [u for u in self.scenario.environment.users if u.enabled]
+        logger.info(f"Generating baseline for {len(enabled_users)} enabled users")
+
+        # Initialize pending unlocks for cross-hour lock/unlock persistence
+        self._pending_unlocks: dict[str, tuple] = {}
+
+        # Emit initial DHCP leases (during warm-up they're suppressed from output
+        # but establish lease state for periodic renewals)
+        self._emit_dhcp_leases()
+
+        # --- Warm-up phase: pre-populate state without emitting ---
+        warmup_hours = math.ceil(self.warmup_duration.total_seconds() / 3600)
+        if warmup_hours > 0:
+            logger.info(f"Running {warmup_hours}-hour warm-up for state pre-population")
+            self._report_progress(
+                "phase_start",
+                {
+                    "phase": "warmup",
+                    "description": f"Warm-up: pre-populating state ({warmup_hours}h)",
+                },
+            )
+
+            current_hour = self.warmup_start_time
+            warmup_count = 0
+
+            while current_hour < self.start_time:
+                warmup_count += 1
+                logger.debug(f"Warm-up hour {warmup_count}/{warmup_hours}: {current_hour}")
+
+                self._report_progress(
+                    "warmup_progress",
+                    {
+                        "hour": warmup_count,
+                        "total_hours": warmup_hours,
+                        "current_time": current_hour,
+                    },
+                )
+
+                self._generate_hour(
+                    current_hour, enabled_users, emit_storylines=False, flush_emitters=False
+                )
+                self.state_manager.sweep_closed_connections()
+                current_hour += timedelta(hours=1)
+
+            logger.info(f"Warm-up complete: processed {warmup_count} hours")
+            self._report_progress("phase_end", {"phase": "warmup"})
+            from evidenceforge.generation.activity.bash_commands import reset_bash_command_memory
+
+            # Warm-up pre-populates durable state but does not emit visible shell/syslog rows.
+            # Reset visible-output texture memory so non-emitted warm-up commands do not
+            # exhaust exact-repeat budgets for the actual collection window.
+            reset_bash_command_memory()
+            self._extra_syslog_sudo_command_counts = {}
+            self._extra_syslog_sudo_command_host_counts = {}
+
+        # --- Real baseline: emit sensor startup and begin output ---
+        self._emit_sensor_startup()
+
+        total_hours = int((self.end_time - self.start_time).total_seconds() / 3600)
+        current_hour = self.start_time
+        hour_count = 0
+
+        while current_hour < self.end_time:
+            hour_count += 1
+            logger.debug(f"Processing hour {hour_count}: {current_hour}")
+
+            self._report_progress(
+                "hour_progress",
+                {"hour": hour_count, "total_hours": total_hours, "current_time": current_hour},
+            )
+
+            self._generate_hour(current_hour, enabled_users)
+            # Evict completed/failed connections to bound memory during long runs
+            self.state_manager.sweep_closed_connections()
+            current_hour += timedelta(hours=1)
+
+        logger.info(f"Baseline generation complete: processed {hour_count} hours")
+
+    def _generate_stale_account_noise(self, current_hour: datetime) -> None:
+        """Generate noise events for stale/inactive accounts.
+
+        Simulates multiple traces left by accounts that are disabled but still
+        referenced by automated systems:
+        - Failed network logons (~15%/hour): monitoring, backup trying cached creds
+        - Kerberos pre-auth failures (~5%/hour): cached TGT renewal attempts on DC
+        - Scheduled task failures (~3%/hour): lingering tasks configured with stale creds
+        - Service startup failures (~2%/hour, first hour only): services using stale creds
+        """
+        stale_accounts = self.scenario.environment.stale_accounts
+        if not stale_accounts:
+            return
+
+        rng = _get_rng()
+        systems = self.scenario.environment.systems
+        servers = [s for s in systems if s.type in ("server", "domain_controller")]
+        dcs = [s for s in systems if s.type == "domain_controller"]
+        windows_servers = [s for s in servers if "windows" in s.os.lower()]
+        target_systems = servers if servers else systems
+
+        # Check if this is the first hour of the scenario (for service startup failures)
+        is_first_hour = current_hour == self.start_time
+
+        for stale in stale_accounts:
+            stale_user = User(
+                username=stale.username,
+                full_name=stale.username,
+                email=f"{stale.username}@system.local",
+                enabled=False,
+            )
+
+            # Pattern 1: Failed network logon (~15%/hour)
+            if rng.random() < 0.15:
+                target_system = rng.choice(target_systems)
+                source_system = rng.choice(target_systems)
+                event_time = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+                self.state_manager.set_current_time(event_time)
+                self.activity_generator.generate_failed_logon(
+                    user=stale_user,
+                    system=target_system,
+                    time=event_time,
+                    logon_type=3,
+                    source_ip=source_system.ip,
+                )
+
+            # Pattern 2: Kerberos pre-auth failure on DC (~15%/hour)
+            if rng.random() < 0.15 and dcs:
+                dc = rng.choice(dcs)
+                source_system = rng.choice(target_systems)
+                event_time = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+                self.state_manager.set_current_time(event_time)
+                self.activity_generator.generate_kerberos_preauth_failed(
+                    username=stale.username,
+                    source_ip=source_system.ip,
+                    dc_hostname=dc.hostname,
+                    time=event_time,
+                    status="0x12",  # KDC_ERR_CLIENT_REVOKED (disabled account)
+                    emit_connection=True,
+                )
+
+            # Pattern 3: Scheduled task failure (~3%/hour)
+            if rng.random() < 0.03 and windows_servers:
+                task_host = rng.choice(windows_servers)
+                event_time = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+                self.state_manager.set_current_time(event_time)
+                # Failed batch logon for the scheduled task
+                self.activity_generator.generate_failed_logon(
+                    user=stale_user,
+                    system=task_host,
+                    time=event_time,
+                    logon_type=4,  # Batch logon (scheduled task)
+                    source_ip=task_host.ip,
+                )
+
+            # Pattern 4: Service startup failure (first hour only, ~2%)
+            if is_first_hour and rng.random() < 0.02 and windows_servers:
+                svc_host = rng.choice(windows_servers)
+                event_time = current_hour + timedelta(seconds=rng.randint(0, 300))
+                self.state_manager.set_current_time(event_time)
+                # Failed service logon
+                self.activity_generator.generate_failed_logon(
+                    user=stale_user,
+                    system=svc_host,
+                    time=event_time,
+                    logon_type=5,  # Service logon
+                    source_ip=svc_host.ip,
+                )
+
+    def _generate_baseline_failed_logons(self, current_hour: datetime) -> None:
+        """Generate realistic baseline failed logon patterns.
+
+        Three patterns:
+        1. Password typo: 1-2 failed logons immediately before a successful one
+        2. Scheduled task with stale creds: periodic failures on specific hosts
+        3. Management sweep: burst of failures across multiple servers
+        """
+        rng = _get_rng()
+        systems = self.scenario.environment.systems
+        servers = [s for s in systems if s.type in ("server", "domain_controller")]
+        if not servers:
+            servers = systems
+        enabled_users = [u for u in self.scenario.environment.users if u.enabled]
+        if not enabled_users:
+            return
+
+        # Pattern 1: Password typo before successful logon (~3 per hour in
+        # a medium environment). Pick a random user and system.
+        n_typos = rng.randint(1, max(1, len(enabled_users) // 3))
+        for _ in range(n_typos):
+            if rng.random() > 0.15:  # ~15% chance per slot
+                continue
+            user = rng.choice(enabled_users)
+            system = next(
+                (s for s in systems if s.assigned_user == user.username),
+                rng.choice(systems),
+            )
+            base_time = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+            self.state_manager.set_current_time(base_time)
+            # 1-2 failures then success
+            n_fails = rng.randint(1, 2)
+            for i in range(n_fails):
+                fail_time = base_time + timedelta(seconds=i * rng.randint(2, 8))
+                self.activity_generator.generate_failed_logon(
+                    user=user,
+                    system=system,
+                    time=fail_time,
+                    logon_type=2,  # interactive
+                )
+
+        # Pattern 2: Scheduled task with stale creds (deterministic per scenario).
+        # Pick configured hosts and a plausible service account name.
+        _sched_seed = _stable_seed(self.scenario.name + "_sched_fail")
+        _sched_rng = random.Random(_sched_seed)
+        _sched_config = scheduled_stale_credentials_config()
+        configured_names = _sched_config.get("account_base_names", [])
+        _svc_names = [
+            str(name).strip() for name in configured_names if isinstance(name, str) and name.strip()
+        ] or [
+            "svc_backup",
+            "svc_monitor",
+            "svc_report",
+            "svc_deploy",
+            "svc_scan",
+            "svc_patch",
+            "svc_build",
+            "svc_sync",
+            "svc_jobs",
+            "svc_batch",
+        ]
+        # Ensure no collision with actual scenario accounts
+        _existing = {u.username for u in self.scenario.environment.users} | set(
+            self.scenario.environment.service_accounts
+        )
+        _sched_acct = _pick_non_colliding_account_name(
+            rng=_sched_rng,
+            existing_accounts=_existing,
+            base_names=_svc_names,
+        )
+        _sched_user = User(
+            username=_sched_acct,
+            full_name=_sched_acct,
+            email=f"{_sched_acct}@system.local",
+            enabled=False,
+        )
+        host_min = max(1, _as_int(_sched_config.get("host_count_min"), 1))
+        host_max = max(host_min, _as_int(_sched_config.get("host_count_max"), 2))
+        n_sched_hosts = min(_sched_rng.randint(host_min, host_max), len(servers))
+        _sched_hosts = _sched_rng.sample(servers, n_sched_hosts)
+        hour_idx = int((current_hour - self.start_time).total_seconds() / 3600)
+        for host in _sched_hosts:
+            for sched_second in _scheduled_stale_failure_offsets(
+                scenario_name=self.scenario.name,
+                account_name=_sched_acct,
+                hostname=host.hostname,
+                hour_idx=hour_idx,
+                config=_sched_config,
+            ):
+                sched_time = current_hour + timedelta(seconds=sched_second)
+                self.state_manager.set_current_time(sched_time)
+                self.activity_generator.generate_failed_logon(
+                    user=_sched_user,
+                    system=host,
+                    time=sched_time,
+                    logon_type=4,  # batch (scheduled task)
+                    source_ip=host.ip,
+                )
+
+        # Pattern 3: Management software sweep (1-2 per business day).
+        # Use scenario-local time for business-hour gating.
+        _local = current_hour
+        if hasattr(self, "_scenario_tz") and self._scenario_tz and current_hour.tzinfo is not None:
+            _local = current_hour.astimezone(self._scenario_tz)
+        is_business = 0 <= _local.weekday() <= 4 and 8 <= _local.hour <= 17
+        # Fire at ~10am and ~2pm (deterministic per scenario)
+        if is_business and _local.hour in (10, 14) and rng.random() < 0.5:
+            _mgmt_acct = _pick_non_colliding_account_name(
+                rng=rng,
+                existing_accounts=_existing,
+                base_names=["svc_mgmt"],
+            )
+            _mgmt_user = User(
+                username=_mgmt_acct,
+                full_name=_mgmt_acct,
+                email=f"{_mgmt_acct}@system.local",
+                enabled=False,
+            )
+            n_targets = min(rng.randint(5, 15), len(servers))
+            targets = rng.sample(servers, n_targets)
+            sweep_start = current_hour + timedelta(seconds=rng.randint(0, 1800))
+            for i, target in enumerate(targets):
+                sweep_time = sweep_start + timedelta(seconds=i * rng.uniform(1.0, 3.0))
+                self.state_manager.set_current_time(sweep_time)
+                self.activity_generator.generate_failed_logon(
+                    user=_mgmt_user,
+                    system=target,
+                    time=sweep_time,
+                    logon_type=3,  # network
+                    source_ip=rng.choice(servers).ip,
+                )
+
+        # Pattern 4: Active-user Kerberos pre-auth failure (password typo at lock screen).
+        # ~2% chance per active user per hour → 0-2 events total in a 10-user scenario.
+        dcs = [s for s in systems if s.type == "domain_controller"]
+        if dcs:
+            for user in enabled_users:
+                if rng.random() < 0.02:
+                    dc = rng.choice(dcs)
+                    user_system = next(
+                        (s for s in systems if s.assigned_user == user.username),
+                        rng.choice(systems),
+                    )
+                    event_time = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+                    self.state_manager.set_current_time(event_time)
+                    self.activity_generator.generate_kerberos_preauth_failed(
+                        username=user.username,
+                        source_ip=user_system.ip,
+                        dc_hostname=dc.hostname,
+                        time=event_time,
+                        status="0x18",  # KDC_ERR_PREAUTH_FAILED (bad password)
+                        emit_connection=True,
+                    )
+
+    def _generate_lateral_movement_noise(self, current_hour: datetime) -> None:
+        """Generate legitimate service account lateral movement between servers.
+
+        Produces realistic inter-server traffic that analysts must distinguish
+        from malicious lateral movement: backup agents, monitoring, patching,
+        AD replication, application-to-database connections, etc.
+
+        Each pattern is conditional on the environment having the required
+        infrastructure (file servers, DB servers, DCs, Linux hosts, etc.).
+        """
+        rng = _get_rng()
+        systems = self.scenario.environment.systems
+        if len(systems) < 2:
+            return
+
+        # Classify systems by role and OS for pattern matching
+        dcs = [s for s in systems if s.type == "domain_controller"]
+        servers = [s for s in systems if s.type in ("server", "domain_controller")]
+        workstations = [s for s in systems if s.type == "workstation"]
+        windows_sys = [s for s in systems if "windows" in s.os.lower()]
+        linux_sys = [s for s in systems if _get_os_category(s.os) == "linux"]
+
+        # Role-based classification
+        file_servers = [s for s in servers if "file_server" in s.roles]
+        db_servers = [s for s in servers if "database" in s.roles or "db_server" in s.roles]
+        web_servers = [s for s in servers if "web_server" in s.roles]
+        mail_servers = [s for s in servers if "mail_server" in s.roles]
+        print_servers = [s for s in servers if "print_server" in s.roles]
+        dns_servers = [s for s in servers if "dns_server" in s.roles]
+        nfs_servers = [s for s in linux_sys if "nfs_server" in s.roles]
+
+        def _db_servers_for_service(service: str) -> list[Any]:
+            return [db for db in db_servers if _baseline_database_service_supported(db, service)]
+
+        # Compute local hour for time-of-day gating
+        if hasattr(self, "_scenario_tz") and self._scenario_tz:
+            local_dt = current_hour.replace(tzinfo=UTC).astimezone(self._scenario_tz)
+        else:
+            local_dt = current_hour
+        local_hour = local_dt.hour
+        is_business_hours = 8 <= local_hour <= 18
+
+        def _emit_conn(src_sys, dst_sys, port, service=None, proto="tcp", pattern_key=""):
+            """Helper: emit a connection with hash-based periodic offset."""
+            if proto == "tcp":
+                effective = _baseline_success_port_for_target(dst_sys, port, service, rng)
+                if effective is None:
+                    return
+                port, service = effective
+            # Deterministic phase per (pattern, src, dst) triple for reproducibility
+            phase_seed = f"lat_{pattern_key}_{src_sys.hostname}_{dst_sys.hostname}_{port}"
+            phase = _stable_seed(phase_seed) % 3600
+            jitter = rng.gauss(0, 60)  # ~1min jitter
+            offset = max(0, min(3599, phase + jitter))
+            ts = current_hour + timedelta(seconds=offset)
+            self.state_manager.set_current_time(ts)
+            self.activity_generator.generate_connection(
+                src_ip=src_sys.ip,
+                dst_ip=dst_sys.ip,
+                time=ts,
+                dst_port=port,
+                proto=proto,
+                service=service,
+                duration=rng.uniform(0.1, 30.0),
+                orig_bytes=rng.randint(200, 5000),
+                resp_bytes=rng.randint(500, 50000),
+                emit_dns=True,
+                source_system=src_sys,
+            )
+
+        # === Windows Server Patterns ===
+
+        # 1. Backup agent → file servers (SMB 445)
+        if file_servers and servers:
+            for fs in file_servers:
+                if rng.random() < 0.40:  # 1-3/hour → ~40% per check
+                    src = rng.choice([s for s in servers if s != fs] or servers)
+                    _emit_conn(src, fs, 445, "smb")
+
+        # 2. Backup agent → database servers (SQL 1433)
+        mssql_db_servers = _db_servers_for_service("mssql")
+        if mssql_db_servers and servers:
+            for db in mssql_db_servers:
+                if rng.random() < 0.30:
+                    src = rng.choice([s for s in servers if s != db] or servers)
+                    _emit_conn(src, db, 1433, "mssql")
+
+        # 3. Monitoring agent → managed Windows hosts (WMI 135)
+        if windows_sys and len(windows_sys) > 1:
+            monitored = rng.sample(windows_sys, min(rng.randint(1, 3), len(windows_sys)))
+            for target in monitored:
+                if rng.random() < 0.50:
+                    src = rng.choice([s for s in servers if s != target] or windows_sys)
+                    _emit_conn(src, target, 135)
+
+        # 4. Deployment/patching → app servers (WinRM 5985)
+        if servers and len(servers) > 1:
+            if rng.random() < 0.20:
+                src = rng.choice(servers)
+                dst = rng.choice([s for s in servers if s != src] or servers)
+                _emit_conn(src, dst, 5985)
+
+        # 5. Vulnerability scanner → hosts (multi-port, bursty)
+        if rng.random() < 0.05 and len(systems) > 1:  # Rare — scan window
+            targets = rng.sample(systems, min(rng.randint(2, 5), len(systems)))
+            scanner = rng.choice(servers or systems)
+            for target in targets:
+                if target != scanner:
+                    port = rng.choice([22, 80, 135, 443, 445, 3389, 8080])
+                    _emit_conn(scanner, target, port)
+
+        # 6. Log collector → hosts (TCP 9997)
+        if servers and len(systems) > 1:
+            if rng.random() < 0.30:
+                collector = rng.choice(servers)
+                target = rng.choice([s for s in systems if s != collector] or systems)
+                _emit_conn(collector, target, 9997)
+
+        # 7. AD replication between DCs (LDAP 389)
+        if len(dcs) >= 2:
+            for _ in range(rng.randint(2, 4)):
+                src_dc, dst_dc = rng.sample(dcs, 2)
+                _emit_conn(src_dc, dst_dc, 389, "ldap")
+
+        # 8. Print server → workstations (SMB 445)
+        if print_servers and workstations:
+            if rng.random() < 0.25:
+                ps = rng.choice(print_servers)
+                ws = rng.choice(workstations)
+                _emit_conn(ps, ws, 445, "smb")
+
+        # 9. WSUS → Windows clients (HTTP 8530)
+        if servers and workstations:
+            if rng.random() < 0.10:
+                wsus = rng.choice(servers)
+                client = rng.choice(workstations)
+                _emit_conn(wsus, client, 8530, "http")
+
+        # 10. Certificate authority → servers (HTTPS 443)
+        if servers and len(servers) > 1:
+            if rng.random() < 0.05:
+                ca = rng.choice(servers)
+                target = rng.choice([s for s in servers if s != ca] or servers)
+                _emit_conn(ca, target, 443, "ssl")
+
+        # 11. DFS replication → file servers (RPC 135)
+        if len(file_servers) >= 2:
+            for _ in range(rng.randint(1, 3)):
+                src_fs, dst_fs = rng.sample(file_servers, 2)
+                _emit_conn(src_fs, dst_fs, 135)
+
+        # 12. Exchange → DCs (LDAP 389)
+        if mail_servers and dcs:
+            for _ in range(rng.randint(3, 6)):
+                ms = rng.choice(mail_servers)
+                dc = rng.choice(dcs)
+                _emit_conn(ms, dc, 389, "ldap")
+
+        # === Application Patterns ===
+
+        # 13. HR app → database (SQL 1433, business hours)
+        if mssql_db_servers and servers and is_business_hours:
+            if rng.random() < 0.50:
+                app_srv = rng.choice([s for s in servers if s not in mssql_db_servers] or servers)
+                db = rng.choice(mssql_db_servers)
+                for _ in range(rng.randint(2, 5)):
+                    _emit_conn(app_srv, db, 1433, "mssql")
+
+        # 14. Web app → database (various ports)
+        if web_servers and db_servers:
+            db_targets = [
+                (db, port, service)
+                for db in db_servers
+                for port, service in ((1433, "mssql"), (3306, "mysql"), (5432, "postgresql"))
+                if _baseline_database_service_supported(db, service)
+            ]
+            if db_targets:
+                for ws in web_servers:
+                    num_queries = rng.randint(5, 15) if is_business_hours else rng.randint(1, 3)
+                    db, port, svc = rng.choice(db_targets)
+                    for _ in range(num_queries):
+                        _emit_conn(ws, db, port, svc)
+
+        # 15. CI/CD → build targets (SSH 22, business hours)
+        if linux_sys and len(linux_sys) > 1 and is_business_hours:
+            if rng.random() < 0.20:
+                ci = rng.choice(linux_sys)
+                target = rng.choice([s for s in linux_sys if s != ci] or linux_sys)
+                _emit_conn(ci, target, 22, "ssh")
+
+        # === Security Infrastructure ===
+
+        # 16. EDR management → endpoints (HTTPS 443)
+        if servers and len(systems) > 1:
+            if rng.random() < 0.10:
+                mgmt = rng.choice(servers)
+                endpoint = rng.choice([s for s in systems if s != mgmt] or systems)
+                _emit_conn(mgmt, endpoint, 443, "ssl")
+
+        # 17. DNS zone transfers (TCP 53)
+        if len(dns_servers) >= 2:
+            if rng.random() < 0.30:
+                primary, secondary = rng.sample(dns_servers, 2)
+                _emit_conn(secondary, primary, 53, "dns")
+        elif dcs and len(dcs) >= 2:
+            if rng.random() < 0.30:
+                primary, secondary = rng.sample(dcs, 2)
+                _emit_conn(secondary, primary, 53, "dns")
+
+        # 18. RADIUS auth (UDP 1812)
+        if dcs and workstations:
+            if rng.random() < 0.15:
+                ws = rng.choice(workstations)
+                dc = rng.choice(dcs)
+                offset = rng.uniform(0, 3599)
+                ts = current_hour + timedelta(seconds=offset)
+                self.state_manager.set_current_time(ts)
+                self.activity_generator.generate_connection(
+                    src_ip=ws.ip,
+                    dst_ip=dc.ip,
+                    time=ts,
+                    dst_port=1812,
+                    proto="udp",
+                    duration=rng.uniform(0.01, 0.1),
+                    orig_bytes=rng.randint(100, 300),
+                    resp_bytes=rng.randint(100, 300),
+                    source_system=ws,
+                )
+
+        # 19. VPN concentrator → internal (matches remote user activity)
+        # Modeled as external-to-internal connections through a server
+        if servers and rng.random() < 0.10:
+            vpn_gw = rng.choice(servers)
+            internal = rng.choice([s for s in systems if s != vpn_gw] or systems)
+            _emit_conn(vpn_gw, internal, rng.choice([443, 445, 3389]))
+
+        # === Linux Patterns ===
+
+        # 20. NFS mounts (TCP 2049)
+        if nfs_servers and linux_sys:
+            clients = [s for s in linux_sys if s not in nfs_servers]
+            if clients:
+                for client in rng.sample(clients, min(2, len(clients))):
+                    if rng.random() < 0.40:
+                        _emit_conn(client, rng.choice(nfs_servers), 2049, "nfs")
+
+        # 21. Config management → Linux hosts (SSH 22)
+        if linux_sys and len(linux_sys) > 1:
+            if rng.random() < 0.20:
+                mgmt = rng.choice(linux_sys)
+                target = rng.choice([s for s in linux_sys if s != mgmt] or linux_sys)
+                _emit_conn(mgmt, target, 22, "ssh")
+
+        # 22. rsync backup between Linux servers (SSH 22)
+        linux_servers = [s for s in linux_sys if s.type in ("server", "domain_controller")]
+        if len(linux_servers) >= 2:
+            if rng.random() < 0.20:
+                src, dst = rng.sample(linux_servers, 2)
+                _emit_conn(src, dst, 22, "ssh")
+
+        # 23. Docker registry pull (HTTPS 443 or 5000)
+        if linux_sys and len(linux_sys) > 1:
+            if rng.random() < 0.15:
+                puller = rng.choice(linux_sys)
+                registry = rng.choice([s for s in linux_sys if s != puller] or linux_sys)
+                _emit_conn(puller, registry, rng.choice([443, 5000]), "ssl")
+
+        # 24. Cron SCP/SFTP transfers (SSH 22)
+        if len(linux_sys) >= 2:
+            if rng.random() < 0.15:
+                src, dst = rng.sample(linux_sys, 2)
+                _emit_conn(src, dst, 22, "ssh")
+
+        # 25. Centralized syslog relay (TCP 514)
+        if linux_sys and len(linux_sys) > 1:
+            if rng.random() < 0.30:
+                sender = rng.choice(linux_sys)
+                collector = rng.choice([s for s in linux_sys if s != sender] or linux_sys)
+                offset = rng.uniform(0, 3599)
+                ts = current_hour + timedelta(seconds=offset)
+                self.state_manager.set_current_time(ts)
+                self.activity_generator.generate_connection(
+                    src_ip=sender.ip,
+                    dst_ip=collector.ip,
+                    time=ts,
+                    dst_port=514,
+                    proto="tcp",
+                    duration=rng.uniform(1.0, 60.0),
+                    orig_bytes=rng.randint(500, 10000),
+                    resp_bytes=rng.randint(50, 200),
+                    source_system=sender,
+                )
+
+        # 26. LDAP client → directory server (389/636)
+        if linux_sys and dcs:
+            for lx in rng.sample(linux_sys, min(2, len(linux_sys))):
+                if rng.random() < 0.25:
+                    dc = rng.choice(dcs)
+                    port = rng.choice([389, 636])
+                    svc = "ldap" if port == 389 else "ssl"
+                    _emit_conn(lx, dc, port, svc)
+
+    def _ensure_session_on_system(self, user: User, system, time, rng) -> str:
+        """Ensure the user has an active session on the target system.
+
+        Returns the logon_id for the session. If no session exists on
+        this specific system, creates a logon with an appropriate type
+        (interactive for workstations, network/RDP for servers).
+        """
+        if _get_os_category(system.os) == "windows":
+            existing_interactive = self._existing_windows_interactive_session(
+                user,
+                system,
+                time,
+            )
+            if existing_interactive is not None:
+                existing_interactive.last_activity_time = time
+                return existing_interactive.logon_id
+
+        if hasattr(self, "world_planner"):
+            session = self.world_planner.ensure_user_session(user, system, time, rng)
+            return session.logon_id
+
+        sessions = self.state_manager.get_sessions_for_user(user.username)
+        session_on_system = next(
+            (s for s in sessions if s.system == system.hostname and _session_started_by(s, time)),
+            None,
+        )
+        if session_on_system:
+            return session_on_system.logon_id
+
+        logon_time = time - timedelta(seconds=rng.randint(1, 5))
+        self.state_manager.set_current_time(logon_time)
+        sys_type = (system.type or "workstation").lower()
+        logon_type = (
+            rng.choices([3, 10], weights=[70, 30], k=1)[0]
+            if sys_type
+            in (
+                "server",
+                "domain_controller",
+            )
+            else 2
+        )
+        return self.activity_generator.generate_logon(
+            user=user,
+            system=system,
+            time=logon_time,
+            logon_type=logon_type,
+        )
+
+    def _existing_windows_interactive_session(
+        self,
+        user: User,
+        system: System,
+        time: datetime,
+    ) -> Any | None:
+        """Return an already-started same-user Windows interactive session."""
+        candidates = [
+            session
+            for session in self.state_manager.get_sessions_for_user_at(user.username, time)
+            if session.system == system.hostname
+            and session.logon_type in {2, 10, 11}
+            and session.session_kind not in {"network", "service"}
+            and _session_started_by(session, time)
+        ]
+        if not candidates:
+            return None
+        return max(candidates, key=lambda session: session.start_time)
+
+    def _generate_suspicious_noise(self, current_hour: datetime) -> None:
+        """Generate suspicious-but-benign ambient noise events.
+
+        Creates events that look suspicious in isolation but have legitimate
+        explanations: after-hours admin logins, PowerShell/cmd on non-admin
+        workstations, failed logon bursts, service account anomalies.
+        """
+        noise_level = self.scenario.baseline_activity.suspicious_noise
+        rng = _get_rng()
+
+        num_events = get_suspicious_event_count(noise_level, rng)
+        if num_events == 0:
+            return
+
+        enabled_users = [u for u in self.scenario.environment.users if u.enabled]
+        systems = self.scenario.environment.systems
+        personas = self.scenario.personas
+
+        for _ in range(num_events):
+            pattern_info = pick_suspicious_pattern(
+                rng, enabled_users, systems, personas, current_hour
+            )
+            if not pattern_info:
+                continue
+
+            pattern_type = pattern_info["type"]
+
+            if pattern_type == "after_hours_admin":
+                result = generate_after_hours_admin(rng, enabled_users, systems, current_hour)
+                if result:
+                    self.activity_generator.generate_logon(
+                        user=result["user"],
+                        system=result["system"],
+                        time=result["time"],
+                        logon_type=result["logon_type"],
+                    )
+
+            elif pattern_type == "suspicious_cli":
+                result = generate_suspicious_cli(
+                    rng,
+                    enabled_users,
+                    systems,
+                    current_hour,
+                    self.scenario.environment.domain or "corp.local",
+                )
+                if result:
+                    aligned_time = self._align_rsat_with_future_workstation_session(
+                        result["user"],
+                        result["system"],
+                        result["time"],
+                        current_hour + timedelta(hours=1),
+                        rng,
+                    )
+                    if aligned_time is None:
+                        continue
+                    result["time"] = aligned_time
+                    logon_id = self._ensure_session_on_system(
+                        result["user"], result["system"], result["time"], rng
+                    )
+                    pid = self.activity_generator.generate_process(
+                        user=result["user"],
+                        system=result["system"],
+                        time=result["time"],
+                        logon_id=logon_id,
+                        process_name=result["process_name"],
+                        command_line=result["command_line"],
+                    )
+                    self._schedule_foreground_process_termination(
+                        user=result["user"],
+                        system=result["system"],
+                        start_time=result["time"],
+                        pid=pid,
+                        process_name=result["process_name"],
+                        command_line=result["command_line"],
+                        logon_id=logon_id,
+                        rng=rng,
+                    )
+
+            elif pattern_type == "failed_logon_burst":
+                result = generate_failed_logon_burst(rng, enabled_users, systems, current_hour)
+                if result:
+                    # Generate failed logons followed by a success
+                    user = result["user"]
+                    system = result["system"]
+                    base_time = result["time"]
+                    for i in range(result["num_failures"]):
+                        fail_time = base_time + timedelta(seconds=i * rng.randint(2, 8))
+                        self.activity_generator.generate_failed_logon(
+                            user=user,
+                            system=system,
+                            time=fail_time,
+                            logon_type=2,  # Interactive (typing password wrong)
+                        )
+                    # Successful logon after the failures
+                    success_time = base_time + timedelta(
+                        seconds=result["num_failures"] * 5 + rng.randint(3, 15)
+                    )
+                    self.activity_generator.generate_logon(
+                        user=user,
+                        system=system,
+                        time=success_time,
+                        logon_type=2,
+                    )
+
+            elif pattern_type == "service_account_anomaly":
+                result = generate_service_account_anomaly(rng, enabled_users, systems, current_hour)
+                if result:
+                    self.activity_generator.generate_logon(
+                        user=result["user"],
+                        system=result["system"],
+                        time=result["time"],
+                        logon_type=result["logon_type"],
+                    )
+
+            elif pattern_type == "suspicious_dns":
+                result = generate_suspicious_dns(rng, enabled_users, systems, current_hour)
+                if result:
+                    # Emit DNS query via a UDP/53 connection with DnsContext
+                    from evidenceforge.events.contexts import DnsContext
+
+                    dns_server_ips = getattr(
+                        self.activity_generator, "_dns_server_ips", ["10.0.0.1"]
+                    )
+                    dns_server_ip = rng.choice(dns_server_ips)
+                    dns_ctx = DnsContext(
+                        query=result["hostname"],
+                        trans_id=rng.randint(1, 65535),
+                        qtype=1,
+                        query_type="A",
+                        rcode="NOERROR",
+                        rcode_num=0,
+                        answers=[_generate_random_external_ip(rng)],
+                        TTLs=[
+                            float(
+                                _dns_base_ttl(
+                                    result["hostname"],
+                                    _dns_is_internal_name(
+                                        result["hostname"],
+                                        self.scenario.environment.domain or "corp.local",
+                                    ),
+                                )
+                            )
+                        ],
+                        rtt=_dns_rtt(rng, dns_server_ip),
+                    )
+                    self.state_manager.set_current_time(result["time"])
+                    self.activity_generator.generate_connection(
+                        src_ip=result["system"].ip,
+                        dst_ip=dns_server_ip,
+                        time=result["time"],
+                        dst_port=53,
+                        proto="udp",
+                        service="dns",
+                        duration=rng.uniform(0.001, 0.05),
+                        orig_bytes=rng.randint(40, 100),
+                        resp_bytes=rng.randint(80, 400),
+                        dns=dns_ctx,
+                    )
+
+            elif pattern_type == "unusual_outbound":
+                result = generate_unusual_outbound(rng, enabled_users, systems, current_hour)
+                if result:
+                    self.state_manager.set_current_time(result["time"])
+                    # Large transfers get bigger byte counts
+                    if result.get("large_transfer"):
+                        orig_bytes = rng.randint(500000, 5000000)
+                        resp_bytes = rng.randint(1000, 50000)
+                        duration = rng.uniform(10.0, 120.0)
+                    else:
+                        orig_bytes = rng.randint(500, 5000)
+                        resp_bytes = rng.randint(1000, 50000)
+                        duration = rng.uniform(0.5, 10.0)
+                    self.activity_generator.generate_connection(
+                        src_ip=result["system"].ip,
+                        dst_ip=result["dst_ip"],
+                        time=result["time"],
+                        dst_port=result["dst_port"],
+                        service=result["service"],
+                        duration=duration,
+                        orig_bytes=orig_bytes,
+                        resp_bytes=resp_bytes,
+                        emit_dns=True,
+                        hostname=result.get("hostname"),
+                    )
+
+            elif pattern_type == "scheduled_scan_overlap":
+                result = generate_scheduled_scan_overlap(rng, enabled_users, systems, current_hour)
+                if result:
+                    ScheduledScanOverlapActionBundle(
+                        executor=self,
+                        request=ScheduledScanOverlapRequest(
+                            scanner=result["scanner"],
+                            targets=tuple(result["targets"]),
+                            time=result["time"],
+                            rng=rng,
+                        ),
+                    ).execute()
+
+            elif pattern_type in ("temp_dir_execution", "unusual_powershell"):
+                gen_fn = (
+                    generate_temp_dir_execution
+                    if pattern_type == "temp_dir_execution"
+                    else generate_unusual_powershell
+                )
+                if pattern_type == "unusual_powershell":
+                    result = gen_fn(
+                        rng,
+                        enabled_users,
+                        systems,
+                        current_hour,
+                        self.scenario.environment.domain or "corp.local",
+                    )
+                else:
+                    result = gen_fn(rng, enabled_users, systems, current_hour)
+                if result:
+                    self.state_manager.set_current_time(result["time"])
+                    logon_id = self._ensure_session_on_system(
+                        result["user"], result["system"], result["time"], rng
+                    )
+                    pid = self.activity_generator.generate_process(
+                        user=result["user"],
+                        system=result["system"],
+                        time=result["time"],
+                        logon_id=logon_id,
+                        process_name=result["process_name"],
+                        command_line=result["command_line"],
+                    )
+                    self._schedule_foreground_process_termination(
+                        user=result["user"],
+                        system=result["system"],
+                        start_time=result["time"],
+                        pid=pid,
+                        process_name=result["process_name"],
+                        command_line=result["command_line"],
+                        logon_id=logon_id,
+                        rng=rng,
+                    )
+
+    def _execute_scheduled_scan_overlap_bundle(self, request: ScheduledScanOverlapRequest) -> None:
+        """Expand a suspicious-but-benign scheduled scanner overlap."""
+
+        scan_ports = [22, 80, 135, 443, 445, 3389, 8080, 8443]
+        rng = request.rng
+        for target in request.targets:
+            for port in rng.sample(scan_ports, rng.randint(2, 4)):
+                scan_time = request.time + timedelta(seconds=rng.uniform(0, 30))
+                self.state_manager.set_current_time(scan_time)
+                conn_state, service, duration, orig_bytes, resp_bytes = _nmap_probe_profile(
+                    port,
+                    target,
+                    rng,
+                )
+                self.activity_generator.generate_connection(
+                    src_ip=request.scanner.ip,
+                    dst_ip=target.ip,
+                    time=scan_time,
+                    dst_port=port,
+                    proto="tcp",
+                    service=service,
+                    duration=duration,
+                    orig_bytes=orig_bytes,
+                    resp_bytes=resp_bytes,
+                    source_system=request.scanner,
+                    conn_state=conn_state,
+                    emit_dns=False,
+                    suppress_application_side_effects=True,
+                )
+
+    def _terminate_stale_processes(self, current_hour: datetime) -> None:
+        """Terminate processes that have exceeded their expected lifetime.
+
+        Called per-hour. Process lifetime depends on type:
+        - System processes (svchost, lsass, csrss, services, explorer): never
+        - Browsers/editors (chrome, firefox, outlook, code): 1-4 hours
+        - Build tools (msbuild, gcc, npm): 5-30 minutes
+        - Other: 30min-2 hours
+        """
+        system_patterns = (
+            # Windows core
+            "svchost",
+            "lsass",
+            "csrss",
+            "services.exe",
+            "explorer.exe",
+            "smss",
+            "wininit",
+            "winlogon",
+            "fontdrvhost",
+            "dwm.exe",
+            "userinit.exe",
+            "runtimebroker",
+            "taskhostw",
+            "searchindexer",
+            "msmpeng",
+            "sqlservr",
+            # Linux core
+            "systemd",
+            "cron",
+            "crond",
+            "sshd",
+            "rsyslogd",
+            "journald",
+            "udevd",
+            "logind",
+            "snapd",
+            "timesyncd",
+            "networkmanager",
+            "dbus-daemon",
+            "bash",
+            "agetty",
+            "mysqld",
+            "postgres",
+        )
+        short_lived = (
+            "msbuild",
+            "gcc",
+            "npm",
+            "make",
+            "dotnet",
+            "cargo",
+            "node.exe",
+            "whoami.exe",
+            "hostname.exe",
+            "ipconfig.exe",
+            "nltest.exe",
+            "klist.exe",
+            "qwinsta.exe",
+            "quser.exe",
+            "query.exe",
+            "cmdkey.exe",
+            "net.exe",
+            "net1.exe",
+            "dsquery.exe",
+            "dsget.exe",
+            "tasklist.exe",
+            "sc.exe",
+            "wevtutil.exe",
+            "curl",
+            "wget",
+            "scp",
+            "kubectl",
+            "mysqldump",
+            "sqlcmd",
+        )
+
+        # Collect all seeded system PIDs for this system as a safety net
+        seeded_pids: dict[str, set[int]] = {}
+        for hostname, pid_map in self._system_pids.items():
+            seeded_pids[hostname] = set(pid_map.values())
+
+        rng = _get_rng()
+        for system in self.scenario.environment.systems:
+            protected_pids = seeded_pids.get(system.hostname, set())
+            processes = self.state_manager.get_processes_on_system(system.hostname)
+            for proc in list(processes):
+                image_lower = proc.image.lower()
+
+                # Never terminate seeded system processes (pattern match + PID safety net)
+                if any(p in image_lower for p in system_patterns):
+                    continue
+                if _get_os_category(system.os) == "windows" and _is_windows_singleton_service_image(
+                    proc.image
+                ):
+                    continue
+                if proc.pid in protected_pids:
+                    continue
+                # Story processes handle their own termination
+                if proc.story_created:
+                    continue
+
+                is_short_lived = any(p in image_lower for p in short_lived)
+                lifetime_rng = random.Random(
+                    _stable_seed(
+                        "windows_stale_process_lifetime:"
+                        f"{system.hostname}:{proc.pid}:{proc.image}:{proc.start_time.isoformat()}"
+                    )
+                )
+                target_lifetime = _windows_stale_process_target_lifetime(
+                    proc.image,
+                    proc.command_line,
+                    lifetime_rng,
+                )
+                target_end = proc.start_time + timedelta(seconds=target_lifetime)
+                if current_hour < target_end:
+                    continue
+
+                bounded_lifetime = _windows_background_process_lifetime_seconds(
+                    proc.image,
+                    proc.command_line,
+                    random.Random(
+                        _stable_seed(
+                            "windows_bounded_process_lifetime_probe:"
+                            f"{system.hostname}:{proc.pid}:{proc.image}:{proc.start_time.isoformat()}"
+                        )
+                    ),
+                )
+                termination_probability = 0.95 if bounded_lifetime is not None else 0.72
+                if rng.random() < termination_probability:
+                    actor = self._find_actor(proc.username)
+                    if not actor:
+                        continue
+
+                    logon_id = proc.logon_id
+                    if not logon_id:
+                        sessions = self.state_manager.get_sessions_for_user(proc.username)
+                        session = next(
+                            (
+                                candidate
+                                for candidate in sessions
+                                if candidate.system == system.hostname
+                            ),
+                            None,
+                        )
+                        logon_id = session.logon_id if session else "0x0"
+
+                    term_time = target_end + timedelta(seconds=rng.uniform(0.2, 75.0))
+                    if is_short_lived and term_time > current_hour + timedelta(hours=1):
+                        continue
+                    if proc.last_activity_time is not None and term_time <= proc.last_activity_time:
+                        term_time = proc.last_activity_time + timedelta(seconds=rng.uniform(2, 30))
+                    self.state_manager.set_current_time(term_time)
+                    self.activity_generator.generate_process_termination(
+                        user=actor,
+                        system=system,
+                        time=term_time,
+                        pid=proc.pid,
+                        process_name=proc.image,
+                        logon_id=logon_id,
+                    )
+
+    def _evaluate_firewall_policy(
+        self,
+        src_ip: str,
+        dst_ip: str,
+        dst_port: int,
+        sensor,
+        segment_cidrs: dict,
+    ) -> str:
+        """Evaluate a connection against the firewall's policy rules.
+
+        Walks rules in order (first match wins). Returns 'permit' or 'deny'.
+        If no rule matches, returns sensor.default_action.
+        """
+        import ipaddress as _ipaddress
+
+        def _resolve_segment(ip: str) -> str:
+            """Resolve an IP to a segment name, or 'external' if not in any."""
+            for seg_name, cidr in segment_cidrs.items():
+                try:
+                    if _ipaddress.ip_address(ip) in cidr:
+                        return seg_name
+                except (ValueError, KeyError):
+                    continue
+            return "external"
+
+        def _matches_specifier(ip: str, ip_segment: str, spec: str) -> bool:
+            """Check if an IP/segment matches a rule specifier."""
+            if spec == "any":
+                return True
+            if spec == "external":
+                return ip_segment == "external"
+            if spec == ip_segment:
+                return True
+            # Try IP match
+            try:
+                if _ipaddress.ip_address(ip) == _ipaddress.ip_address(spec):
+                    return True
+            except ValueError:
+                pass
+            # Try CIDR match
+            try:
+                if _ipaddress.ip_address(ip) in _ipaddress.ip_network(spec, strict=False):
+                    return True
+            except ValueError:
+                pass
+            return False
+
+        src_seg = _resolve_segment(src_ip)
+        dst_seg = _resolve_segment(dst_ip)
+
+        for rule in sensor.policy:
+            if not _matches_specifier(src_ip, src_seg, rule.src):
+                continue
+            if not _matches_specifier(dst_ip, dst_seg, rule.dst):
+                continue
+            # Check port (empty list = any)
+            if rule.ports:
+                port_list = [int(p) if isinstance(p, int) else p for p in rule.ports]
+                if "any" not in port_list and dst_port not in port_list:
+                    continue
+            return rule.action
+
+        return sensor.default_action
+
+    def _firewall_controls_connection_path(
+        self,
+        src_ip: str,
+        dst_ip: str,
+        sensor: Any,
+        segment_cidrs: dict,
+    ) -> bool:
+        """Return whether a firewall sensor plausibly controls this connection path."""
+        import ipaddress as _ipaddress
+
+        def _resolve_segments(ip: str) -> set[str]:
+            try:
+                address = _ipaddress.ip_address(ip)
+            except ValueError:
+                return set()
+            return {seg_name for seg_name, cidr in segment_cidrs.items() if address in cidr}
+
+        src_segments = _resolve_segments(src_ip)
+        dst_segments = _resolve_segments(dst_ip)
+        sensor_segments = set(getattr(sensor, "monitoring_segments", []) or [])
+
+        if src_segments and dst_segments:
+            return bool((src_segments & sensor_segments) and (dst_segments & sensor_segments))
+        if src_segments:
+            return bool(src_segments & sensor_segments)
+        if dst_segments:
+            return bool(dst_segments & sensor_segments)
+
+        # External-to-public-edge traffic has no internal segment on either
+        # endpoint but can still hit the firewall's outside interface.
+        return True
+
+    @staticmethod
+    def _firewall_internal_probe_sources(
+        sensor_name: str,
+        systems: list[System],
+    ) -> list[System]:
+        """Return a small stable source set for internal denied probe noise."""
+        if not systems:
+            return []
+
+        scanner_role_terms = {
+            "scanner",
+            "vulnerability_scanner",
+            "vulnerability-scanner",
+            "security_scanner",
+            "security-scanner",
+            "monitoring",
+        }
+
+        def _roles(system: System) -> set[str]:
+            return {str(role).lower() for role in system.roles or []}
+
+        explicit_scanners = [system for system in systems if scanner_role_terms & _roles(system)]
+        workstations = [
+            system for system in systems if (system.type or "workstation").lower() == "workstation"
+        ]
+        non_dc_servers = [
+            system
+            for system in systems
+            if (system.type or "").lower() == "server"
+            and "domain_controller" not in _roles(system)
+            and "dc" not in system.hostname.lower()
+        ]
+        candidates = explicit_scanners or workstations or non_dc_servers or systems
+        source_count = 1 if len(candidates) < 8 else 2
+        ranked = sorted(
+            candidates,
+            key=lambda system: _stable_seed(
+                f"firewall_internal_probe_source:{sensor_name}:{system.hostname}"
+            ),
+        )
+        return ranked[:source_count]
+
+    @staticmethod
+    def _firewall_blocked_port_for_internal_source(src_ip: str, rng: random.Random) -> int:
+        """Return a source-sticky denied-port preference instead of a broad shared pool."""
+        profiles = [
+            (44, [3389, 445, 135, 5985]),
+            (24, [1433, 3306, 5432, 6379]),
+            (18, [22, 3389, 5900]),
+            (14, [23, 2323, 80, 8080]),
+        ]
+        seed = _stable_seed(f"firewall_internal_blocked_port_profile:{src_ip}")
+        selector = random.Random(seed)
+        profile_ports = selector.choices(
+            [ports for _weight, ports in profiles],
+            weights=[weight for weight, _ports in profiles],
+            k=1,
+        )[0]
+        return rng.choice(profile_ports)
+
+    def _generate_firewall_deny_baseline(self, current_hour: datetime) -> None:
+        """Generate denied connection events for firewall sensors.
+
+        For each firewall-type sensor, generates deny events proportional to
+        the estimated allow traffic (controlled by deny_ratio). Deny targets
+        are connections that violate the sensor's policy rules.
+        """
+        if not self.scenario.environment.network or not self.scenario.environment.network.sensors:
+            return
+
+        rng = _get_rng()
+
+        # Pre-compute segment CIDRs for IP matching
+        import ipaddress
+
+        segments = self.scenario.environment.network.segments
+        segment_cidrs: dict[str, ipaddress.IPv4Network | ipaddress.IPv6Network] = {}
+        for seg in segments:
+            try:
+                segment_cidrs[seg.name] = ipaddress.ip_network(seg.cidr, strict=False)
+            except ValueError:
+                continue
+
+        # Collect internal IPs from scenario systems
+        internal_ips = [s.ip for s in self.scenario.environment.systems if s.ip]
+
+        for sensor in self.scenario.environment.network.sensors:
+            if sensor.type != "firewall" or "cisco_asa" not in sensor.log_formats:
+                continue
+            if sensor.deny_ratio <= 0:
+                continue
+
+            # Build public scan target pool from visibility engine
+            _public_cidrs: list = []
+            _vip_to_real: dict[str, str] = {}
+            if hasattr(self, "dispatcher") and self.dispatcher.visibility_engine:
+                _ve = self.dispatcher.visibility_engine
+                _public_cidrs = _ve._public_cidrs
+                _vip_to_real = _ve._vip_to_real_ip
+
+            def _pick_public_scan_target(
+                _cidrs: list = _public_cidrs,  # noqa: B006
+            ) -> str:
+                """Pick a random IP from the org's public address space."""
+                if not _cidrs:
+                    return rng.choice(internal_ips) if internal_ips else "10.0.10.1"
+                # Weight by CIDR size (minimum 1 to handle /31 and /32)
+                cidr = rng.choices(
+                    _cidrs,
+                    weights=[max(1, net.num_addresses) for net in _cidrs],
+                    k=1,
+                )[0]
+                # Handle /32 (single host) and /31 (point-to-point)
+                if cidr.num_addresses <= 2:
+                    return str(cidr.network_address)
+                offset = rng.randint(1, cidr.num_addresses - 2)
+                return str(cidr.network_address + offset)
+
+            sensor_systems = []
+            for candidate in self.scenario.environment.systems:
+                try:
+                    candidate_ip = ipaddress.ip_address(candidate.ip)
+                except ValueError:
+                    continue
+                if any(
+                    seg_name in sensor.monitoring_segments and candidate_ip in cidr
+                    for seg_name, cidr in segment_cidrs.items()
+                ):
+                    sensor_systems.append(candidate)
+            sensor_systems = sensor_systems or self.scenario.environment.systems
+            avg_multiplier = sum(
+                self._activity_multiplier(system, "firewall_deny") for system in sensor_systems
+            ) / max(1, len(sensor_systems))
+
+            # Estimate allow traffic: ~10-20 connections per internal system per hour.
+            allows_lo, allows_hi = scale_count_range(10, 20, avg_multiplier)
+            estimated_allows = len(internal_ips) * rng.randint(allows_lo, allows_hi)
+            deny_count = int(estimated_allows * sensor.deny_ratio)
+            if deny_count <= 0:
+                continue
+
+            from evidenceforge.events.contexts import FirewallContext
+
+            sensor_interfaces = sensor.interfaces
+            deny_conn_state = "REJ" if sensor.drop_mode == "reject" else "S0"
+            internal_probe_sources = self._firewall_internal_probe_sources(
+                sensor.hostname or sensor.name,
+                sensor_systems,
+            )
+            workstation_probe_sources = [
+                system
+                for system in internal_probe_sources
+                if (system.type or "workstation").lower() == "workstation"
+            ] or [
+                system
+                for system in sensor_systems
+                if (system.type or "workstation").lower() == "workstation"
+            ][:1]
+
+            def _resolve_iface(ip: str, _ifaces: dict = sensor_interfaces) -> str:  # noqa: B006
+                for seg_name, cidr in segment_cidrs.items():
+                    try:
+                        if ipaddress.ip_address(ip) in cidr:
+                            return _ifaces.get(seg_name, seg_name)
+                    except ValueError:
+                        continue
+                return _ifaces.get("_default", "outside")
+
+            # Generate deny events — only emit connections the policy would deny
+            generated = 0
+            attempts = 0
+            max_attempts = deny_count * 5
+            while generated < deny_count and attempts < max_attempts:
+                attempts += 1
+
+                # Choose deny pattern candidate
+                roll = rng.random()
+                if roll < 0.82:
+                    # External -> public address space (scanner pool + public CIDRs)
+                    src_ip = rng.choices(
+                        self._external_scanner_ips,
+                        weights=self._external_scanner_weights,
+                        k=1,
+                    )[0]
+                    dst_ip = _pick_public_scan_target()
+                    dst_port = external_scanner_port_for_source(src_ip, rng)
+                    proto = "tcp"
+                elif roll < 0.86:
+                    # Cross-segment blocked — source-sticky internal probe/noisy tooling.
+                    if not internal_probe_sources:
+                        continue
+                    src_system = rng.choice(internal_probe_sources)
+                    src_ip = src_system.ip
+                    candidates = [ip for ip in internal_ips if ip != src_ip]
+                    if not candidates:
+                        continue
+                    dst_ip = rng.choice(candidates)
+                    dst_port = self._firewall_blocked_port_for_internal_source(src_ip, rng)
+                    proto = "tcp"
+                elif roll < 0.88:
+                    # Outbound blocked — only workstations generate suspicious outbound;
+                    # servers never initiate random connections on scanning ports
+                    if not workstation_probe_sources:
+                        continue
+                    src_ip = rng.choice(workstation_probe_sources).ip
+                    dst_ip = self._generate_external_client_ip(rng)
+                    dst_port = self._firewall_blocked_port_for_internal_source(src_ip, rng)
+                    proto = "tcp"
+                else:
+                    # ICMP ping sweep from external (use scanner pool + public CIDRs)
+                    src_ip = rng.choices(
+                        self._external_scanner_ips,
+                        weights=self._external_scanner_weights,
+                        k=1,
+                    )[0]
+                    dst_ip = _pick_public_scan_target()
+                    dst_port = 8  # ICMP echo request type
+                    proto = "icmp"
+
+                # Policy evaluation uses real (post-NAT) IPs for modern ASA.
+                # Resolve VIP back to real_ip; non-VIP public IPs resolve to
+                # "external" segment which always hits default deny.
+                policy_dst_ip = _vip_to_real.get(dst_ip, dst_ip)
+                if not self._firewall_controls_connection_path(
+                    src_ip, policy_dst_ip, sensor, segment_cidrs
+                ):
+                    continue
+                if (
+                    self._evaluate_firewall_policy(
+                        src_ip, policy_dst_ip, dst_port, sensor, segment_cidrs
+                    )
+                    != "deny"
+                ):
+                    continue
+
+                offset_sec = pick_firewall_deny_offset(
+                    rng=rng,
+                    sensor_name=sensor.hostname or sensor.name,
+                    current_hour_epoch=int(current_hour.timestamp()),
+                    generated_index=generated,
+                    multiplier=avg_multiplier,
+                )
+                if offset_sec is None:
+                    continue
+                ts = current_hour + timedelta(seconds=offset_sec)
+                self.state_manager.set_current_time(ts)
+
+                src_iface = _resolve_iface(src_ip)
+                dst_iface = _resolve_iface(dst_ip)
+                acl_name = f"{src_iface}_access_in"
+                deny_hash_a, deny_hash_b = firewall_deny_hash_values(rng)
+
+                fw_ctx = FirewallContext(
+                    action="deny",
+                    msg_id=106023,
+                    connection_id=0,
+                    src_interface=src_iface,
+                    dst_interface=dst_iface,
+                    access_group=acl_name,
+                    deny_hash_a=deny_hash_a,
+                    deny_hash_b=deny_hash_b,
+                )
+
+                self.activity_generator.generate_connection(
+                    src_ip=src_ip,
+                    dst_ip=dst_ip,
+                    time=ts,
+                    dst_port=dst_port,
+                    proto=proto,
+                    conn_state=deny_conn_state,
+                    firewall=fw_ctx,
+                )
+                generated += 1
+
+    def _plan_logoffs_for_hour(
+        self,
+        users: list[User],
+        current_hour: datetime,
+    ) -> dict[tuple[str, str], float]:
+        """Pre-decide which sessions log off this hour and at what offset.
+
+        Called before system traffic so profile traffic can bound persona
+        connection timestamps to before the planned logoff.
+
+        Returns:
+            Dict mapping (system_hostname, logon_id) → offset_seconds within hour.
+        """
+        planned: dict[tuple[str, str], float] = {}
+        for user in users:
+            sessions = self.state_manager.get_sessions_for_user(user.username)
+            if not sessions:
+                continue
+
+            persona = self._get_user_persona(user)
+            is_outside_work_hours = False
+            if persona and persona.work_hours_parsed:
+                # Use scenario-local time for work-hour checks, not UTC.
+                # Guard against naive datetimes (treat as UTC).
+                _local_hour = current_hour
+                if (
+                    hasattr(self, "_scenario_tz")
+                    and self._scenario_tz
+                    and current_hour.tzinfo is not None
+                ):
+                    _local_hour = current_hour.astimezone(self._scenario_tz)
+                is_outside_work_hours = _local_hour.hour not in persona.work_hours_parsed.get(
+                    "hours", range(24)
+                )
+
+            for session in list(sessions):
+                # Never baseline-close a storyline-created session — the
+                # storyline controls when these sessions end.
+                if session.storyline_protected:
+                    continue
+                network_close_time = getattr(session, "network_close_time", None)
+                if session.session_kind == "ssh" and network_close_time is not None:
+                    network_close_time = (
+                        network_close_time.replace(tzinfo=UTC)
+                        if network_close_time.tzinfo is None
+                        else network_close_time.astimezone(UTC)
+                    )
+                    hour_end = current_hour + timedelta(hours=1)
+                    if network_close_time < hour_end:
+                        close_seed = _stable_seed(
+                            "baseline_ssh_logoff_after_transport:"
+                            f"{session.system}:{session.logon_id}:"
+                            f"{network_close_time.isoformat()}"
+                        )
+                        close_offset = (
+                            network_close_time
+                            - current_hour
+                            + timedelta(milliseconds=80 + (close_seed % 1420))
+                        ).total_seconds()
+                        planned[(session.system, session.logon_id)] = min(
+                            max(0.0, close_offset),
+                            3599.0,
+                        )
+                        continue
+                session_age_hours = (current_hour - session.start_time).total_seconds() / 3600
+                if session_age_hours < 0.5:
+                    continue
+
+                rng = _get_rng()
+                logoff_probability = (
+                    0.6 if is_outside_work_hours else 0.3 if session_age_hours > 1 else 0.1
+                )
+                if rng.random() < logoff_probability:
+                    logoff_offset = rng.uniform(0, 3599)
+                    planned[(session.system, session.logon_id)] = logoff_offset
+        return planned
+
+    def _generate_logoffs_for_hour(
+        self,
+        users: list[User],
+        current_hour: datetime,
+        planned_logoffs: dict[tuple[str, str], float],
+    ) -> None:
+        """Execute pre-planned logoff events for sessions ending this hour."""
+        # Build user/system lookup for logoff emission
+        user_map = {u.username: u for u in users}
+        for (_system_hostname, logon_id), offset in planned_logoffs.items():
+            # Find the session to get username and logon_type
+            session = self.state_manager.get_session(logon_id)
+            if not session:
+                continue
+            # Re-check protection — storyline may have marked this session
+            # as protected after logoff was planned earlier in the hour.
+            if session.storyline_protected:
+                continue
+            user = user_map.get(session.username)
+            if not user:
+                continue
+
+            # Resolve system from the session's host, not the user's primary system
+            system = next(
+                (s for s in self.scenario.environment.systems if s.hostname == session.system),
+                None,
+            )
+            if not system:
+                continue
+
+            logoff_time = current_hour + timedelta(seconds=offset)
+            self.state_manager.set_current_time(logoff_time)
+            self.activity_generator.generate_logoff(
+                user=user,
+                system=system,
+                time=logoff_time,
+                logon_id=session.logon_id,
+                logon_type=session.logon_type,
+            )
+
+    def _barrier_flush_all_emitters(self) -> None:
+        """Flush all emitters and wait for completion (hour-level barrier).
+
+        Ensures temporal consistency: all events for hour N are written
+        before hour N+1 begins.
+        """
+        logger.debug("Barrier flush: waiting for all emitters to complete")
+        for _format_name, emitter in self.emitters.items():
+            emitter.barrier_flush()
+        logger.debug("Barrier flush: all emitters complete")
+
+    def _get_user_persona(self, user: User) -> Persona | None:
+        """Resolve user.persona string to Persona object."""
+        if not user.persona or not self.scenario.personas:
+            return None
+        for persona in self.scenario.personas:
+            if persona.name == user.persona:
+                return persona
+        return None
+
+    @staticmethod
+    def _sigmoid(x: float) -> float:
+        """Sigmoid function for smooth temporal transitions."""
+        return 1.0 / (1.0 + math.exp(-6.0 * x))
+
+    def _work_hour_multiplier(
+        self,
+        hour: int,
+        whp: dict,
+        user_offsets: dict | None = None,
+        weekday: int | None = None,
+    ) -> float:
+        """Calculate activity multiplier based on work hours with smooth transitions.
+
+        Returns 0.0-1.5 multiplier (before day-of-week scaling). Uses sigmoid
+        ramps for gradual transitions at work start/end and lunch, instead of
+        binary on/off. When weekday is provided (0=Monday..6=Sunday), the result
+        is further scaled by _DAY_OF_WEEK_MULTIPLIERS.
+        """
+        start = whp["start"]
+        end = whp["end"]
+        lunch = whp.get("lunch")
+        peak_hours = whp.get("peak_hours") or []
+
+        if user_offsets:
+            start += user_offsets.get("start_offset", 0)
+            end += user_offsets.get("end_offset", 0)
+            if lunch:
+                lunch_start = lunch[0] + user_offsets.get("lunch_start_offset", 0)
+                lunch_dur_offset = user_offsets.get("lunch_duration_offset", 0)
+                lunch_end = lunch[1] + user_offsets.get("lunch_start_offset", 0) + lunch_dur_offset
+                lunch = (lunch_start, lunch_end)
+
+        h = float(hour) + 0.5
+
+        # Compute intra-day multiplier from work-hour sigmoid model
+        if h < start - 1.5:
+            base = 0.05
+        elif h < start + 0.5:
+            t = (h - (start - 1.0)) / 1.5
+            base = 0.05 + 0.95 * self._sigmoid(t * 2 - 1)
+        elif h > end + 1.5:
+            base = 0.05
+        elif h > end - 0.5:
+            t = (h - (end - 0.5)) / 1.5
+            base = 0.05 + 0.95 * (1.0 - self._sigmoid(t * 2 - 1))
+        elif lunch:
+            lunch_start, lunch_end = lunch
+            lunch_mid = (lunch_start + lunch_end) / 2.0
+            lunch_half = (lunch_end - lunch_start) / 2.0
+            if lunch_start - 0.5 < h < lunch_end + 0.5:
+                dist_from_mid = abs(h - lunch_mid)
+                if dist_from_mid < lunch_half:
+                    base = 0.5
+                else:
+                    t = (dist_from_mid - lunch_half) / 0.5
+                    base = 0.5 + 0.5 * min(1.0, t)
+            elif hour in peak_hours:
+                base = 1.5
+            else:
+                base = 1.0
+        elif hour in peak_hours:
+            base = 1.5
+        else:
+            base = 1.0
+
+        # Apply day-of-week scaling (Monday login storms, weekend near-zero)
+        if weekday is not None:
+            base *= _DAY_OF_WEEK_MULTIPLIERS.get(weekday, 1.0)
+
+        return base
+
+    def _calculate_events_for_hour(
+        self,
+        user: User,
+        current_hour: int | None = None,
+        persona: Persona | None = None,
+        user_offsets: dict | None = None,
+        weekday: int | None = None,
+    ) -> int:
+        """Calculate number of events for user this hour."""
+        lo, hi = self._resolve_traffic_rate("user_activity")
+        base_events = lo if lo == hi else _get_rng().randint(lo, hi)
+        activity_system = self._activity_system_for_user(user)
+        base_events = int(
+            round(
+                base_events
+                * self._activity_multiplier(activity_system, "user_activity", user.persona)
+            )
+        )
+
+        if persona and persona.risk_profile:
+            risk_mult = {"low": 0.7, "medium": 1.0, "high": 1.3}
+            base_events = int(base_events * risk_mult.get(persona.risk_profile, 1.0))
+
+        if persona and persona.work_hours_parsed and current_hour is not None:
+            multiplier = self._work_hour_multiplier(
+                current_hour, persona.work_hours_parsed, user_offsets, weekday=weekday
+            )
+            base_events = int(base_events * multiplier)
+
+        if user_offsets and "intensity_bias" in user_offsets:
+            base_events = int(base_events * user_offsets["intensity_bias"])
+
+        rng = _get_rng()
+        variation_map = {"low": 0.10, "medium": 0.25, "high": 0.50}
+        stddev = base_events * variation_map[self.scenario.baseline_activity.variation]
+        num_events = max(0, int(rng.gauss(base_events, stddev)))
+
+        return num_events
+
+    def _distribute_events_in_hour_uniform(
+        self, hour_start: datetime, num_events: int
+    ) -> list[datetime]:
+        """Distribute events uniformly (legacy fallback)."""
+        if num_events == 0:
+            return []
+
+        rng = _get_rng()
+        interval = 3600 / num_events
+        times = []
+        for i in range(num_events):
+            offset = interval * i + rng.uniform(-interval * 0.25, interval * 0.25)
+            offset = max(0, min(3599, offset))
+            times.append(hour_start + timedelta(seconds=offset))
+        return sorted(times)
+
+    def _distribute_events_in_hour(
+        self,
+        hour_start: datetime,
+        num_events: int,
+        persona_name: str | None = None,
+        username: str | None = None,
+    ) -> list[datetime]:
+        """Distribute events using a Hawkes self-exciting process.
+
+        Replaces the Phase 5.5 cluster model with a Hawkes process that
+        produces self-exciting bursts with exponential decay. Parameters
+        are derived from persona risk_profile, so new personas work
+        automatically without code changes.
+
+        Cross-hour continuity: intensity state carries across hours via
+        _hawkes_states dict, so a burst at 9:55 naturally continues into 10:00.
+        """
+        if num_events == 0:
+            return []
+
+        from evidenceforge.utils.timing import hawkes_timestamps
+
+        # Derive Hawkes parameters from persona
+        persona = None
+        if persona_name:
+            for p in self.scenario.personas:
+                if p.name == persona_name:
+                    persona = p
+                    break
+        params = _hawkes_params_from_persona(persona)
+        alpha_beta_ratio = params["alpha_beta_ratio"]
+        beta = params["beta"]
+
+        # Apply per-user biases
+        if username and hasattr(self, "_user_time_offsets"):
+            user_offsets = self._user_time_offsets.get(username, {})
+            size_bias = 1.0 + user_offsets.get("cluster_size_bias", 0)
+            alpha_beta_ratio = min(0.75, alpha_beta_ratio * size_bias)
+            gap_bias = 1.0 + user_offsets.get("inter_gap_bias", 0)
+            beta = max(0.03, beta * gap_bias)
+
+        alpha = alpha_beta_ratio * beta
+        # Adaptive mu: calibrate base rate so expected count ≈ num_events
+        mu = num_events / 3600.0 * (1.0 - alpha_beta_ratio)
+        mu = max(0.0001, mu)
+
+        rng = _get_rng()
+
+        # Retrieve cross-hour state
+        state = None
+        elapsed = 0.0
+        state_key = username or "_default"
+        if hasattr(self, "_hawkes_states"):
+            prev_state = self._hawkes_states.get(state_key)
+            if prev_state is not None:
+                state = prev_state
+                elapsed = 3600.0  # one full hour since last window
+
+        offsets, new_state = hawkes_timestamps(
+            num_events=num_events,
+            duration=3600.0,
+            mu=mu,
+            alpha=alpha,
+            beta=beta,
+            rng=rng,
+            state=state,
+            elapsed_since_last=elapsed,
+        )
+
+        # Store state for next hour
+        if hasattr(self, "_hawkes_states"):
+            self._hawkes_states[state_key] = new_state
+
+        if not offsets:
+            return []
+
+        # Convert offsets to datetimes
+        times = [hour_start + timedelta(seconds=t) for t in offsets]
+
+        # Dedup: max 5 events within 5 seconds (prevent multi-format collisions)
+        final: list[datetime] = [times[0]]
+        for ts in times[1:]:
+            recent = sum(1 for prev in final[-5:] if (ts - prev).total_seconds() <= 5.0)
+            if recent < 5:
+                final.append(ts)
+            else:
+                final.append(final[-1] + timedelta(seconds=rng.uniform(5.1, 8.0)))
+
+        return sorted(final)
+
+    def _pace_interactive_startup_activity(
+        self,
+        *,
+        session: Any,
+        system: Any,
+        user: Any,
+        candidate_time: datetime,
+        activity_key: str,
+        current_hour: datetime | None = None,
+        planned_logoffs: dict[tuple[str, str], float] | None = None,
+    ) -> datetime | None:
+        """Spread baseline desktop activity away from a fresh interactive logon."""
+        if getattr(session, "logon_type", None) not in {2, 10, 11}:
+            return candidate_time
+        if getattr(session, "session_kind", "") in {"network", "service"}:
+            return candidate_time
+
+        session_start = getattr(session, "start_time", None)
+        if session_start is None:
+            return candidate_time
+
+        age_seconds = (candidate_time - session_start).total_seconds()
+        if age_seconds < 0 or age_seconds >= _BASELINE_INTERACTIVE_STARTUP_WINDOW_SECONDS:
+            return candidate_time
+
+        next_age_by_session = getattr(self, "_baseline_startup_next_age_seconds", None)
+        if next_age_by_session is None:
+            next_age_by_session = {}
+            self._baseline_startup_next_age_seconds = next_age_by_session
+
+        key = (getattr(session, "system", ""), getattr(session, "logon_id", ""))
+        next_age = next_age_by_session.get(key)
+        if next_age is None:
+            seed = _stable_seed(
+                "baseline_startup_initial_delay:"
+                f"{getattr(system, 'hostname', '')}:{getattr(user, 'username', '')}:"
+                f"{getattr(session, 'logon_id', '')}:{session_start.isoformat()}"
+            )
+            rng = random.Random(seed)
+            next_age = rng.uniform(*_BASELINE_INTERACTIVE_STARTUP_INITIAL_DELAY_SECONDS)
+
+        target_age = max(age_seconds, next_age)
+        paced_time = session_start + timedelta(seconds=target_age)
+
+        gap_seed = _stable_seed(
+            "baseline_startup_activity_gap:"
+            f"{getattr(system, 'hostname', '')}:{getattr(user, 'username', '')}:"
+            f"{getattr(session, 'logon_id', '')}:{activity_key}:{target_age:.3f}"
+        )
+        gap_rng = random.Random(gap_seed)
+        next_age_by_session[key] = min(
+            _BASELINE_INTERACTIVE_STARTUP_WINDOW_SECONDS,
+            target_age + gap_rng.uniform(*_BASELINE_INTERACTIVE_STARTUP_GAP_SECONDS),
+        )
+
+        if current_hour is not None and paced_time >= current_hour + timedelta(hours=1):
+            return None
+        if planned_logoffs and current_hour is not None:
+            logoff_offset = planned_logoffs.get((getattr(system, "hostname", ""), session.logon_id))
+            if logoff_offset is not None and paced_time >= current_hour + timedelta(
+                seconds=logoff_offset
+            ):
+                return None
+        return paced_time
+
+    def _remember_workstation_locked_interval(
+        self,
+        *,
+        hostname: str,
+        logon_id: str,
+        lock_time: datetime,
+        unlock_time: datetime,
+    ) -> None:
+        """Remember a visible workstation lock interval for baseline scheduling."""
+        intervals_by_session = getattr(self, "_baseline_locked_intervals", None)
+        if intervals_by_session is None:
+            intervals_by_session = {}
+            self._baseline_locked_intervals = intervals_by_session
+        key = (hostname, logon_id)
+        intervals = intervals_by_session.setdefault(key, [])
+        intervals.append((lock_time, unlock_time))
+        intervals.sort(key=lambda interval: interval[0])
+
+    def _locked_interval_for_session(
+        self,
+        *,
+        session: Any,
+        candidate_time: datetime,
+    ) -> tuple[datetime, datetime] | None:
+        """Return the remembered locked interval covering ``candidate_time``, if any."""
+        intervals_by_session = getattr(self, "_baseline_locked_intervals", {})
+        key = (getattr(session, "system", ""), getattr(session, "logon_id", ""))
+        candidate_utc = (
+            candidate_time.replace(tzinfo=UTC)
+            if candidate_time.tzinfo is None
+            else candidate_time.astimezone(UTC)
+        )
+        for lock_time, unlock_time in intervals_by_session.get(key, []):
+            lock_utc = (
+                lock_time.replace(tzinfo=UTC)
+                if lock_time.tzinfo is None
+                else lock_time.astimezone(UTC)
+            )
+            unlock_utc = (
+                unlock_time.replace(tzinfo=UTC)
+                if unlock_time.tzinfo is None
+                else unlock_time.astimezone(UTC)
+            )
+            if lock_utc <= candidate_utc < unlock_utc:
+                return lock_time, unlock_time
+        return None
+
+    def _activity_time_outside_locked_session(
+        self,
+        *,
+        session: Any,
+        candidate_time: datetime,
+        activity_key: str,
+        current_hour: datetime | None,
+        planned_logoffs: dict[tuple[str, str], float] | None,
+    ) -> datetime | None:
+        """Move baseline foreground activity out of visible workstation lock intervals."""
+        locked_interval = self._locked_interval_for_session(
+            session=session,
+            candidate_time=candidate_time,
+        )
+        if locked_interval is None:
+            return candidate_time
+
+        _lock_time, unlock_time = locked_interval
+        if current_hour is None:
+            return None
+
+        jitter_seed = _stable_seed(
+            "baseline_locked_activity_defer:"
+            f"{getattr(session, 'system', '')}:{getattr(session, 'logon_id', '')}:"
+            f"{activity_key}:{candidate_time.isoformat()}"
+        )
+        jitter_rng = random.Random(jitter_seed)
+        adjusted_time = unlock_time + timedelta(seconds=jitter_rng.uniform(3.0, 90.0))
+        if adjusted_time >= current_hour + timedelta(hours=1):
+            return None
+        if not _session_active_at(session, adjusted_time, current_hour, planned_logoffs):
+            return None
+        return adjusted_time
+
+    def _generate_user_activity(
+        self,
+        user: User,
+        event_time: datetime,
+        current_hour: datetime | None = None,
+        planned_logoffs: dict[tuple[str, str], float] | None = None,
+    ) -> None:
+        """Generate activity for user at specified time."""
+        rng = _get_rng()
+        if hasattr(self, "world_model"):
+            system = self.world_model.pick_activity_system(user, rng)
+        elif user.primary_system:
+            systems = [
+                s for s in self.scenario.environment.systems if s.hostname == user.primary_system
+            ]
+            system = systems[0] if systems else rng.choice(self.scenario.environment.systems)
+        else:
+            assigned_systems = [
+                s for s in self.scenario.environment.systems if s.assigned_user == user.username
+            ]
+            if assigned_systems:
+                system = rng.choice(assigned_systems)
+            else:
+                candidates = [
+                    s for s in self.scenario.environment.systems if s.type != "domain_controller"
+                ]
+                system = (
+                    rng.choice(candidates)
+                    if candidates
+                    else rng.choice(self.scenario.environment.systems)
+                )
+
+        persona = self._get_user_persona(user)
+        persona_name = user.persona if user.persona else None
+        pattern = self.activity_generator.get_baseline_pattern(persona_name, persona=persona)
+
+        pattern = list(pattern)
+        rng.shuffle(pattern)
+
+        if rng.random() < 0.15:
+            return
+
+        activities = []
+        for activity_type, probability in pattern:
+            if rng.random() < probability:
+                if rng.random() < 0.20:
+                    activities.extend([activity_type] * rng.randint(2, 4))
+                else:
+                    activities.append(activity_type)
+
+        sessions = self.state_manager.get_sessions_for_user(user.username)
+        has_session_on_system = any(
+            s.system == system.hostname
+            and (
+                _session_active_at(s, event_time, current_hour, planned_logoffs)
+                if current_hour is not None
+                else _session_started_by(s, event_time)
+            )
+            for s in sessions
+        )
+        if not has_session_on_system and activities:
+            if hasattr(self, "world_planner"):
+                self.world_planner.ensure_user_session(user, system, event_time, rng)
+            else:
+                self._ensure_session_on_system(user, system, event_time, rng)
+
+        for activity_type in activities:
+            jitter = timedelta(seconds=rng.randint(0, 55))
+            t = event_time + jitter
+            active_session = next(
+                (
+                    s
+                    for s in self.state_manager.get_sessions_for_user(user.username)
+                    if s.system == system.hostname
+                    and (
+                        _session_active_at(s, t, current_hour, planned_logoffs)
+                        if current_hour is not None
+                        else _session_started_by(s, t)
+                    )
+                ),
+                None,
+            )
+            if active_session is None:
+                continue
+            paced_t = self._pace_interactive_startup_activity(
+                session=active_session,
+                system=system,
+                user=user,
+                candidate_time=t,
+                activity_key=f"user_activity:{activity_type}",
+                current_hour=current_hour,
+                planned_logoffs=planned_logoffs,
+            )
+            if paced_t is None:
+                continue
+            unlocked_t = self._activity_time_outside_locked_session(
+                session=active_session,
+                candidate_time=paced_t,
+                activity_key=f"user_activity:{activity_type}",
+                current_hour=current_hour,
+                planned_logoffs=planned_logoffs,
+            )
+            if unlocked_t is None:
+                continue
+            t = unlocked_t
+            self.state_manager.set_current_time(t)
+            self.activity_generator.execute_baseline_activity(
+                user=user, system=system, time=t, activity_type=activity_type
+            )
+
+        # Persona-driven 4648: sysadmin RunAs and helpdesk remote sessions
+        os_cat = _get_os_category(system.os) if hasattr(system, "os") else "unknown"
+        if os_cat == "windows" and persona_name:
+            _pn = persona_name.lower()
+            servers = [
+                s
+                for s in self.scenario.environment.systems
+                if s.type in ("server", "domain_controller")
+            ]
+            if _pn in ("sysadmin", "security_analyst") and rng.random() < 0.15 and servers:
+                target_server = rng.choice(servers)
+                admin_alias = f"{user.username}-admin"
+                runas_t = event_time + timedelta(seconds=rng.randint(0, 55))
+                session = next(
+                    (
+                        s
+                        for s in sessions
+                        if s.system == system.hostname
+                        and (
+                            _session_active_at(s, runas_t, current_hour, planned_logoffs)
+                            if current_hour is not None
+                            else _session_started_by(s, runas_t)
+                        )
+                    ),
+                    None,
+                )
+                if session is None:
+                    return
+                adjusted_runas_t = self._activity_time_outside_locked_session(
+                    session=session,
+                    candidate_time=runas_t,
+                    activity_key="explicit_credentials:runas",
+                    current_hour=current_hour,
+                    planned_logoffs=planned_logoffs,
+                )
+                if adjusted_runas_t is None:
+                    return
+                runas_t = adjusted_runas_t
+                self.state_manager.set_current_time(runas_t)
+                self.activity_generator.generate_explicit_credentials(
+                    user=user,
+                    system=system,
+                    time=runas_t,
+                    target_username=admin_alias,
+                    target_server=target_server.hostname,
+                    process_name=rng.choice(
+                        [
+                            r"C:\Windows\System32\runas.exe",
+                            r"C:\Windows\System32\mmc.exe",
+                            r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe",
+                        ]
+                    ),
+                    process_pid=session.explorer_pid if session else 0,
+                )
+            elif _pn == "help_desk" and rng.random() < 0.08:
+                non_admins = [
+                    u
+                    for u in self.scenario.environment.users
+                    if u.enabled
+                    and (u.persona or "").lower()
+                    not in ("sysadmin", "security_analyst", "help_desk")
+                    and u.username != user.username
+                ]
+                if non_admins:
+                    target_user = rng.choice(non_admins)
+                    hd_t = event_time + timedelta(seconds=rng.randint(0, 55))
+                    session = next(
+                        (
+                            s
+                            for s in sessions
+                            if s.system == system.hostname
+                            and (
+                                _session_active_at(s, hd_t, current_hour, planned_logoffs)
+                                if current_hour is not None
+                                else _session_started_by(s, hd_t)
+                            )
+                        ),
+                        None,
+                    )
+                    if session is None:
+                        return
+                    adjusted_hd_t = self._activity_time_outside_locked_session(
+                        session=session,
+                        candidate_time=hd_t,
+                        activity_key="explicit_credentials:helpdesk",
+                        current_hour=current_hour,
+                        planned_logoffs=planned_logoffs,
+                    )
+                    if adjusted_hd_t is None:
+                        return
+                    hd_t = adjusted_hd_t
+                    self.state_manager.set_current_time(hd_t)
+                    self.activity_generator.generate_explicit_credentials(
+                        user=user,
+                        system=system,
+                        time=hd_t,
+                        target_username=target_user.username,
+                        target_server=target_user.primary_system or "",
+                        process_name=rng.choice(
+                            [
+                                r"C:\Windows\System32\mstsc.exe",
+                                r"C:\Windows\System32\msra.exe",
+                            ]
+                        ),
+                        process_pid=session.explorer_pid if session else 0,
+                    )
+
+    def _emit_unlock(self, user, system, unlock_t, logon_id, rng) -> None:
+        """Emit an unlock event, optionally preceded by a failed password attempt."""
+        self.state_manager.set_current_time(unlock_t)
+        if rng.random() < 0.15:
+            fail_t = unlock_t - timedelta(seconds=rng.randint(3, 15))
+            self.state_manager.set_current_time(fail_t)
+            self.activity_generator.generate_failed_logon(
+                user=user,
+                system=system,
+                time=fail_t,
+                logon_type=7,
+                source_ip=system.ip,
+            )
+            self.state_manager.set_current_time(unlock_t)
+        self.activity_generator.generate_workstation_unlock(
+            user=user,
+            system=system,
+            time=unlock_t,
+            logon_id=logon_id,
+        )
+
+    def _defer_unlock(self, username, unlock_t, logon_id) -> None:
+        """Store a pending unlock for emission in a future hour."""
+        if not hasattr(self, "_pending_unlocks"):
+            self._pending_unlocks = {}
+        self._pending_unlocks[username] = (unlock_t, logon_id)
+
+    def _emit_pending_workstation_unlock(
+        self,
+        user: User,
+        current_hour: datetime,
+        planned_logoffs: dict[tuple[str, str], float] | None = None,
+    ) -> None:
+        """Emit a deferred workstation unlock when its timestamp falls in this hour."""
+        pending = getattr(self, "_pending_unlocks", {})
+        if user.username not in pending:
+            return
+
+        hour_end = current_hour + timedelta(hours=1)
+        unlock_t, pending_logon_id = pending[user.username]
+        if unlock_t >= hour_end:
+            return
+
+        pending.pop(user.username, None)
+        pending_session = self.state_manager.get_session(pending_logon_id)
+        if not pending_session or not _session_active_at(
+            pending_session, unlock_t, current_hour, planned_logoffs
+        ):
+            return
+
+        system = next(
+            (s for s in self.scenario.environment.systems if s.hostname == pending_session.system),
+            None,
+        )
+        if system is None:
+            return
+
+        rng = _get_rng()
+        self._emit_unlock(user, system, unlock_t, pending_logon_id, rng)
+
+    def _generate_lock_unlock_events(
+        self,
+        user: User,
+        current_hour: datetime,
+        local_hour: int,
+        persona_name: str | None,
+        planned_logoffs: dict[tuple[str, str], float] | None = None,
+    ) -> None:
+        """Generate workstation lock/unlock events for Windows interactive sessions."""
+        rng = _get_rng()
+        hour_end = current_hour + timedelta(hours=1)
+
+        # Only Windows workstation users with active interactive sessions
+        sessions = self.state_manager.get_sessions_for_user(user.username)
+        session = next(
+            (
+                s
+                for s in sessions
+                if s.logon_type == 2
+                and _session_active_at(s, current_hour, current_hour, planned_logoffs)
+                and any(
+                    sys.type == "workstation"
+                    for sys in self.scenario.environment.systems
+                    if sys.hostname == s.system
+                )
+            ),
+            None,
+        )
+        if not session:
+            return
+        system = next(
+            (s for s in self.scenario.environment.systems if s.hostname == session.system),
+            None,
+        )
+        if not system or _get_os_category(system.os) != "windows":
+            return
+
+        # Per-persona lock frequency
+        _pn = (persona_name or "").lower()
+        if _pn in ("security_analyst", "sysadmin"):
+            lock_prob = 0.40
+        elif _pn in ("developer",):
+            lock_prob = 0.08
+        else:
+            lock_prob = 0.20
+
+        if not (7 <= local_hour <= 19):
+            return
+
+        # Lunch lock at hour 12
+        if local_hour == 12 and rng.random() < 0.85:
+            lock_t = current_hour + timedelta(
+                minutes=rng.randint(0, 15),
+                seconds=rng.randint(0, 59),
+                milliseconds=rng.randint(11, 973),
+            )
+            if not _session_active_at(session, lock_t, current_hour, planned_logoffs):
+                return
+            self.state_manager.set_current_time(lock_t)
+            self.activity_generator.generate_workstation_lock(
+                user=user,
+                system=system,
+                time=lock_t,
+                logon_id=session.logon_id,
+            )
+            unlock_t = lock_t + _sample_lock_duration(rng, "lunch")
+            logoff_time = _session_logoff_time(session, current_hour, planned_logoffs)
+            if logoff_time and unlock_t >= logoff_time:
+                self._remember_workstation_locked_interval(
+                    hostname=system.hostname,
+                    logon_id=session.logon_id,
+                    lock_time=lock_t,
+                    unlock_time=logoff_time,
+                )
+                return
+            self._remember_workstation_locked_interval(
+                hostname=system.hostname,
+                logon_id=session.logon_id,
+                lock_time=lock_t,
+                unlock_time=unlock_t,
+            )
+            if unlock_t < hour_end:
+                self._emit_unlock(user, system, unlock_t, session.logon_id, rng)
+            else:
+                self._defer_unlock(user.username, unlock_t, session.logon_id)
+            return
+
+        # Random meeting-break lock/unlock
+        if rng.random() < lock_prob:
+            lock_t = current_hour + timedelta(
+                seconds=rng.randint(60, 3500),
+                milliseconds=rng.randint(11, 973),
+            )
+            if not _session_active_at(session, lock_t, current_hour, planned_logoffs):
+                return
+            self.state_manager.set_current_time(lock_t)
+            self.activity_generator.generate_workstation_lock(
+                user=user,
+                system=system,
+                time=lock_t,
+                logon_id=session.logon_id,
+            )
+            unlock_t = lock_t + _sample_lock_duration(rng, "meeting")
+            logoff_time = _session_logoff_time(session, current_hour, planned_logoffs)
+            if logoff_time and unlock_t >= logoff_time:
+                self._remember_workstation_locked_interval(
+                    hostname=system.hostname,
+                    logon_id=session.logon_id,
+                    lock_time=lock_t,
+                    unlock_time=logoff_time,
+                )
+                return
+            self._remember_workstation_locked_interval(
+                hostname=system.hostname,
+                logon_id=session.logon_id,
+                lock_time=lock_t,
+                unlock_time=unlock_t,
+            )
+            if unlock_t < hour_end:
+                self._emit_unlock(user, system, unlock_t, session.logon_id, rng)
+            else:
+                self._defer_unlock(user.username, unlock_t, session.logon_id)
+
+    def _get_server_ssh_users(self, system) -> list:
+        """Return the subset of admin users who would SSH into this server.
+
+        Sysadmins access all servers. Other personas are added based on
+        server role (determined from services and hostname). Workstations
+        return only their assigned user. Results are cached per hostname.
+        """
+        if hasattr(self, "world_model"):
+            return self.world_model.get_remote_admin_users(system)
+
+        if not hasattr(self, "_ssh_user_roster_cache"):
+            self._ssh_user_roster_cache: dict[str, list] = {}
+        if system.hostname in self._ssh_user_roster_cache:
+            return self._ssh_user_roster_cache[system.hostname]
+
+        from evidenceforge.generation.activity.bash_commands import _resolve_server_role
+
+        enabled_users = [u for u in self.scenario.environment.users if u.enabled]
+
+        # Workstations: only the assigned user
+        if system.type == "workstation" and system.assigned_user:
+            roster = [u for u in enabled_users if u.username == system.assigned_user]
+            self._ssh_user_roster_cache[system.hostname] = roster
+            return roster
+
+        # Servers: sysadmins always, plus role-specific personas
+        admin_personas = {"sysadmin", "help_desk"}
+        sysadmins = [u for u in enabled_users if (u.persona or "").lower() in admin_personas]
+
+        server_role = _resolve_server_role(system.hostname, system.services)
+        role_personas: set[str] = set()
+        if server_role == "db":
+            role_personas = {"developer", "data_analyst", "analyst"}
+        elif server_role == "web":
+            role_personas = {"developer"}
+        elif server_role == "log":
+            role_personas = {"security_analyst"}
+
+        role_users = [u for u in enabled_users if (u.persona or "").lower() in role_personas]
+
+        # Deduplicate by username, preserving order
+        seen = set()
+        roster = []
+        for u in sysadmins + role_users:
+            if u.username not in seen:
+                seen.add(u.username)
+                roster.append(u)
+
+        # Fallback: at least 2 admin users
+        if len(roster) < 2:
+            all_admins = [
+                u
+                for u in enabled_users
+                if (u.persona or "").lower()
+                in ("sysadmin", "help_desk", "developer", "security_analyst")
+            ]
+            for u in all_admins:
+                if u.username not in seen:
+                    seen.add(u.username)
+                    roster.append(u)
+                if len(roster) >= 2:
+                    break
+
+        self._ssh_user_roster_cache[system.hostname] = roster
+        return roster
+
+    def _get_baseline_ssh_users(self, system) -> list:
+        """Return scenario users eligible for ordinary baseline SSH sessions."""
+        if hasattr(self, "world_model") and hasattr(self.world_model, "get_ssh_admin_users"):
+            return self.world_model.get_ssh_admin_users(system)
+        return self._get_server_ssh_users(system)
+
+    def _baseline_ssh_source_system_for_user(
+        self,
+        user: User,
+        target_system: System,
+        rng: random.Random,
+    ) -> System | None:
+        """Pick the user's own plausible SSH source instead of a random host."""
+        if hasattr(self, "world_model"):
+            world_user = self.world_model.user_for(user.username)
+            if world_user is not None:
+                candidates = [
+                    system
+                    for system in world_user.remote_source_systems
+                    if system.hostname != target_system.hostname
+                    and (system.assigned_user in (None, user.username))
+                ]
+                if candidates:
+                    return rng.choice(candidates)
+
+        systems = list(self.scenario.environment.systems)
+        if user.primary_system:
+            primary = next((s for s in systems if s.hostname == user.primary_system), None)
+            if (
+                primary is not None
+                and primary.hostname != target_system.hostname
+                and primary.type == "workstation"
+                and primary.assigned_user in (None, user.username)
+            ):
+                return primary
+        assigned = [
+            system
+            for system in systems
+            if system.hostname != target_system.hostname
+            and system.type == "workstation"
+            and system.assigned_user == user.username
+        ]
+        return rng.choice(assigned) if assigned else None
+
+    def _pick_baseline_ssh_identity(
+        self,
+        target_system: System,
+        rng: random.Random,
+    ) -> tuple[User, System] | None:
+        """Pick a baseline SSH user and source host that agree with each other."""
+        roster = self._get_baseline_ssh_users(target_system)
+        if not roster:
+            return None
+        for user in rng.sample(roster, k=len(roster)):
+            source_system = self._baseline_ssh_source_system_for_user(user, target_system, rng)
+            if source_system is not None:
+                return user, source_system
+        return None
+
+    def _linux_remote_admin_hour_probability(self, system: Any) -> float:
+        """Return the hourly probability of an organic SSH admin session on a Linux server."""
+        multiplier = self._activity_multiplier(system, "linux_remote_admin")
+        return min(0.72, _LINUX_REMOTE_ADMIN_HOURLY_BASE_PROBABILITY * multiplier)
+
+    def _linux_remote_admin_session_count(self, rng: random.Random, system: Any) -> int:
+        """Return a low-volume count for organic SSH admin sessions in one hour."""
+        multiplier = self._activity_multiplier(system, "linux_remote_admin")
+        second_session_probability = min(
+            0.38,
+            _LINUX_REMOTE_ADMIN_SECOND_SESSION_PROBABILITY * multiplier,
+        )
+        return 1 + int(rng.random() < second_session_probability)
+
+    @staticmethod
+    def _is_profile_email_connection(conn: dict[str, Any]) -> bool:
+        """Return whether a generic traffic-profile entry is email-shaped."""
+        service = str(conn.get("service", "")).lower()
+        try:
+            port = int(conn.get("port", 0))
+        except (TypeError, ValueError):
+            port = 0
+        if service == "smtp" or port in _BASELINE_EMAIL_PROFILE_PORTS:
+            return True
+        if service in {"imap", "imaps", "pop3", "pop3s"}:
+            return True
+        if service in {"http", "ssl"} and port in {80, 443}:
+            description = str(conn.get("description", "")).lower()
+            return any(term in description for term in _BASELINE_WEBMAIL_PROFILE_TERMS)
+        return False
+
+    # Service→DNS tag defaults for external resolution when dns_tags is absent
+    _SERVICE_DNS_DEFAULTS: dict[str, tuple[str, ...]] = {
+        "smtp": ("email",),
+        "dns": ("background",),
+        "ntp": ("background",),
+    }
+
+    def _resolve_role(
+        self,
+        role: str,
+        exclude_ip: str,
+        rng: Any,
+        os_cat: str = "windows",
+        dns_tags: list[str] | None = None,
+        inbound: bool = False,
+        src_host: str = "",
+        service: str = "",
+        source_system_type: str | None = None,
+        source_user: User | None = None,
+    ) -> tuple[str | None, str | None]:
+        """Resolve a role name to (ip, hostname), excluding a specific IP.
+
+        Works for both outbound (exclude_ip = source) and inbound
+        (exclude_ip = destination). Returns (None, None) if no suitable
+        system exists in the scenario.
+
+        Args:
+            inbound: If True, _external resolves to a random client IP
+                (realistic for internet clients hitting a server).
+                If False, _external resolves via dns_registry
+                (realistic for outbound destinations like CDNs/APIs).
+            src_host: Source hostname for DNS affinity (per-host IP caching).
+            service: Network service (ssl, smtp, etc.) for default tag derivation.
+        """
+        if role == "_external":
+            if inbound:
+                ip = self._generate_external_client_ip(rng)
+                return ip, None
+            from evidenceforge.generation.activity.dns_registry import pick_domain_and_ip
+
+            if dns_tags:
+                tags = tuple(dns_tags)
+            elif service in self._SERVICE_DNS_DEFAULTS:
+                tags = self._SERVICE_DNS_DEFAULTS[service]
+            else:
+                tags = ("background", os_cat)
+            for _ in range(8):
+                if service == "ssl":
+                    from evidenceforge.generation.activity.tls_realism import pick_tls_destination
+
+                    domain, ip = pick_tls_destination(
+                        rng,
+                        src_host=src_host,
+                        source_os=os_cat,
+                        system_type=source_system_type,
+                        purpose_tags=tuple(tags),
+                    )
+                else:
+                    domain, ip = pick_domain_and_ip(
+                        rng,
+                        *tags,
+                        src_host=src_host,
+                        include_os=os_cat,
+                        source_system_type=source_system_type,
+                    )
+                if self._baseline_destination_allowed_by_suppression(
+                    domain=domain,
+                    requested_tags=tuple(tags),
+                    source_user=source_user,
+                    source_host=src_host,
+                    kind="web" if service in {"http", "ssl"} else "connection",
+                    direction="outbound",
+                    rng=rng,
+                ):
+                    return ip, domain
+            return None, None
+
+        if hasattr(self, "world_model"):
+            src_system = next(
+                (system for system in self.scenario.environment.systems if system.ip == exclude_ip),
+                None,
+            )
+            if src_system is not None:
+                return self.world_model.resolve_destination(
+                    dest_role=role,
+                    src_system=src_system,
+                    rng=rng,
+                    os_category=os_cat,
+                    dns_tags=dns_tags,
+                    service=service,
+                )
+
+        if role in ("_dc", "domain_controller"):
+            dc_ips = self._infra_ips.get("dc", [])
+            candidates = [ip for ip in dc_ips if ip != exclude_ip]
+            return (rng.choice(candidates), None) if candidates else (None, None)
+        if role == "_any_server":
+            servers = [
+                s.ip
+                for s in self.scenario.environment.systems
+                if s.ip != exclude_ip
+                and s.type
+                and s.type.lower() in ("server", "domain_controller")
+            ]
+            return (rng.choice(servers), None) if servers else (None, None)
+        if role == "_any":
+            others = [s.ip for s in self.scenario.environment.systems if s.ip != exclude_ip]
+            return (rng.choice(others), None) if others else (None, None)
+        # Named role: find a system with that role/type.
+        # For database role, filter by service compatibility when a specific
+        # DB service is requested (prevents MSSQL traffic to PostgreSQL hosts).
+        candidates = [
+            s.ip
+            for s in self.scenario.environment.systems
+            if s.ip != exclude_ip
+            and (
+                (s.type and s.type.lower() == role)
+                or (s.roles and role in [r.lower() for r in s.roles])
+            )
+        ]
+        if role == "database" and service and candidates:
+            ip_to_system = {s.ip: s for s in self.scenario.environment.systems}
+            candidates = [
+                ip
+                for ip in candidates
+                if (
+                    (target_system := ip_to_system.get(ip)) is not None
+                    and _baseline_database_service_supported(target_system, service)
+                )
+            ]
+        result = (rng.choice(candidates), None) if candidates else (None, None)
+        if result[0]:
+            self._validate_ip_in_segments(result[0], f"_resolve_role({role})")
+        return result
+
+    def _validate_ip_in_segments(self, ip: str, context: str) -> None:
+        """Warn if a private IP doesn't belong to any defined network segment."""
+        import ipaddress as _ipa_val
+
+        if not self.scenario.environment.network:
+            return
+        try:
+            addr = _ipa_val.ip_address(ip)
+        except ValueError:
+            return
+        if not addr.is_private:
+            return  # External IPs don't need segment validation
+        for seg in self.scenario.environment.network.segments:
+            try:
+                if addr in _ipa_val.ip_network(seg.cidr, strict=False):
+                    return
+            except ValueError:
+                continue
+        logger.warning("Internal IP %s not in any defined segment (%s)", ip, context)
+
+    def _emit_smb_logon_pair(
+        self,
+        user: Any,
+        file_server: Any,
+        source_ip: str,
+        time: datetime,
+        rng: Any,
+        *,
+        source_port: int | None = None,
+        emit_network_evidence: bool = True,
+    ) -> str | None:
+        """Emit type 3 network logon + logoff pair on a file server for SMB access.
+
+        In real Windows, every authenticated SMB share access produces:
+        - 4624 type 3 (network logon) on the file server
+        - 4634 (logoff) after the file access session closes
+        """
+        from evidenceforge.generation.activity.generator import _get_os_category
+
+        if _get_os_category(file_server.os) != "windows":
+            return None
+
+        logon_kwargs: dict[str, Any] = {
+            "user": user,
+            "system": file_server,
+            "time": time,
+            "logon_type": 3,
+            "source_ip": source_ip,
+        }
+        if source_port is not None:
+            logon_kwargs["source_port"] = source_port
+        if not emit_network_evidence:
+            logon_kwargs["emit_network_evidence"] = False
+
+        logon_id = self.activity_generator.generate_logon(
+            **logon_kwargs,
+        )
+        logoff_delay = rng.uniform(5.0, 60.0)
+        logoff_time = time + timedelta(seconds=logoff_delay)
+        self.activity_generator.generate_logoff(
+            user=user,
+            system=file_server,
+            time=logoff_time,
+            logon_id=logon_id,
+            logon_type=3,
+        )
+        return logon_id
+
+    def _last_smb_connection_source_port(
+        self,
+        *,
+        source_ip: str,
+        dst_ip: str,
+    ) -> int | None:
+        """Return the source port from the most recent matching SMB transport."""
+        activity_generator = getattr(self, "activity_generator", None)
+        matcher = getattr(activity_generator, "_last_effective_connection_source_port", None)
+        if matcher is None:
+            return None
+        return matcher(src_ip=source_ip, dst_ip=dst_ip, dst_port=445, proto="tcp")
+
+    @staticmethod
+    def _smb_logon_transport_conn_state(service: Any, will_emit_logon: bool) -> str | None:
+        """Return the SMB transport state required by a successful companion logon."""
+        if will_emit_logon and str(service or "").lower() == "smb":
+            return "SF"
+        return None
+
+    def _build_smb_targets(self, system: Any, dc_ips: list[str]) -> tuple[list[str], list[Any]]:
+        """Build weighted SMB targets for Windows client browsing noise."""
+        dc_targets = [ip for ip in dc_ips if ip != system.ip]
+        fs_targets = [
+            s
+            for s in self.scenario.environment.systems
+            if s.ip != system.ip and s.roles and "file_server" in [r.lower() for r in s.roles]
+        ]
+
+        targets = list(dc_targets)
+        for fs in fs_targets:
+            weight = 3 if fs.ip not in dc_targets else 2
+            targets.extend([fs.ip] * weight)
+        return targets, fs_targets
+
+    def _emit_smb_file_operations(
+        self,
+        user: Any,
+        file_server: Any,
+        client_system: Any,
+        time: datetime,
+        rng: Any,
+    ) -> None:
+        """Emit eCAR file operations that make SMB sessions look like file work."""
+        import uuid
+
+        from evidenceforge.events.base import SecurityEvent
+        from evidenceforge.events.contexts import AuthContext, EdrContext, FileContext
+
+        host_ctx = self.activity_generator._build_host_context(file_server)
+        username = getattr(user, "username", "unknown")
+        client_name = getattr(client_system, "hostname", "client").lower()
+        share = rng.choice(["Departments", "Finance", "Projects", "Shared", "IT"])
+        stems = [
+            "budget-review",
+            "client-onboarding",
+            "change-request",
+            "expense-export",
+            "incident-summary",
+            "inventory",
+            "maintenance-window",
+            "monthly-close",
+            "oncall-roster",
+            "purchase-order",
+            "quarterly-report",
+            "renewal-tracker",
+            "risk-register",
+            "server-build",
+            "vendor-list",
+            "project-plan",
+            "meeting-notes",
+            "policy-update",
+            "service-review",
+            "status-update",
+            "team-roadmap",
+        ]
+        extensions = ["docx", "xlsx", "pdf", "pptx", "txt"]
+        op_count = rng.randint(3, 8)
+        operation_choices = ["file_read", "file_read", "file_read", "file_modify", "file_create"]
+        session_operations = ["file_read", "file_modify"]
+        if rng.random() < 0.18:
+            session_operations.append("file_create")
+        if rng.random() < 0.08:
+            session_operations.append("file_delete")
+        while len(session_operations) < op_count:
+            session_operations.append(rng.choice(operation_choices))
+        rng.shuffle(session_operations)
+
+        for idx, event_type in enumerate(session_operations):
+            stem = rng.choice(stems)
+            ext = rng.choice(extensions)
+            file_path = rf"\\{file_server.hostname}\{share}\{client_name}\{stem}-{rng.randint(1, 99):02d}.{ext}"
+            self.activity_generator.dispatcher.dispatch(
+                SecurityEvent(
+                    timestamp=time + timedelta(milliseconds=idx * rng.randint(200, 1500)),
+                    event_type=event_type,
+                    src_host=host_ctx,
+                    auth=AuthContext(username=username),
+                    file=FileContext(
+                        path=file_path,
+                        action=event_type.removeprefix("file_"),
+                        pid=4,
+                    ),
+                    edr=EdrContext(object_id=str(uuid.UUID(int=rng.getrandbits(128)))),
+                )
+            )
+
+    def _emit_ecar_file_churn(
+        self,
+        system: Any,
+        current_hour: datetime,
+        rng: random.Random,
+        os_cat: str,
+        sys_pids: dict[str, int],
+    ) -> None:
+        """Emit ordinary endpoint FILE telemetry from running baseline processes."""
+        if "ecar" not in self.emitters:
+            return
+
+        from evidenceforge.config.schemas import MAX_ECAR_FILE_CHURN_EVENTS_PER_HOST_HOUR
+        from evidenceforge.events.base import SecurityEvent
+        from evidenceforge.events.contexts import (
+            AuthContext,
+            EdrContext,
+            FileContext,
+            ProcessContext,
+        )
+        from evidenceforge.generation.activity.edr_pools import (
+            get_file_paths,
+            is_service_account,
+            select_ambient_file_churn_effect,
+        )
+        from evidenceforge.generation.activity.endpoint_noise import ecar_file_churn_config
+
+        cfg = ecar_file_churn_config()
+        if not cfg.get("enabled", True):
+            return
+        os_cfg = cfg.get(os_cat, {})
+        count_min = int(os_cfg.get("count_min", 0))
+        count_max = int(os_cfg.get("count_max", count_min))
+        if count_max <= 0 or count_min > count_max:
+            return
+        count_min = min(count_min, MAX_ECAR_FILE_CHURN_EVENTS_PER_HOST_HOUR)
+        count_max = min(count_max, MAX_ECAR_FILE_CHURN_EVENTS_PER_HOST_HOUR)
+
+        processes = []
+        for pid in sorted(set(sys_pids.values())):
+            running = self.state_manager.get_process(system.hostname, pid)
+            if running is not None:
+                processes.append(running)
+        if not processes:
+            return
+
+        action_weights = os_cfg.get("action_weights", {"read": 60, "modify": 30, "create": 10})
+        actions = [str(action) for action, weight in action_weights.items() if int(weight) > 0]
+        weights = [int(action_weights[action]) for action in actions]
+        path_templates = get_file_paths(os_cat)
+        if not actions or not path_templates:
+            return
+
+        count = min(
+            self._scaled_randint(
+                rng,
+                system,
+                "ecar_file_churn",
+                count_min,
+                count_max,
+            ),
+            MAX_ECAR_FILE_CHURN_EVENTS_PER_HOST_HOUR,
+        )
+        host_ctx = self.activity_generator._build_host_context(system)
+        assigned_user = getattr(system, "assigned_user", None) or ""
+        hour_end = current_hour + timedelta(hours=1)
+
+        for idx in range(count):
+            process = rng.choice(processes)
+            process_username = process.username or ("root" if os_cat == "linux" else "SYSTEM")
+            if is_service_account(os_cat, process_username):
+                username = process_username
+            else:
+                username = assigned_user or process_username
+            if (
+                process.username
+                and not is_service_account(os_cat, process.username)
+                and rng.random() < 0.55
+            ):
+                username = process.username
+
+            file_effect = select_ambient_file_churn_effect(
+                process.image,
+                process.command_line,
+                os_cat,
+                rng,
+                username,
+                path_templates,
+                actions,
+                weights,
+                host_ip=system.ip,
+                host_key=system.hostname,
+                host_os=system.os,
+            )
+            if file_effect is None:
+                continue
+            file_action, file_path = file_effect
+
+            ts = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+            if process.start_time and ts <= process.start_time:
+                ts = process.start_time + timedelta(milliseconds=rng.randint(5, 750))
+            if ts >= hour_end:
+                continue
+
+            event_type = f"file_{file_action}"
+            object_id = stable_uuid(
+                "baseline.ecar.file",
+                system.hostname,
+                process.pid,
+                file_path,
+                file_action,
+                current_hour.isoformat(),
+                idx,
+            )
+            self.activity_generator.dispatcher.dispatch(
+                SecurityEvent(
+                    timestamp=ts,
+                    event_type=event_type,
+                    src_host=host_ctx,
+                    auth=AuthContext(
+                        username=username,
+                        user_sid=self.activity_generator._get_sid(username),
+                        logon_id=process.logon_id,
+                    ),
+                    process=ProcessContext(
+                        pid=process.pid,
+                        parent_pid=process.parent_pid,
+                        image=process.image,
+                        command_line=process.command_line,
+                        username=process.username,
+                        integrity_level=process.integrity_level,
+                        logon_id=process.logon_id,
+                        start_time=process.start_time,
+                    ),
+                    file=FileContext(path=file_path, action=file_action, pid=process.pid),
+                    edr=EdrContext(object_id=object_id, actor_id=process.ecar_object_id),
+                )
+            )
+
+    def _generate_profile_traffic(
+        self,
+        current_hour: datetime,
+        system: Any,
+        rng: Any,
+        os_cat: str,
+        sys_pids: dict[str, int] | None = None,
+        local_dt: Any = None,
+        planned_logoffs: dict[tuple[str, str], float] | None = None,
+    ) -> None:
+        """Generate role-based and persona-based network connections from traffic profiles.
+
+        Role traffic runs 24/7 (system-level). Persona traffic runs only during
+        active user sessions on this host.
+        """
+        from evidenceforge.generation.activity.traffic_profiles import (
+            get_persona_connections,
+            get_role_connections,
+        )
+
+        # Pre-compute burst windows for realistic traffic burstiness.
+        # Real enterprise traffic is self-similar with CV > 0.5.
+        # 70% of connections cluster around 3-5 peaks per hour;
+        # 30% are uniform background.
+        _n_bursts = rng.randint(3, 5)
+        _burst_centers = sorted(rng.sample(range(300, 3300, 60), _n_bursts))
+        _burst_width = 180  # seconds
+
+        def _burst_offset() -> float:
+            if rng.random() < 0.70:
+                center = rng.choice(_burst_centers)
+                return max(0.0, min(3599.0, center + rng.gauss(0, _burst_width / 3)))
+            return rng.uniform(0, 3599)
+
+        # Use compiled world-model canonical roles (includes service/hostname-inferred
+        # roles like 'database' from services=['postgresql']). Falls back to raw
+        # scenario fields for engines without a world model.
+        if hasattr(self, "world_model") and system.hostname in self.world_model.hosts:
+            roles = list(self.world_model.hosts[system.hostname].canonical_roles)
+        else:
+            roles = [r.lower() for r in (system.roles or [])]
+            if not roles:
+                roles = [(system.type or "workstation").lower()]
+
+        # Use scenario-local time for business-hour gating, not UTC.
+        _local = local_dt if local_dt is not None else current_hour
+        dow = _local.weekday()
+        hour = _local.hour
+        is_business = 0 <= dow <= 4 and 7 <= hour <= 19
+
+        # --- Role traffic (system-level, 24/7) ---
+        role_conns = get_role_connections(roles, os_cat)
+        explicit_email_topology = getattr(self.scenario.environment, "email", None) is not None
+        if role_conns:
+            weights = [c.get("weight", 1) for c in role_conns]
+            # Scale connection count by time-of-day (fewer at night)
+            if is_business:
+                base_count = self._scaled_randint(rng, system, "role_network", 8, 20)
+            else:
+                base_count = self._scaled_randint(rng, system, "role_network", 2, 6)
+
+            for _ in range(base_count):
+                conn = rng.choices(role_conns, weights=weights, k=1)[0]
+                if explicit_email_topology and self._is_profile_email_connection(conn):
+                    continue
+                dst_ip, hostname = self._resolve_role(
+                    conn["role"],
+                    system.ip,
+                    rng,
+                    os_cat=os_cat,
+                    dns_tags=conn.get("dns_tags"),
+                    src_host=system.hostname,
+                    service=conn.get("service", ""),
+                    source_system_type=getattr(system, "type", None),
+                )
+                if not dst_ip:
+                    continue
+                offset = _burst_offset()
+                ts = current_hour + timedelta(seconds=offset)
+                self.state_manager.set_current_time(ts)
+                # Resolve initiating PID from the system process that handles this service
+                _SERVICE_TO_PID_KEY = {
+                    "kerberos": "lsass",
+                    "ldap": "lsass",
+                    "dns": "svchost_net_svc",
+                    "smb": "svchost_netsvcs",
+                    "ssl": "svchost_netsvcs",
+                    "http": "svchost_netsvcs",
+                    "smtp": "svchost_netsvcs",
+                    "ntp": "svchost_local_svc",
+                    "ssh": "sshd",
+                }
+                _pids = sys_pids or {}
+                pid_key = _SERVICE_TO_PID_KEY.get(conn.get("service", ""), "")
+                conn_pid = _pids.get(pid_key, -1) if pid_key else -1
+
+                if (
+                    conn.get("service") == "kerberos"
+                    and conn.get("port") == 88
+                    and os_cat == "windows"
+                ):
+                    dc_ips = self._infra_ips.get("dc", [])
+                    if isinstance(dc_ips, str):
+                        dc_ips = [dc_ips]
+                    dc_hostnames = self._infra_ips.get("dc_hostnames", [])
+                    if isinstance(dc_hostnames, str):
+                        dc_hostnames = [dc_hostnames]
+                    dc_hostname_by_ip = {
+                        dc_ip: dc_hostname
+                        for dc_ip, dc_hostname in zip(dc_ips, dc_hostnames, strict=False)
+                    }
+                    dc_hostname = dc_hostname_by_ip.get(dst_ip)
+                    if dc_hostname is None and dc_hostnames and dst_ip in dc_ips:
+                        dc_hostname = rng.choice(dc_hostnames)
+                    if dc_hostname:
+                        machine_principal = f"{system.hostname}$"
+                        tgt_time, tgs_time = self.activity_generator._kerberos_ticket_times(
+                            ts,
+                            rng,
+                            tgs_before_ms=(8, 65),
+                            tgt_before_tgs_ms=(35, 240),
+                        )
+                        self.activity_generator._maybe_generate_kerberos_tgt(
+                            username=machine_principal,
+                            source_ip=system.ip,
+                            dc_hostname=dc_hostname,
+                            time=tgt_time,
+                            rng=rng,
+                        )
+                        service_name = rng.choices(
+                            [
+                                f"host/{dc_hostname}",
+                                f"ldap/{dc_hostname}",
+                                f"cifs/{dc_hostname}",
+                                f"DNS/{dc_hostname}",
+                            ],
+                            weights=[34, 36, 20, 10],
+                            k=1,
+                        )[0]
+                        self.activity_generator.generate_kerberos_service_ticket(
+                            username=machine_principal,
+                            service_name=service_name,
+                            source_ip=system.ip,
+                            dc_hostname=dc_hostname,
+                            time=tgs_time,
+                        )
+
+                self.activity_generator.generate_connection(
+                    src_ip=system.ip,
+                    dst_ip=dst_ip,
+                    time=ts,
+                    dst_port=conn["port"],
+                    proto=conn.get("proto", "tcp"),
+                    service=conn.get("service"),
+                    duration=rng.uniform(0.05, 5.0),
+                    orig_bytes=rng.randint(200, 5000),
+                    resp_bytes=rng.randint(500, 50000),
+                    emit_dns=conn.get("emit_dns", False),
+                    source_system=system,
+                    hostname=hostname,
+                    pid=conn_pid,
+                )
+
+        # --- Inbound traffic (connections TO this host from other roles/external) ---
+        # Inbound profile traffic generates permitted connections that match
+        # the host's role.  Each candidate connection is checked against
+        # firewall policy — denied flows are skipped here because the deny
+        # baseline (_generate_firewall_deny_baseline) already generates
+        # ASA Deny / REJ records independently.
+        from evidenceforge.generation.activity.traffic_profiles import (
+            get_role_inbound_connections,
+        )
+
+        inbound_conns = get_role_inbound_connections(roles, os_cat)
+        if explicit_email_topology:
+            inbound_conns = [
+                conn for conn in inbound_conns if not self._is_profile_email_connection(conn)
+            ]
+        if "database" in roles:
+            inbound_conns = [
+                conn
+                for conn in inbound_conns
+                if _baseline_database_service_supported(system, conn.get("service"))
+            ]
+        if inbound_conns:
+            # Gate external inbound on segment exposure — internal-only
+            # hosts must not receive internet client traffic.
+            exposure = self._get_system_exposure(system)
+            allows_external = exposure in ("external", "both")
+            if not allows_external:
+                inbound_conns = [c for c in inbound_conns if c["role"] != "_external"]
+
+            # Pre-compute firewall policy context for per-connection checks
+            import ipaddress as _ipa_inbound
+
+            _inbound_segment_cidrs: dict = {}
+            _inbound_fw_sensors: list = []
+            if self.scenario.environment.network:
+                for seg in self.scenario.environment.network.segments:
+                    try:
+                        _inbound_segment_cidrs[seg.name] = _ipa_inbound.ip_network(
+                            seg.cidr, strict=False
+                        )
+                    except ValueError:
+                        continue
+                _inbound_fw_sensors = [
+                    s for s in self.scenario.environment.network.sensors if s.type == "firewall"
+                ]
+
+            # VIP lookup for external inbound: use public VIP as dst_ip so
+            # the NAT engine fires and outside sensors see the correct address.
+            _inbound_vip: dict[str, str] = {}
+            if hasattr(self, "dispatcher") and self.dispatcher.visibility_engine:
+                _inbound_vip = self.dispatcher.visibility_engine._real_ip_to_vip
+
+            # Helper to resolve firewall interface names for a given sensor
+            def _fw_iface_for(ip: str, fw_sensor) -> str:
+                import ipaddress as _ipa_fw
+
+                for seg_name, cidr in _inbound_segment_cidrs.items():
+                    try:
+                        if _ipa_fw.ip_address(ip) in cidr:
+                            return fw_sensor.interfaces.get(seg_name, seg_name)
+                    except ValueError:
+                        continue
+                return fw_sensor.interfaces.get("_default", "outside")
+
+            def _fw_is_on_path(fw_sensor, src_ip: str, dst_ip: str) -> bool:
+                """Check if a firewall controls the source/destination path."""
+                return self._firewall_controls_connection_path(
+                    src_ip, dst_ip, fw_sensor, _inbound_segment_cidrs
+                )
+
+            if not inbound_conns:
+                pass  # All entries were external and host is internal-only
+            else:
+                from evidenceforge.events.contexts import FirewallContext as _InboundFwCtx
+
+                inbound_weights = [c.get("weight", 1) for c in inbound_conns]
+                if is_business:
+                    num_inbound = self._scaled_randint(rng, system, "inbound_network", 4, 15)
+                else:
+                    num_inbound = self._scaled_randint(rng, system, "inbound_network", 1, 4)
+                for _ in range(num_inbound):
+                    conn = rng.choices(inbound_conns, weights=inbound_weights, k=1)[0]
+                    is_external_src = conn["role"] == "_external"
+                    src_ip, hostname = self._resolve_role(
+                        conn["role"],
+                        system.ip,
+                        rng,
+                        os_cat,
+                        inbound=True,
+                    )
+                    if not src_ip:
+                        continue
+
+                    # External clients connect to the public VIP, not the
+                    # internal IP. Internal clients use system.ip directly.
+                    if is_external_src:
+                        vip = _inbound_vip.get(system.ip)
+                        if vip:
+                            effective_dst_ip = vip
+                        elif not _ipa_inbound.ip_address(system.ip).is_private:
+                            # System has a public IP directly (cloud/flat routing)
+                            effective_dst_ip = system.ip
+                        else:
+                            # RFC1918 host with no VIP → unreachable from outside
+                            continue
+                    else:
+                        effective_dst_ip = system.ip
+
+                    # Evaluate firewall policy — only on firewalls in the path.
+                    # Policy uses system.ip (real IP) — correct for modern ASA.
+                    fw_denied = False
+                    denying_sensor = None
+                    if _inbound_fw_sensors:
+                        for fw_sensor in _inbound_fw_sensors:
+                            if not _fw_is_on_path(fw_sensor, src_ip, system.ip):
+                                continue
+                            action = self._evaluate_firewall_policy(
+                                src_ip,
+                                system.ip,
+                                conn["port"],
+                                fw_sensor,
+                                _inbound_segment_cidrs,
+                            )
+                            if action == "deny":
+                                fw_denied = True
+                                denying_sensor = fw_sensor
+                                break
+
+                    offset = _burst_offset()
+                    ts = current_hour + timedelta(seconds=offset)
+                    self.state_manager.set_current_time(ts)
+
+                    # Resolve source system object (None for external IPs)
+                    src_sys = None
+                    if hasattr(self, "activity_generator"):
+                        ip_map = getattr(self.activity_generator, "_ip_to_system", {})
+                        src_sys = ip_map.get(src_ip)
+
+                    is_internal_src = src_sys is not None
+                    # External clients use the public-facing hostname;
+                    # internal clients use the internal FQDN.
+                    dst_hostname = None
+                    if is_external_src:
+                        # Use public hostname if configured, otherwise suppress
+                        # REVERSE_DNS to avoid leaking internal FQDNs.
+                        if system.public_hostnames:
+                            dst_hostname = rng.choice(system.public_hostnames)
+                        else:
+                            dst_hostname = ""
+                    elif is_internal_src and hasattr(self, "world_model"):
+                        dst_hostname = self.world_model.fqdn_for_system(system)
+
+                    if fw_denied and denying_sensor:
+                        deny_hash_a, deny_hash_b = firewall_deny_hash_values(rng)
+                        # Emit as a deny record from the actual in-path firewall
+                        deny_state = "REJ" if denying_sensor.drop_mode == "reject" else "S0"
+                        self.activity_generator.generate_connection(
+                            src_ip=src_ip,
+                            dst_ip=effective_dst_ip,
+                            time=ts,
+                            dst_port=conn["port"],
+                            proto=conn.get("proto", "tcp"),
+                            service=conn.get("service"),
+                            conn_state=deny_state,
+                            firewall=_InboundFwCtx(
+                                action="deny",
+                                msg_id=106023,
+                                connection_id=0,
+                                src_interface=_fw_iface_for(src_ip, denying_sensor),
+                                dst_interface=_fw_iface_for(system.ip, denying_sensor),
+                                access_group=f"{_fw_iface_for(src_ip, denying_sensor)}_access_in",
+                                deny_hash_a=deny_hash_a,
+                                deny_hash_b=deny_hash_b,
+                            ),
+                            emit_dns=False,
+                        )
+                    else:
+                        if conn["port"] in _BASELINE_GUARDED_SUCCESS_PORTS and not (
+                            _baseline_guarded_success_port_allowed(system, conn["port"])
+                        ):
+                            continue
+                        if (
+                            conn.get("service") == "kerberos"
+                            and conn.get("port") == 88
+                            and is_internal_src
+                            and src_sys is not None
+                            and os_cat == "windows"
+                        ):
+                            dc_hostname = system.hostname
+                            machine_principal = f"{src_sys.hostname}$"
+                            tgt_time, tgs_time = self.activity_generator._kerberos_ticket_times(
+                                ts,
+                                rng,
+                                tgs_before_ms=(8, 65),
+                                tgt_before_tgs_ms=(35, 240),
+                            )
+                            self.activity_generator._maybe_generate_kerberos_tgt(
+                                username=machine_principal,
+                                source_ip=src_ip,
+                                dc_hostname=dc_hostname,
+                                time=tgt_time,
+                                rng=rng,
+                            )
+                            service_name = rng.choices(
+                                [
+                                    f"host/{dc_hostname}",
+                                    f"ldap/{dc_hostname}",
+                                    f"cifs/{dc_hostname}",
+                                    f"DNS/{dc_hostname}",
+                                ],
+                                weights=[34, 36, 20, 10],
+                                k=1,
+                            )[0]
+                            self.activity_generator.generate_kerberos_service_ticket(
+                                username=machine_principal,
+                                service_name=service_name,
+                                source_ip=src_ip,
+                                dc_hostname=dc_hostname,
+                                time=tgs_time,
+                            )
+
+                        will_emit_smb_logon = bool(
+                            conn.get("service") == "smb"
+                            and is_internal_src
+                            and src_sys
+                            and "file_server" in roles
+                        )
+                        self.activity_generator.generate_connection(
+                            src_ip=src_ip,
+                            dst_ip=effective_dst_ip,
+                            time=ts,
+                            dst_port=conn["port"],
+                            proto=conn.get("proto", "tcp"),
+                            service=conn.get("service"),
+                            duration=rng.uniform(0.05, 5.0),
+                            orig_bytes=rng.randint(200, 5000),
+                            resp_bytes=rng.randint(500, 50000),
+                            conn_state=self._smb_logon_transport_conn_state(
+                                conn.get("service"),
+                                will_emit_smb_logon,
+                            ),
+                            source_system=src_sys,
+                            emit_dns=is_internal_src,
+                            hostname=dst_hostname,
+                        )
+                        smb_source_port = self._last_smb_connection_source_port(
+                            source_ip=src_ip,
+                            dst_ip=effective_dst_ip,
+                        )
+
+                        # SMB access to file servers produces type 3 logon
+                        if (
+                            conn.get("service") == "smb"
+                            and is_internal_src
+                            and src_sys
+                            and "file_server" in roles
+                        ):
+                            src_sessions = self.state_manager.get_sessions_on_system(
+                                src_sys.hostname
+                            )
+                            for sess in src_sessions:
+                                if sess.logon_type in (2, 10, 11):
+                                    smb_user = next(
+                                        (
+                                            u
+                                            for u in self.scenario.environment.users
+                                            if u.username == sess.username
+                                        ),
+                                        None,
+                                    )
+                                    if smb_user:
+                                        self._emit_smb_logon_pair(
+                                            smb_user,
+                                            system,
+                                            src_ip,
+                                            ts,
+                                            rng,
+                                            source_port=smb_source_port,
+                                            emit_network_evidence=smb_source_port is None,
+                                        )
+                                        break
+
+        # --- Persona traffic (user-level, during active sessions) ---
+        # Only real interactive user sessions get persona traffic — skip
+        # SYSTEM, LOCAL SERVICE, NETWORK SERVICE, machine accounts, etc.
+        host_sessions = self.state_manager.get_sessions_on_system(system.hostname)
+        for session in host_sessions:
+            persona = None
+            user_obj = None
+            for u in self.scenario.environment.users:
+                if u.username == session.username:
+                    persona = u.persona
+                    user_obj = u
+                    break
+            if persona is None:
+                continue  # Not a scenario user — skip service/machine accounts
+            # Only interactive sessions generate user-driven persona traffic
+            if session.logon_type not in (2, 10, 11):
+                continue
+            # Remote admin sessions on other machines use _server_admin profile
+            # instead of the user's normal persona (no Outlook/Teams on servers).
+            use_server_admin_persona = self._use_server_admin_persona(system, session)
+            if use_server_admin_persona:
+                persona_conns = get_persona_connections("_server_admin", os_cat)
+            else:
+                persona_conns = get_persona_connections(persona, os_cat)
+            if not persona_conns:
+                continue
+            p_weights = [c.get("weight", 1) for c in persona_conns]
+            # Fewer persona connections than role connections; scaled by intensity
+            _pc_lo, _pc_hi = self._resolve_traffic_rate("persona_connections")
+            _pc_lo, _pc_hi = self._scaled_count_range(
+                system,
+                "persona_connections",
+                _pc_lo,
+                _pc_hi,
+                persona=persona,
+            )
+            num_persona = rng.randint(_pc_lo, _pc_hi) if is_business else 0
+            # Clamp timestamps to session lifetime within this hour
+            session_start_sec = max(0.0, (session.start_time - current_hour).total_seconds())
+            session_deadline = _session_activity_deadline(session, current_hour, planned_logoffs)
+            session_deadline_sec = min(
+                3599.0,
+                max(0.0, (session_deadline - current_hour).total_seconds()),
+            )
+            if session_deadline_sec <= session_start_sec:
+                continue
+
+            for _ in range(num_persona):
+                conn = rng.choices(persona_conns, weights=p_weights, k=1)[0]
+                # Skip SSH/RDP — these require compound session evidence
+                # (sshd syslog, 4624 type 10, bash history) that bare
+                # connections don't provide. They're handled by dedicated
+                # SSH/RDP generation paths instead.
+                if conn.get("service") in ("ssh", "rdp"):
+                    continue
+                dst_ip, hostname = self._resolve_role(
+                    conn["role"],
+                    system.ip,
+                    rng,
+                    os_cat=os_cat,
+                    dns_tags=conn.get("dns_tags"),
+                    src_host=system.hostname,
+                    service=conn.get("service", ""),
+                    source_system_type=getattr(system, "type", None),
+                    source_user=user_obj,
+                )
+                if not dst_ip:
+                    continue
+
+                if conn["port"] in _BASELINE_GUARDED_SUCCESS_PORTS:
+                    ip_map = getattr(self.activity_generator, "_ip_to_system", {})
+                    target_system = ip_map.get(dst_ip)
+                    guarded_target = _baseline_success_target_for_guarded_port(
+                        self.scenario.environment.systems,
+                        system,
+                        target_system,
+                        conn["port"],
+                        rng,
+                    )
+                    if guarded_target is None:
+                        continue
+                    if guarded_target is not target_system:
+                        dst_ip = guarded_target.ip
+                        hostname = (
+                            self.world_model.fqdn_for_system(guarded_target)
+                            if hasattr(self, "world_model")
+                            else guarded_target.hostname
+                        )
+
+                # Compute timestamp with burst clustering, clamped to session window
+                raw_offset = _burst_offset()
+                if raw_offset >= session_deadline_sec:
+                    continue
+                offset = max(session_start_sec, raw_offset)
+                ts = current_hour + timedelta(seconds=offset)
+                if not _session_active_at(session, ts, current_hour, planned_logoffs):
+                    continue
+                paced_ts = self._pace_interactive_startup_activity(
+                    session=session,
+                    system=system,
+                    user=user_obj,
+                    candidate_time=ts,
+                    activity_key=f"profile:{conn.get('service', '')}:{hostname or conn['role']}",
+                    current_hour=current_hour,
+                    planned_logoffs=planned_logoffs,
+                )
+                if paced_ts is None:
+                    continue
+                ts = paced_ts
+                if not _session_active_at(session, ts, current_hour, planned_logoffs):
+                    continue
+
+                persona_pid = -1
+                # Thread effective persona so _server_admin sessions don't
+                # get browser/SaaS processes attributed on servers.
+                eff_persona = "_server_admin" if use_server_admin_persona else None
+                if user_obj and conn.get("service"):
+                    persona_pid = self.world_planner.ensure_connection_process(
+                        user=user_obj,
+                        system=system,
+                        session=session,
+                        time=ts,
+                        service=conn["service"],
+                        rng=rng,
+                        effective_persona=eff_persona,
+                        destination_hostname=hostname,
+                    )
+
+                self.state_manager.set_current_time(ts)
+
+                # For HTTP/HTTPS: generate browsing session with subresources,
+                # referrer chains, and cross-domain CDN fan-out.
+                svc = conn.get("service", "")
+                is_server_source = self._is_server_admin_persona_source(system)
+                if svc in ("ssl", "http") and hostname and not is_server_source:
+                    self._emit_browsing_session(
+                        system=system,
+                        user_obj=user_obj,
+                        session=session,
+                        hostname=hostname,
+                        dst_ip=dst_ip,
+                        conn=conn,
+                        base_ts=ts,
+                        persona_pid=persona_pid,
+                        os_cat=os_cat,
+                        rng=rng,
+                        latest_request_time=session_deadline,
+                    )
+                else:
+                    self.activity_generator.generate_connection(
+                        src_ip=system.ip,
+                        dst_ip=dst_ip,
+                        time=ts,
+                        dst_port=conn["port"],
+                        proto=conn.get("proto", "tcp"),
+                        service=conn.get("service"),
+                        duration=rng.uniform(0.1, 10.0),
+                        orig_bytes=rng.randint(200, 8000),
+                        resp_bytes=rng.randint(500, 80000),
+                        emit_dns=conn.get("emit_dns", False),
+                        source_system=system,
+                        hostname=hostname,
+                        pid=persona_pid,
+                    )
+
+    def _emit_browsing_session(
+        self,
+        system: Any,
+        user_obj: Any,
+        session: Any,
+        hostname: str,
+        dst_ip: str,
+        conn: dict,
+        base_ts: datetime,
+        persona_pid: int,
+        os_cat: str,
+        rng: Any,
+        latest_request_time: datetime | None = None,
+    ) -> None:
+        """Generate a multi-request browsing session for an HTTP/HTTPS persona connection.
+
+        Replaces the single generate_connection() call with a session model
+        that produces a landing page, subresource cascade, navigation, and
+        referrer chains.
+        """
+        from evidenceforge.generation.activity.dns_registry import get_domain_tags
+        from evidenceforge.generation.activity.proxy_uri import is_browser_like_proxy_domain
+
+        domain_tags = get_domain_tags(hostname) if hostname else []
+
+        if not is_browser_like_proxy_domain(hostname, domain_tags=domain_tags):
+            self.activity_generator.generate_connection(
+                src_ip=system.ip,
+                dst_ip=dst_ip,
+                time=base_ts,
+                dst_port=conn.get("port", 443),
+                proto=conn.get("proto", "tcp"),
+                service=conn.get("service"),
+                duration=rng.uniform(0.1, 10.0),
+                orig_bytes=rng.randint(200, 8000),
+                resp_bytes=rng.randint(500, 80000),
+                emit_dns=conn.get("emit_dns", False),
+                source_system=system,
+                hostname=hostname,
+                pid=persona_pid,
+            )
+            return
+
+        # Resolve browsing intensity: user override > persona > default
+        intensity = "normal"
+        if user_obj and getattr(user_obj, "browsing_intensity", None):
+            intensity = user_obj.browsing_intensity
+        elif user_obj and user_obj.persona:
+            for p in self.scenario.personas:
+                if p.name == user_obj.persona:
+                    intensity = getattr(p, "browsing_intensity", "normal")
+                    break
+
+        session_ua = self._source_sticky_browser_user_agent(
+            source_system=system,
+            src_ip=system.ip,
+            os_cat=os_cat,
+            rng=rng,
+            hostname=hostname,
+            domain_tags=tuple(domain_tags),
+        )
+
+        BrowserSessionActionBundle(
+            request=BrowserSessionRequest(
+                src_ip=system.ip,
+                dst_ip=dst_ip,
+                time=base_ts,
+                hostname=hostname,
+                dst_port=conn.get("port", 443),
+                proto=conn.get("proto", "tcp"),
+                service=conn.get("service"),
+                source_system=system,
+                pid=persona_pid,
+                domain_tags=tuple(domain_tags),
+                source_os=os_cat,
+                browsing_intensity=intensity,
+                require_browser_like_domain=True,
+                latest_request_time=latest_request_time,
+                transfer_variant_key=f"{system.ip}:{hostname}:{os_cat}:{base_ts.isoformat()}",
+                user_agent=session_ua,
+                source="baseline_persona_browsing",
+            ),
+            executor=self.activity_generator,
+            rng=rng,
+        ).execute()
+
+    def _generate_system_traffic(
+        self,
+        current_hour: datetime,
+        planned_logoffs: dict[tuple[str, str], float] | None = None,
+    ) -> None:
+        """Generate system-initiated background traffic for all systems.
+
+        Called once per hour. Generates DNS lookups, NTP syncs, SMB browsing,
+        and scheduled task activity independently of user activity.
+
+        Uses periodic-with-jitter timing to produce realistic autocorrelation
+        in system event intervals.
+        """
+        from evidenceforge.generation.activity import _get_os_category
+
+        rng = _get_rng()
+
+        # Compute scenario-local time for business-hour gating
+        if hasattr(self, "_scenario_tz") and self._scenario_tz:
+            local_dt = current_hour.replace(tzinfo=UTC).astimezone(self._scenario_tz)
+        else:
+            local_dt = current_hour
+
+        dns_ips = self._infra_ips.get("dns", ["10.0.0.1"])
+        if isinstance(dns_ips, str):
+            dns_ips = [dns_ips]
+        ntp_ips = self._infra_ips.get("ntp", ["129.6.15.28"])
+        if isinstance(ntp_ips, str):
+            ntp_ips = [ntp_ips]
+        if not hasattr(self, "_ntp_schedule_state"):
+            self._ntp_schedule_state: dict[tuple[str, str, int], dict[str, float | int]] = {}
+
+        for system in self.scenario.environment.systems:
+            services = self._system_service_defaults.get(system.hostname, [])
+            os_cat = _get_os_category(system.os)
+            sys_pids = self._system_pids.get(system.hostname, {})
+            is_rhel_like = any(
+                d in system.os.lower() for d in ("centos", "rhel", "red hat", "rocky", "alma")
+            )
+
+            def _svc_pid(*keys: str, _pids: dict = sys_pids) -> int:  # noqa: B006
+                """Resolve service PID from _system_pids, -1 if absent."""
+                for k in keys:
+                    if k in _pids:
+                        return _pids[k]
+                return -1
+
+            hour_start_sec = (current_hour - self._generation_epoch).total_seconds()
+
+            # DNS lookups: truly periodic with small jitter, using global schedule
+            if "dns-client" in services:
+                _dns_lo, _dns_hi = self._resolve_traffic_rate("dns_interval")
+                _dns_lo, _dns_hi = self._scaled_interval_range(
+                    system, "dns_interval", _dns_lo, _dns_hi
+                )
+                _dns_range = max(1, _dns_hi - _dns_lo)
+                dns_interval = _dns_lo + (_stable_seed(f"dns_iv_{system.hostname}") % _dns_range)
+                dns_phase = _stable_seed(f"dns_ph_{system.hostname}") % dns_interval
+                t = dns_phase
+                while t < hour_start_sec:
+                    t += dns_interval
+                while t < hour_start_sec + 3600:
+                    jitter = rng.gauss(0, dns_interval * 0.02)
+                    ts = self._generation_epoch + timedelta(seconds=t + jitter)
+                    self.state_manager.set_current_time(ts)
+                    dns_pid = (
+                        _svc_pid("svchost_net_svc")
+                        if os_cat == "windows"
+                        else _svc_pid("systemd_resolved")
+                        if not is_rhel_like
+                        else -1
+                    )
+                    self.activity_generator.generate_connection(
+                        src_ip=system.ip,
+                        dst_ip=rng.choice(dns_ips),
+                        time=ts,
+                        dst_port=53,
+                        proto="udp",
+                        service="dns",
+                        duration=rng.uniform(0.001, 0.05),
+                        orig_bytes=rng.randint(40, 120),
+                        resp_bytes=rng.randint(80, 512),
+                        source_system=system,
+                        pid=dns_pid,
+                    )
+                    t += dns_interval
+
+            # NTP syncs follow a stable per-association poll schedule rather
+            # than a fixed hourly tick.
+            if "ntp-client" in services:
+                # Deterministic NTP source per host (stable across hours)
+                # Exclude the host's own IP — DCs don't NTP-sync to themselves
+                ntp_candidates = [ip for ip in ntp_ips if ip != system.ip]
+                ntp_ip = (
+                    ntp_candidates[_stable_seed(f"ntp_src_{system.hostname}") % len(ntp_candidates)]
+                    if ntp_candidates
+                    else None  # This host IS the NTP server; skip NTP client traffic only
+                )
+                if ntp_ip:
+                    poll_seconds = _ntp_association_poll_seconds(
+                        system.ip,
+                        ntp_ip,
+                    )
+                    ntp_pid = (
+                        _svc_pid("svchost_local_svc")
+                        if os_cat == "windows"
+                        else _svc_pid("chronyd", "timesyncd")
+                    )
+                    state_key = (system.hostname, ntp_ip, poll_seconds)
+                    schedule_state = self._ntp_schedule_state.get(state_key)
+                    if schedule_state is None:
+                        phase_rng = random.Random(
+                            _stable_seed(f"ntp_phase:{system.hostname}:{ntp_ip}:{poll_seconds}")
+                        )
+                        schedule_state = {
+                            "scheduled_second": phase_rng.uniform(0, min(3600, poll_seconds)),
+                            "sequence": 0,
+                        }
+                        self._ntp_schedule_state[state_key] = schedule_state
+                    for observed_second in _ntp_sync_seconds_for_hour_from_state(
+                        system.hostname,
+                        ntp_ip,
+                        hour_start_sec,
+                        poll_seconds,
+                        schedule_state,
+                    ):
+                        ts = self._generation_epoch + timedelta(seconds=observed_second)
+                        self.state_manager.set_current_time(ts)
+                        self.activity_generator.generate_connection(
+                            src_ip=system.ip,
+                            dst_ip=ntp_ip,
+                            time=ts,
+                            dst_port=123,
+                            proto="udp",
+                            service="ntp",
+                            duration=rng.uniform(0.01, 0.1),
+                            orig_bytes=48,
+                            resp_bytes=48,
+                            source_system=system,
+                            pid=ntp_pid,
+                        )
+
+            # DHCP lease renewal at T/2 with RFC 2131 jitter
+            dhcp_state = getattr(self, "_dhcp_lease_state", {}).get(system.hostname)
+            if dhcp_state and "zeek_dhcp" in self.emitters:
+                storyline_dhcp_time = self._storyline_dhcp_lease_time_in_hour(
+                    system.hostname,
+                    current_hour,
+                )
+                if storyline_dhcp_time is not None:
+                    dhcp_state["next_renewal"] = storyline_dhcp_time.timestamp()
+                    continue
+                lease_time = dhcp_state["lease_time"]
+                (
+                    renewal_epochs,
+                    updated_last_renewal,
+                    pending_next_renewal,
+                ) = _dhcp_renewal_epochs_for_hour(
+                    last_renewal=dhcp_state["last_renewal"],
+                    lease_time=lease_time,
+                    current_hour=current_hour,
+                    rng=rng,
+                    next_renewal=dhcp_state.get("next_renewal"),
+                )
+                if renewal_epochs:
+                    from evidenceforge.utils.ids import generate_zeek_uid
+
+                for next_renewal, renewal_interval in renewal_epochs:
+                    renewal_ts = datetime.fromtimestamp(next_renewal, tz=current_hour.tzinfo)
+                    # Randomize fractional seconds (OS timer imprecision)
+                    renewal_ts = renewal_ts.replace(microsecond=rng.randint(0, 999999))
+                    self.state_manager.set_current_time(renewal_ts)
+                    self.activity_generator.generate_dhcp_lease(
+                        system=dhcp_state["system"],
+                        time=renewal_ts,
+                        mac=dhcp_state["mac"],
+                        server_addr=dhcp_state.get("server_addr", "10.0.0.1"),
+                        lease_time=lease_time,
+                        uid=generate_zeek_uid("C"),
+                        msg_types=["REQUEST", "ACK"],  # Renewal, not discovery
+                        renewal_interval=renewal_interval,
+                    )
+                    self._emit_dhcp_registry_side_effect(
+                        system=dhcp_state["system"],
+                        time=renewal_ts,
+                        rng=rng,
+                        sys_pids=sys_pids,
+                        dhcp_state=dhcp_state,
+                    )
+                dhcp_state["last_renewal"] = updated_last_renewal
+                if pending_next_renewal is None:
+                    dhcp_state.pop("next_renewal", None)
+                else:
+                    dhcp_state["next_renewal"] = pending_next_renewal
+
+            # SMB browsing: Windows workstations to DCs (SYSVOL/GPO) and file servers
+            dc_ips = self._infra_ips.get("dc", ["10.0.0.1"])
+            if isinstance(dc_ips, str):
+                dc_ips = [dc_ips]
+            dc_hostnames = self._infra_ips.get("dc_hostnames", [])
+            if isinstance(dc_hostnames, str):
+                dc_hostnames = [dc_hostnames]
+            dc_hostname_by_ip = {
+                dc_ip: dc_hostname for dc_ip, dc_hostname in zip(dc_ips, dc_hostnames, strict=False)
+            }
+            dc_targets = [ip for ip in dc_ips if ip != system.ip]
+            if "smb-client" in services and os_cat == "windows":
+                # Include DC SYSVOL/GPO traffic and weight file servers higher
+                # when present; file-server environments should still produce
+                # SMB even if no DC role has been inferred.
+                smb_targets, fs_targets = self._build_smb_targets(system, dc_ips)
+                if smb_targets:
+                    _smb_lo, _smb_hi = self._resolve_traffic_rate("smb_interval")
+                    _smb_lo, _smb_hi = self._scaled_interval_range(
+                        system, "smb_interval", _smb_lo, _smb_hi
+                    )
+                    _smb_range = max(1, _smb_hi - _smb_lo)
+                    smb_interval = _smb_lo + (
+                        _stable_seed(f"smb_iv_{system.hostname}") % _smb_range
+                    )
+                    smb_phase = _stable_seed(f"smb_ph_{system.hostname}") % smb_interval
+                    hour_start_sec = (current_hour - self._generation_epoch).total_seconds()
+                    t = smb_phase
+                    while t < hour_start_sec:
+                        t += smb_interval
+                    while t < hour_start_sec + 3600:
+                        offset = t - hour_start_sec + rng.gauss(0, smb_interval * 0.02)
+                        offset = max(0, min(3599, offset))
+                        ts = current_hour + timedelta(seconds=offset)
+                        self.state_manager.set_current_time(ts)
+                        smb_dst_ip = rng.choice(smb_targets)
+                        smb_dst_sys = next((s for s in fs_targets if s.ip == smb_dst_ip), None)
+                        if smb_dst_sys:
+                            operation_profile = rng.choices(
+                                ["read", "write", "metadata"],
+                                weights=[55, 30, 15],
+                                k=1,
+                            )[0]
+                            if operation_profile == "read":
+                                duration = rng.uniform(2.0, 90.0)
+                                orig_bytes = rng.randint(1_200, 12_000)
+                                resp_bytes = rng.randint(80_000, 5_000_000)
+                            elif operation_profile == "write":
+                                duration = rng.uniform(3.0, 120.0)
+                                orig_bytes = rng.randint(80_000, 4_000_000)
+                                resp_bytes = rng.randint(2_000, 50_000)
+                            else:
+                                duration = rng.uniform(0.2, 5.0)
+                                orig_bytes = rng.randint(800, 8_000)
+                                resp_bytes = rng.randint(1_000, 25_000)
+                        else:
+                            duration = rng.uniform(0.1, 2.0)
+                            orig_bytes = rng.randint(200, 2_000)
+                            resp_bytes = rng.randint(500, 5_000)
+                        will_emit_smb_logon = smb_dst_sys is not None
+                        self.activity_generator.generate_connection(
+                            src_ip=system.ip,
+                            dst_ip=smb_dst_ip,
+                            time=ts,
+                            dst_port=445,
+                            proto="tcp",
+                            service="smb",
+                            duration=duration,
+                            orig_bytes=orig_bytes,
+                            resp_bytes=resp_bytes,
+                            conn_state=self._smb_logon_transport_conn_state(
+                                "smb",
+                                will_emit_smb_logon,
+                            ),
+                            emit_dns=rng.random() > 0.02,
+                            source_system=system,
+                            pid=4,  # SMB: kernel System process
+                        )
+                        smb_source_port = self._last_smb_connection_source_port(
+                            source_ip=system.ip,
+                            dst_ip=smb_dst_ip,
+                        )
+                        # Emit type 3 logon on file server for SMB access
+                        if smb_dst_sys:
+                            # Find active user on this workstation
+                            ws_sessions = self.state_manager.get_sessions_on_system(system.hostname)
+                            for sess in ws_sessions:
+                                if sess.logon_type in (2, 10, 11):
+                                    ws_user = next(
+                                        (
+                                            u
+                                            for u in self.scenario.environment.users
+                                            if u.username == sess.username
+                                        ),
+                                        None,
+                                    )
+                                    if ws_user:
+                                        self._emit_smb_logon_pair(
+                                            ws_user,
+                                            smb_dst_sys,
+                                            system.ip,
+                                            ts,
+                                            rng,
+                                            source_port=smb_source_port,
+                                            emit_network_evidence=smb_source_port is None,
+                                        )
+                                        self._emit_smb_file_operations(
+                                            ws_user, smb_dst_sys, system, ts, rng
+                                        )
+                                        break
+                        t += smb_interval
+
+            # Kerberos
+            if "kerberos-client" in services and os_cat == "windows" and dc_targets:
+                _krb_lo, _krb_hi = self._resolve_traffic_rate("kerberos")
+                _krb_lo, _krb_hi = self._scaled_count_range(system, "kerberos", _krb_lo, _krb_hi)
+                num_krb = rng.randint(_krb_lo, _krb_hi)
+                base_interval = 3600 / (num_krb + 1)
+                for i in range(num_krb):
+                    offset = base_interval * (i + 1) + rng.gauss(0, base_interval * 0.1)
+                    offset = max(0, min(3599, offset))
+                    ts = current_hour + timedelta(seconds=offset)
+                    self.state_manager.set_current_time(ts)
+                    krb_dst_ip = rng.choice(dc_targets)
+                    dc_hostname = dc_hostname_by_ip.get(krb_dst_ip)
+                    if dc_hostname is None and dc_hostnames:
+                        dc_hostname = rng.choice(dc_hostnames)
+                    if dc_hostname:
+                        machine_principal = f"{system.hostname}$"
+                        tgt_time, tgs_time = self.activity_generator._kerberos_ticket_times(
+                            ts,
+                            rng,
+                            tgs_before_ms=(8, 55),
+                            tgt_before_tgs_ms=(35, 220),
+                        )
+                        self.activity_generator._maybe_generate_kerberos_tgt(
+                            username=machine_principal,
+                            source_ip=system.ip,
+                            dc_hostname=dc_hostname,
+                            time=tgt_time,
+                            rng=rng,
+                        )
+                        service_name = rng.choices(
+                            [
+                                f"host/{dc_hostname}",
+                                f"ldap/{dc_hostname}",
+                                f"cifs/{dc_hostname}",
+                                f"DNS/{dc_hostname}",
+                            ],
+                            weights=[34, 36, 20, 10],
+                            k=1,
+                        )[0]
+                        self.activity_generator.generate_kerberos_service_ticket(
+                            username=machine_principal,
+                            service_name=service_name,
+                            source_ip=system.ip,
+                            dc_hostname=dc_hostname,
+                            time=tgs_time,
+                        )
+                    self.activity_generator.generate_connection(
+                        src_ip=system.ip,
+                        dst_ip=krb_dst_ip,
+                        time=ts,
+                        dst_port=88,
+                        proto="tcp",
+                        service="kerberos",
+                        duration=rng.uniform(0.001, 0.05),
+                        orig_bytes=rng.randint(200, 1500),
+                        resp_bytes=rng.randint(200, 2000),
+                        emit_dns=rng.random() > 0.02,
+                        source_system=system,
+                        pid=_svc_pid("lsass"),
+                    )
+
+            # LDAP
+            if "ldap-client" in services and os_cat == "windows" and dc_targets:
+                _ldap_lo, _ldap_hi = self._resolve_traffic_rate("ldap")
+                _ldap_lo, _ldap_hi = self._scaled_count_range(system, "ldap", _ldap_lo, _ldap_hi)
+                num_ldap = rng.randint(_ldap_lo, _ldap_hi)
+                base_interval = 3600 / (num_ldap + 1)
+                for i in range(num_ldap):
+                    offset = base_interval * (i + 1) + rng.gauss(0, base_interval * 0.1)
+                    offset = max(0, min(3599, offset))
+                    ts = current_hour + timedelta(seconds=offset)
+                    self.state_manager.set_current_time(ts)
+                    self.activity_generator.generate_connection(
+                        src_ip=system.ip,
+                        dst_ip=rng.choice(dc_targets),
+                        time=ts,
+                        dst_port=389,
+                        proto="tcp",
+                        service="ldap",
+                        duration=rng.uniform(0.01, 0.5),
+                        orig_bytes=rng.randint(100, 2000),
+                        resp_bytes=rng.randint(500, 10000),
+                        emit_dns=rng.random() > 0.02,
+                        source_system=system,
+                        pid=_svc_pid("lsass"),
+                    )
+
+            # Profile-driven traffic: role-based system connections + persona user connections
+            # Replaces former HTTPS background + database traffic blocks
+            self._generate_profile_traffic(
+                current_hour,
+                system,
+                rng,
+                os_cat,
+                sys_pids,
+                local_dt=local_dt,
+                planned_logoffs=planned_logoffs,
+            )
+
+            # Independent system service processes (not tied to user activity)
+            # Windows hosts spawn 3-8 service processes per hour
+            if os_cat == "windows":
+                from evidenceforge.generation.activity.system_processes import (
+                    pick_system_service_process as _pick_svc,
+                )
+
+                sys_type_str = (system.type or "workstation").lower()
+                num_svc = self._scaled_randint(rng, system, "windows_service_process", 3, 8)
+                for _si in range(num_svc):
+                    svc_offset = rng.uniform(0, 3599)
+                    svc_ts = current_hour + timedelta(seconds=svc_offset)
+                    self.state_manager.set_current_time(svc_ts)
+                    svc_image, svc_cmd, svc_parent_key = _pick_svc(
+                        rng,
+                        sys_type_str,
+                        system,
+                    )
+                    svc_parent = sys_pids.get(
+                        svc_parent_key, sys_pids.get("services", sys_pids.get("wininit", 4))
+                    )
+                    svc_pid = self.activity_generator.generate_system_process(
+                        system=system,
+                        time=svc_ts,
+                        process_name=svc_image,
+                        command_line=svc_cmd,
+                        parent_pid=svc_parent,
+                        username="SYSTEM",
+                    )
+                    svc_lifetime = _windows_background_process_lifetime_seconds(
+                        svc_image,
+                        svc_cmd,
+                        rng,
+                    )
+                    if svc_pid and svc_lifetime is not None:
+                        svc_end = svc_ts + timedelta(seconds=svc_lifetime)
+                        self.state_manager.set_current_time(svc_end)
+                        self.activity_generator.generate_system_process_termination(
+                            system=system,
+                            time=svc_end,
+                            pid=svc_pid,
+                            process_name=svc_image,
+                            parent_pid=svc_parent,
+                            username="SYSTEM",
+                        )
+
+            self._emit_ecar_file_churn(system, current_hour, rng, os_cat, sys_pids)
+
+            # Baseline registry activity from running services. Real Sysmon
+            # generates hundreds-thousands of Event 12/13 per hour. We emit
+            # 15-40 per host per hour to provide realistic background volume.
+            if os_cat == "windows" and "windows_event_sysmon" in self.emitters:
+                from evidenceforge.events.base import SecurityEvent
+                from evidenceforge.events.contexts import (
+                    AuthContext,
+                    ProcessContext,
+                    RegistryContext,
+                )
+                from evidenceforge.generation.activity.edr_pools import (
+                    get_registry_keys_hkcu,
+                    get_registry_keys_hklm,
+                    materialize_edr_template,
+                    materialize_edr_template_group,
+                )
+                from evidenceforge.generation.activity.endpoint_noise import registry_noise_config
+
+                _REG_KEYS_HKCU = get_registry_keys_hkcu()
+                _REG_KEYS_HKLM = get_registry_keys_hklm()
+                _reg_count = self._scaled_randint(rng, system, "windows_registry", 18, 42)
+                _svc_pid = sys_pids.get("svchost_netsvcs", sys_pids.get("services", 4))
+                _host_ctx = self.activity_generator._build_host_context(system)
+                _registry_cfg = registry_noise_config()
+                _dhcp_state = getattr(self, "_dhcp_lease_state", {}).get(system.hostname)
+                # Only emit HKCU on workstations with a logged-in user;
+                # servers and DCs run services, not user desktops.
+                _has_desktop = getattr(
+                    system, "assigned_user", None
+                ) is not None and system.type not in ("server", "domain_controller")
+                _hkcu_rate = 0.30 if _has_desktop else 0.0
+                for _ri in range(_reg_count):
+                    _reg_ts = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+                    if rng.random() < _hkcu_rate:
+                        dynamic_hkcu = [entry for entry in _REG_KEYS_HKCU if "{" in entry[0]]
+                        static_hkcu = [
+                            entry
+                            for entry in _REG_KEYS_HKCU
+                            if "{" not in entry[0]
+                            and "Office\\16.0\\Word\\Reading Locations\\Document 1" not in entry[0]
+                        ]
+                        pool = dynamic_hkcu if dynamic_hkcu and rng.random() < 0.80 else static_hkcu
+                        _key, _vname, _details = rng.choice(pool or _REG_KEYS_HKCU)
+                    else:
+                        dynamic_hklm = [
+                            entry
+                            for entry in _REG_KEYS_HKLM
+                            if "{" in entry[0] and str(entry[1]).lower() != "driverdesc"
+                        ]
+                        noisy_static_hklm = [
+                            entry
+                            for entry in _REG_KEYS_HKLM
+                            if "{" not in entry[0]
+                            and "Windows NT\\CurrentVersion\\Winlogon" not in entry[0]
+                            and "Services\\EventLog\\Application" not in entry[0]
+                        ]
+                        rare_static_hklm = [
+                            entry for entry in _REG_KEYS_HKLM if "{" not in entry[0]
+                        ]
+                        if dynamic_hklm and rng.random() < 0.85:
+                            pool = dynamic_hklm
+                        elif rng.random() < 0.95:
+                            pool = noisy_static_hklm
+                        else:
+                            pool = rare_static_hklm
+                        _key, _vname, _details = rng.choice(pool or _REG_KEYS_HKLM)
+                    if not _ambient_registry_entry_allowed(
+                        system,
+                        _key,
+                        _vname,
+                        _dhcp_state,
+                        _registry_cfg,
+                    ):
+                        continue
+                    _template_user = system.assigned_user or "SYSTEM"
+                    _key, _vname, _details = materialize_edr_template_group(
+                        (_key, _vname, _details),
+                        rng,
+                        _template_user,
+                        host_ip=system.ip,
+                        dns_server_ip=str((_dhcp_state or {}).get("server_addr") or "10.0.0.1"),
+                        host_key=system.hostname,
+                        host_os=system.os,
+                    )
+                    writer_candidates = _registry_writer_candidates(
+                        _key,
+                        sys_pids,
+                        system.assigned_user,
+                    )
+                    if writer_candidates:
+                        _reg_pid, _reg_image, _reg_user = rng.choice(writer_candidates)
+                    else:
+                        _reg_pid = _svc_pid
+                        _reg_image = r"C:\Windows\System32\svchost.exe"
+                        _reg_user = "SYSTEM"
+                    _reg_proc = self.state_manager.get_process(system.hostname, _reg_pid)
+                    if _reg_proc is not None:
+                        _reg_image = _reg_proc.image
+                    if _reg_proc and _reg_proc.start_time and _reg_ts <= _reg_proc.start_time:
+                        _reg_ts = _reg_proc.start_time + timedelta(milliseconds=1)
+                    _target = f"{_key}\\{_vname}"
+                    _details = _materialize_registry_value_for_time(
+                        _target,
+                        _details,
+                        _reg_ts,
+                        rng,
+                    )
+                    # Sysmon value writes are Event 13. Event 12 is reserved for key-only
+                    # create/delete contexts, not the value-name pools used here.
+                    _reg_action = "modify"
+                    self.activity_generator.dispatcher.dispatch(
+                        SecurityEvent(
+                            timestamp=_reg_ts,
+                            event_type="registry_modify",
+                            src_host=_host_ctx,
+                            auth=AuthContext(
+                                username=_reg_user,
+                                user_sid=self.activity_generator._get_sid(_reg_user),
+                                logon_id=_reg_proc.logon_id if _reg_proc is not None else "",
+                            ),
+                            process=ProcessContext(
+                                pid=_reg_pid,
+                                parent_pid=_reg_proc.parent_pid if _reg_proc is not None else 0,
+                                image=_reg_image,
+                                command_line=_reg_proc.command_line
+                                if _reg_proc is not None
+                                else "",
+                                username=_reg_proc.username if _reg_proc is not None else _reg_user,
+                                logon_id=_reg_proc.logon_id if _reg_proc is not None else "",
+                                start_time=_reg_proc.start_time if _reg_proc is not None else None,
+                            ),
+                            registry=RegistryContext(
+                                key=_target, value=_details, action=_reg_action, pid=_reg_pid
+                            ),
+                        )
+                    )
+
+            # Windows scheduled tasks — diverse per-hour selection from YAML.
+            # Linux scheduled tasks are handled by _generate_scheduled_tasks()
+            # which uses realistic daily/weekly frequencies instead of the
+            # legacy 2-5 per hour approach.
+            if os_cat == "windows":
+                for offset in _windows_scheduled_task_offsets(
+                    current_hour,
+                    system,
+                    rng,
+                    count_multiplier=self._activity_multiplier(
+                        system,
+                        "windows_scheduled_task",
+                    ),
+                ):
+                    ts = current_hour + timedelta(seconds=offset)
+                    self.state_manager.set_current_time(ts)
+                    selected_task = self._select_windows_scheduled_task(
+                        system=system,
+                        rng=rng,
+                        time=ts,
+                    )
+                    if selected_task is None:
+                        continue
+                    task_image, task_cmd, task_parent_key = selected_task
+                    parent_pid = sys_pids.get(
+                        task_parent_key, sys_pids.get("services", sys_pids.get("wininit", 4))
+                    )
+                    task_pid = self.activity_generator.generate_system_process(
+                        system=system,
+                        time=ts,
+                        process_name=task_image,
+                        command_line=task_cmd,
+                        parent_pid=parent_pid,
+                        username="SYSTEM",
+                    )
+                    task_lifetime = _windows_background_process_lifetime_seconds(
+                        task_image,
+                        task_cmd,
+                        rng,
+                    )
+                    if task_pid and task_lifetime is not None:
+                        task_end = ts + timedelta(seconds=task_lifetime)
+                        self.state_manager.set_current_time(task_end)
+                        self.activity_generator.generate_system_process_termination(
+                            system=system,
+                            time=task_end,
+                            pid=task_pid,
+                            process_name=task_image,
+                            parent_pid=parent_pid,
+                            username="SYSTEM",
+                        )
+
+            # Service account delegation: svc accounts auth to remote servers
+            if os_cat == "windows" and self.scenario.environment.service_accounts:
+                delegation_config = service_account_delegation_config()
+                delegation_probability = float(delegation_config.get("hourly_probability", 0.3))
+                all_systems = self.scenario.environment.systems
+                servers = [s for s in all_systems if s.type in ("server", "domain_controller")]
+                for svc_name in self.scenario.environment.service_accounts:
+                    if not self._service_account_eligible_for_baseline_noise(svc_name):
+                        continue
+                    if rng.random() < delegation_probability:
+                        target_sys = rng.choice(servers) if servers else None
+                        if target_sys and target_sys.hostname != system.hostname:
+                            svc_ts = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+                            if not self._service_account_available_at(svc_name, svc_ts):
+                                continue
+                            self.state_manager.set_current_time(svc_ts)
+                            caller_image, caller_pid = (
+                                self._ensure_service_account_delegation_process(
+                                    system=system,
+                                    svc_name=svc_name,
+                                    time=svc_ts,
+                                    sys_pids=sys_pids,
+                                    rng=rng,
+                                )
+                            )
+                            self.activity_generator.generate_explicit_credentials(
+                                user=_SYSTEM_USER,
+                                system=system,
+                                time=svc_ts,
+                                target_username=svc_name,
+                                target_server=target_sys.hostname,
+                                process_name=caller_image,
+                                process_pid=caller_pid,
+                            )
+
+            # GPO application: periodic SYSTEM credential usage to DC
+            if os_cat == "windows" and system.type == "workstation":
+                gpo_phase = _stable_seed(f"gpo_phase_{system.hostname}") % 4
+                if (current_hour.hour + gpo_phase) % 3 == 0:
+                    dcs = [
+                        s
+                        for s in self.scenario.environment.systems
+                        if s.type == "domain_controller"
+                    ]
+                    if dcs:
+                        gpo_ts = current_hour + timedelta(seconds=rng.uniform(60, 300))
+                        self.state_manager.set_current_time(gpo_ts)
+                        # Group Policy refresh runs as SYSTEM but does not normally
+                        # create a 4648 explicit-credential audit for SYSTEM->SYSTEM.
+                        gpupdate_image = r"C:\Windows\System32\gpupdate.exe"
+                        gpupdate_command = r"gpupdate.exe /target:computer /force"
+                        parent_pid = sys_pids.get("svchost_netsvcs", sys_pids.get("services", 4))
+                        gpupdate_pid = self.activity_generator.generate_system_process(
+                            system=system,
+                            time=gpo_ts,
+                            process_name=gpupdate_image,
+                            command_line=gpupdate_command,
+                            parent_pid=parent_pid,
+                            username="SYSTEM",
+                        )
+                        lifetime = _windows_foreground_lifetime(gpupdate_image, gpupdate_command)
+                        if lifetime is not None:
+                            end_ts = gpo_ts + timedelta(seconds=rng.uniform(*lifetime))
+                            self.state_manager.set_current_time(end_ts)
+                            self.activity_generator.generate_system_process_termination(
+                                system=system,
+                                time=end_ts,
+                                pid=gpupdate_pid,
+                                process_name=gpupdate_image,
+                                parent_pid=parent_pid,
+                                username="SYSTEM",
+                            )
+
+            # Sysmon Event 8 (CreateRemoteThread) baseline noise — Windows only
+            if os_cat == "windows" and "windows_event_sysmon" in self.emitters:
+                valid_crt = [
+                    p
+                    for p in load_create_remote_thread_patterns()
+                    if p.get("source_pid_key") in sys_pids and p.get("target_pid_key") in sys_pids
+                ]
+                noise_cfg = load_create_remote_thread_noise_config()
+                probability = float(noise_cfg.get("probability_per_host_hour", 0.08))
+                max_events = int(noise_cfg.get("max_events_per_hour", 1))
+                probability *= self._activity_multiplier(system, "windows_remote_thread")
+                if valid_crt and max_events > 0 and rng.random() < min(0.95, probability):
+                    num_crt = rng.randint(1, max_events)
+                    for _ in range(num_crt):
+                        pattern = pick_create_remote_thread_pattern(valid_crt, rng)
+                        src_key = pattern["source_pid_key"]
+                        src_image = pattern["source_image"]
+                        tgt_key = pattern["target_pid_key"]
+                        tgt_image = pattern["target_image"]
+                        src_pid = sys_pids[src_key]
+                        tgt_pid = sys_pids[tgt_key]
+                        if src_pid == tgt_pid:
+                            continue
+                        offset = rng.uniform(0, 3599)
+                        ts = current_hour + timedelta(seconds=offset)
+                        self.state_manager.set_current_time(ts)
+                        self.activity_generator.generate_create_remote_thread(
+                            user=_SYSTEM_USER,
+                            system=system,
+                            time=ts,
+                            source_pid=src_pid,
+                            source_image=src_image,
+                            target_pid=tgt_pid,
+                            target_image=tgt_image,
+                        )
+
+            # Sysmon Event 10 (ProcessAccess) baseline noise — Windows only
+            if os_cat == "windows" and "windows_event_sysmon" in self.emitters:
+                valid_pa = [
+                    p
+                    for p in load_process_access_patterns()
+                    if p.get("source_pid_key") in sys_pids and p.get("target_pid_key") in sys_pids
+                ]
+                if valid_pa:
+                    num_pa = self._scaled_randint(rng, system, "windows_process_access", 3, 8)
+                    for _ in range(num_pa):
+                        pattern = rng.choice(valid_pa)
+                        src_key = pattern["source_pid_key"]
+                        src_image = pattern["source_image"]
+                        tgt_key = pattern["target_pid_key"]
+                        tgt_image = pattern["target_image"]
+                        src_pid = sys_pids[src_key]
+                        tgt_pid = sys_pids[tgt_key]
+                        offset = rng.uniform(0, 3599)
+                        ts = current_hour + timedelta(seconds=offset)
+                        self.state_manager.set_current_time(ts)
+                        self.activity_generator.generate_process_access(
+                            user=_SYSTEM_USER,
+                            system=system,
+                            time=ts,
+                            source_pid=src_pid,
+                            source_image=src_image,
+                            target_pid=tgt_pid,
+                            target_image=tgt_image,
+                            granted_access=pick_granted_access(pattern, rng),
+                        )
+
+            # Sysmon Event 7 (ImageLoaded) baseline noise — Windows only
+            # Uses data-driven DLL profiles from system_processes.yaml and
+            # application_catalog.yaml. Picks from processes actually running
+            # on this system (from StateManager) so PIDs are always valid.
+            if os_cat == "windows" and "windows_event_sysmon" in self.emitters:
+                from evidenceforge.generation.activity.dll_load_profiles import (
+                    get_dlls_for_process,
+                )
+                from evidenceforge.generation.activity.edr_pools import (
+                    get_dll_pool,
+                    materialize_edr_template,
+                )
+
+                running = self.state_manager.get_processes_on_system(system.hostname)
+                if running:
+                    generic_dll_pool = get_dll_pool()
+                    num_dll = self._scaled_randint(rng, system, "windows_module_load", 20, 45)
+                    for _ in range(num_dll):
+                        offset = rng.uniform(0, 3599)
+                        ts = current_hour + timedelta(seconds=offset)
+                        win_procs: list[tuple[int, str]] = []
+                        for proc in running:
+                            if _eligible_for_hourly_module_load(proc, ts):
+                                win_procs.append((proc.pid, proc.image))
+                        if not win_procs:
+                            continue
+                        proc_pid, proc_image = rng.choice(win_procs)
+                        exe_name = proc_image.rsplit("\\", 1)[-1]
+                        profiled_dlls = get_dlls_for_process(exe_name)
+                        dll_pool = list(profiled_dlls)
+                        for path in generic_dll_pool:
+                            if not _module_matches_process(exe_name, path):
+                                continue
+                            path_lower = path.lower()
+                            dll_pool.append(
+                                {
+                                    "path": materialize_edr_template(
+                                        path,
+                                        rng,
+                                        system.assigned_user or "SYSTEM",
+                                        host_key=system.hostname,
+                                    ),
+                                    "signed": not any(
+                                        vendor in path_lower
+                                        for vendor in ["7-zip", "videolan", "notepad++"]
+                                    ),
+                                    "signature": _signature_for_loaded_module(path),
+                                    "signature_status": "Valid",
+                                }
+                            )
+                        if not dll_pool:
+                            continue
+                        dll = rng.choice(dll_pool)
+                        self.state_manager.set_current_time(ts)
+                        self.activity_generator.generate_image_load(
+                            user=_SYSTEM_USER,
+                            system=system,
+                            time=ts,
+                            pid=proc_pid,
+                            image=proc_image,
+                            dll_path=dll["path"],
+                            signed=dll["signed"],
+                            signature=dll["signature"],
+                            signature_status=dll["signature_status"],
+                        )
+
+            # ICMP monitoring pings are now handled by role_traffic profiles
+
+            # SSH: connections to Linux servers
+            sys_type = (system.type or "workstation").lower()
+            if os_cat == "linux" and sys_type == "server":
+                roster = self._get_baseline_ssh_users(system)
+                if roster and rng.random() < self._linux_remote_admin_hour_probability(system):
+                    from evidenceforge.generation.activity.bash_commands import (
+                        pick_bash_session_commands,
+                    )
+
+                    num_ssh = self._linux_remote_admin_session_count(rng, system)
+                    for _ in range(num_ssh):
+                        ssh_identity = self._pick_baseline_ssh_identity(system, rng)
+                        if ssh_identity is None:
+                            continue
+                        ssh_user, source_system = ssh_identity
+                        offset = rng.uniform(0, 3599)
+                        ts = current_hour + timedelta(seconds=offset)
+                        hour_end = current_hour + timedelta(hours=1)
+                        self.state_manager.set_current_time(ts)
+                        self.world_planner.bootstrap_user_session(
+                            user=ssh_user,
+                            target_system=system,
+                            time=ts,
+                            rng=rng,
+                            session_kind="ssh",
+                            source_system=source_system,
+                            allow_existing=True,
+                            required_until=hour_end,
+                        )
+
+                        persona_lower = (ssh_user.persona or "").lower()
+                        if persona_lower == "sysadmin":
+                            n_cmds = self._scaled_randint(
+                                rng,
+                                system,
+                                "linux_shell",
+                                3,
+                                8,
+                                persona=ssh_user.persona,
+                            )
+                        elif persona_lower == "developer":
+                            n_cmds = self._scaled_randint(
+                                rng,
+                                system,
+                                "linux_shell",
+                                2,
+                                6,
+                                persona=ssh_user.persona,
+                            )
+                        else:
+                            n_cmds = self._scaled_randint(
+                                rng,
+                                system,
+                                "linux_shell",
+                                1,
+                                4,
+                                persona=ssh_user.persona,
+                            )
+                        cumulative_gap = 0
+                        _SLOW_CMD_KEYWORDS = frozenset(
+                            [
+                                "build",
+                                "make",
+                                "pytest",
+                                "cargo",
+                                "docker",
+                                "npm run",
+                                "go build",
+                                "gcc",
+                                "compile",
+                                "install",
+                                "apt",
+                                "yum",
+                                "dnf",
+                                "pip install",
+                            ]
+                        )
+                        command_entries = pick_bash_session_commands(
+                            rng,
+                            ssh_user.persona or "",
+                            system.hostname,
+                            system.services,
+                            username=ssh_user.username,
+                            command_count=n_cmds,
+                            system_os=system.os,
+                        )
+                        for cmd, _is_typo in command_entries:
+                            cmd_offset = rng.randint(30, 600)
+                            # Complexity-aware timing: build/install commands
+                            # take longer than simple lookups (ls, cat, pwd)
+                            is_slow = any(kw in cmd.lower() for kw in _SLOW_CMD_KEYWORDS)
+                            if is_slow:
+                                gap = rng.randint(30, 180)
+                            else:
+                                gap = rng.choices(
+                                    [
+                                        rng.randint(8, 25),
+                                        rng.randint(30, 90),
+                                        rng.randint(120, 300),
+                                    ],
+                                    weights=[35, 40, 25],
+                                    k=1,
+                                )[0]
+                            cumulative_gap += gap
+                            cmd_time = ts + timedelta(seconds=cmd_offset + cumulative_gap)
+                            if cmd_time >= hour_end:
+                                break
+                            self.activity_generator.generate_bash_command(
+                                ssh_user, system, cmd_time, cmd
+                            )
+
+            # Bash: interactive shell usage on Linux workstations for assigned user
+            if os_cat == "linux" and sys_type == "workstation" and system.assigned_user:
+                ws_user = next(
+                    (
+                        u
+                        for u in self.scenario.environment.users
+                        if u.username == system.assigned_user and u.enabled
+                    ),
+                    None,
+                )
+                if ws_user is not None:
+                    from evidenceforge.generation.activity.bash_commands import (
+                        pick_bash_session_commands,
+                    )
+
+                    n_cmds = self._scaled_randint(
+                        rng,
+                        system,
+                        "linux_shell",
+                        1,
+                        4,
+                        persona=ws_user.persona,
+                    )
+                    ts0 = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+                    hour_end = current_hour + timedelta(hours=1)
+                    cumulative = 0
+                    command_entries = pick_bash_session_commands(
+                        rng,
+                        ws_user.persona or "",
+                        system.hostname,
+                        system.services,
+                        username=ws_user.username,
+                        command_count=n_cmds,
+                        system_os=system.os,
+                    )
+                    for cmd, _is_typo in command_entries:
+                        gap = rng.randint(30, 300)
+                        cumulative += gap
+                        cmd_time = ts0 + timedelta(seconds=cumulative)
+                        if cmd_time >= hour_end:
+                            break
+                        self.state_manager.set_current_time(cmd_time)
+                        self.activity_generator.generate_bash_command(
+                            ws_user, system, cmd_time, cmd
+                        )
+
+        # RDP: IT admin connections to Windows servers/DCs
+        for system in self.scenario.environment.systems:
+            os_cat_rdp = _get_os_category(system.os)
+            sys_type_rdp = (system.type or "workstation").lower()
+            if os_cat_rdp != "windows" or sys_type_rdp not in ("server", "domain_controller"):
+                continue
+
+            # 1-3 RDP admin sessions per hour to servers, shaped by host role/profile.
+            rdp_multiplier = self._activity_multiplier(system, "windows_remote_admin")
+            if rng.random() > min(0.95, 0.60 * rdp_multiplier):
+                continue
+
+            if not any(
+                s.ip != system.ip and _get_os_category(s.os) == "windows"
+                for s in self.scenario.environment.systems
+            ):
+                continue
+
+            num_rdp = self._baseline_rdp_hourly_count(rng, system)
+            roster = self._get_server_ssh_users(system)
+            if not roster:
+                continue
+
+            rdp_requests = []
+            for _ in range(num_rdp):
+                offset = rng.uniform(0, 3599)
+                ts = current_hour + timedelta(seconds=offset)
+                rdp_user = rng.choice(roster)
+                source_system = (
+                    self.world_model.pick_remote_source_system(rdp_user, system, rng)
+                    if hasattr(self, "world_model")
+                    else None
+                )
+                if source_system is not None and _get_os_category(source_system.os) != "windows":
+                    continue
+                rdp_requests.append((ts, rdp_user, source_system))
+
+            for ts, rdp_user, source_system in sorted(rdp_requests, key=lambda request: request[0]):
+                source_hostname = source_system.hostname if source_system is not None else "-"
+                if not self._baseline_rdp_cooldown_allows(
+                    target_hostname=system.hostname,
+                    source_hostname=source_hostname,
+                    username=rdp_user.username,
+                    planned_time=ts,
+                ):
+                    continue
+
+                self.state_manager.set_current_time(ts)
+                result = self.world_planner.bootstrap_user_session(
+                    user=rdp_user,
+                    target_system=system,
+                    time=ts,
+                    rng=rng,
+                    session_kind="rdp",
+                    source_system=source_system,
+                    allow_existing=True,
+                )
+                session_time = result.session.start_time if result.session is not None else ts
+                self._remember_baseline_rdp_session(
+                    target_hostname=system.hostname,
+                    source_hostname=source_hostname,
+                    username=rdp_user.username,
+                    session_time=session_time,
+                )
+
+        # RSAT: admin workstation → DC management sessions (mmc.exe + LDAP/RPC)
+        self._generate_rsat_sessions(current_hour, rng, local_dt)
+
+        # Service logons (LogonType 5) and ANONYMOUS LOGONs on Windows systems
+        for system in self.scenario.environment.systems:
+            os_cat_svc = _get_os_category(system.os)
+            if os_cat_svc != "windows" or "windows_event_security" not in self.emitters:
+                continue
+
+            sys_type_svc = (system.type or "workstation").lower()
+            if sys_type_svc != "workstation":
+                num_svc = self._scaled_randint(rng, system, "windows_service_logon", 2, 5)
+            else:
+                num_svc = self._scaled_randint(rng, system, "windows_service_logon", 1, 2)
+            for _ in range(num_svc):
+                offset = rng.uniform(0, 3599)
+                ts = current_hour + timedelta(seconds=offset)
+                svc_accounts = ["SYSTEM", "LOCAL SERVICE", "NETWORK SERVICE"]
+                svc_user = rng.choice(svc_accounts)
+                self.activity_generator.generate_service_logon(
+                    system=system,
+                    time=ts,
+                    service_account=svc_user,
+                )
+
+            if sys_type_svc in ("server", "domain_controller"):
+                num_anon = self._scaled_randint(rng, system, "windows_service_logon", 1, 3)
+                for _ in range(num_anon):
+                    offset = rng.uniform(0, 3599)
+                    ts = current_hour + timedelta(seconds=offset)
+                    self.state_manager.set_current_time(ts)
+                    self.activity_generator.generate_anonymous_logon(
+                        system=system,
+                        time=ts,
+                    )
+
+        # Machine account ($) authentication to DCs
+        dc_ips = self._infra_ips.get("dc", [])
+        dc_hostnames = self._infra_ips.get("dc_hostnames", [])
+        if isinstance(dc_ips, str):
+            dc_ips = [dc_ips]
+        if dc_ips and dc_hostnames:
+            for system in self.scenario.environment.systems:
+                os_cat = _get_os_category(system.os)
+                if os_cat != "windows" or system.ip in dc_ips:
+                    continue
+
+                num_auth = self._scaled_randint(rng, system, "windows_machine_auth", 2, 6)
+                base_interval = 3600 / (num_auth + 1)
+                for i in range(num_auth):
+                    offset = base_interval * (i + 1) + rng.gauss(0, base_interval * 0.1)
+                    offset = max(0, min(3599, offset))
+                    ts = current_hour + timedelta(seconds=offset)
+                    self.state_manager.set_current_time(ts)
+                    dc_idx = rng.randint(0, len(dc_ips) - 1)
+                    self.activity_generator.generate_machine_account_logon(
+                        hostname=system.hostname,
+                        machine_username=f"{system.hostname}$",
+                        dc_hostname=dc_hostnames[dc_idx],
+                        source_ip=system.ip,
+                        dc_ip=dc_ips[dc_idx],
+                        time=ts,
+                    )
+
+        # DC-side Kerberos event generation
+        if dc_ips and dc_hostnames:
+            windows_clients = [
+                s
+                for s in self.scenario.environment.systems
+                if _get_os_category(s.os) == "windows" and s.ip not in dc_ips
+            ]
+            for _dc_idx, dc_hostname in enumerate(dc_hostnames):
+                dc_system = next(
+                    (s for s in self.scenario.environment.systems if s.hostname == dc_hostname),
+                    None,
+                )
+                for client in windows_clients:
+                    dc_kerberos_multiplier = self._activity_multiplier(dc_system, "dc_kerberos")
+                    cycle_lo, cycle_hi = _dc_kerberos_cycle_range(dc_kerberos_multiplier)
+                    num_cycles = rng.randint(cycle_lo, cycle_hi)
+                    base_interval = 3600 / (num_cycles + 1)
+                    krb_pid = self._system_pids.get(client.hostname, {}).get("lsass", -1)
+                    for i in range(num_cycles):
+                        offset = base_interval * (i + 1) + rng.gauss(0, base_interval * 0.15)
+                        offset = max(0, min(3599, offset))
+                        ts = current_hour + timedelta(seconds=offset)
+                        self.state_manager.set_current_time(ts)
+
+                        username = f"{client.hostname}$"
+                        self.activity_generator.generate_kerberos_tgt(
+                            username=username,
+                            source_ip=client.ip,
+                            dc_hostname=dc_hostname,
+                            time=ts,
+                        )
+                        self.activity_generator.generate_connection(
+                            src_ip=client.ip,
+                            dst_ip=dc_ips[_dc_idx],
+                            time=ts,
+                            dst_port=88,
+                            proto="tcp",
+                            service="kerberos",
+                            duration=rng.uniform(0.001, 0.04),
+                            orig_bytes=rng.randint(180, 900),
+                            resp_bytes=rng.randint(80, 1500),
+                            source_system=client,
+                            pid=krb_pid,
+                            emit_dns=False,
+                        )
+                        if rng.random() < 0.22:
+                            num_tgs = 0
+                        else:
+                            tgs_lo, tgs_hi = _dc_kerberos_tgs_range(dc_kerberos_multiplier)
+                            num_tgs = rng.randint(tgs_lo, tgs_hi)
+                        member_servers = [
+                            s.hostname
+                            for s in self.scenario.environment.systems
+                            if _get_os_category(s.os) == "windows"
+                            and s.ip not in dc_ips
+                            and _is_kerberos_member_server(s)
+                        ]
+                        elapsed_ms = 0
+                        for tgs_i in range(num_tgs):
+                            elapsed_ms += _machine_account_tgs_gap_ms(rng, first=tgs_i == 0)
+                            ts2 = ts + timedelta(milliseconds=elapsed_ms)
+                            if ts2 >= current_hour + timedelta(hours=1):
+                                continue
+                            target, target_is_dc = _pick_dc_kerberos_target(
+                                rng,
+                                member_servers,
+                                dc_hostname,
+                            )
+                            svc = _pick_dc_kerberos_service(rng, target_is_dc=target_is_dc)
+                            self.activity_generator.generate_kerberos_service_ticket(
+                                username=username,
+                                service_name=f"{svc}/{target}",
+                                source_ip=client.ip,
+                                dc_hostname=dc_hostname,
+                                time=ts2,
+                            )
+                            self.activity_generator.generate_connection(
+                                src_ip=client.ip,
+                                dst_ip=dc_ips[_dc_idx],
+                                time=ts2,
+                                dst_port=88,
+                                proto="tcp",
+                                service="kerberos",
+                                duration=rng.uniform(0.001, 0.05),
+                                orig_bytes=rng.randint(180, 1100),
+                                resp_bytes=rng.randint(80, 2200),
+                                source_system=client,
+                                pid=krb_pid,
+                                emit_dns=False,
+                            )
+                        if rng.random() < 0.10:
+                            ntlm_offset = _machine_account_ntlm_offset_seconds(offset, rng)
+                            self.activity_generator.generate_ntlm_validation(
+                                username=username,
+                                workstation=client.hostname,
+                                dc_hostname=dc_hostname,
+                                time=current_hour + timedelta(seconds=ntlm_offset),
+                            )
+
+        # TGT Renewal
+        if not hasattr(self, "_last_tgt_time"):
+            self._last_tgt_time: dict[str, datetime] = {}
+        if dc_ips and dc_hostnames:
+            renewal_interval = timedelta(hours=rng.uniform(8.0, 12.0))
+            for client in windows_clients:
+                username = f"{client.hostname}$"
+                last_tgt = self._last_tgt_time.get(username)
+                if last_tgt and (current_hour - last_tgt) >= renewal_interval:
+                    offset = rng.uniform(0, 3599)
+                    ts = current_hour + timedelta(seconds=offset)
+                    self.state_manager.set_current_time(ts)
+                    dc_idx = rng.randint(0, len(dc_hostnames) - 1)
+                    self.activity_generator.generate_kerberos_tgt_renewal(
+                        username=username,
+                        source_ip=client.ip,
+                        dc_hostname=dc_hostnames[dc_idx],
+                        time=ts,
+                    )
+                    self._last_tgt_time[username] = ts
+                elif last_tgt is None:
+                    self._last_tgt_time[username] = current_hour
+
+        # Linux syslog diversity
+        for system in self.scenario.environment.systems:
+            os_cat = _get_os_category(system.os)
+            if os_cat != "linux" or "syslog" not in self.emitters:
+                continue
+
+            sys_pids = self._system_pids.get(system.hostname, {})
+            sys_type = (system.type or "workstation").lower()
+            is_dmz = "dmz" in system.hostname.lower() or "web" in system.hostname.lower()
+            is_rhel_like = any(
+                d in system.os.lower() for d in ("centos", "rhel", "red hat", "rocky", "alma")
+            )
+            has_web_role = (
+                any(r in (system.roles or []) for r in ("web_server", "forward_proxy"))
+                or "web" in system.hostname.lower()
+            )
+            has_ntp_client = "ntp-client" in self._system_service_defaults.get(system.hostname, [])
+            if is_dmz:
+                num_events = self._scaled_randint(rng, system, "linux_syslog", 100, 300)
+            else:
+                num_events = self._scaled_randint(rng, system, "linux_syslog", 50, 120)
+
+            scenario_start = self.scenario.time_window.start
+            boot_uptime = self._kernel_boot_uptimes.get(system.hostname, 500000.0)
+            primary_interface = linux_primary_interface(system)
+
+            # Generate scheduled tasks (cron/systemd timers) at real frequencies
+            self._generate_scheduled_tasks(
+                current_hour, system, rng, sys_pids, is_rhel_like, has_web_role
+            )
+            self._emit_journald_housekeeping(system, current_hour, rng, sys_pids)
+            if not is_rhel_like and current_hour == self.start_time:
+                anacron_offset = 60 + (_stable_seed(f"anacron_lifecycle:{system.hostname}") % 1800)
+                self._emit_anacron_lifecycle(
+                    system,
+                    current_hour + timedelta(seconds=anacron_offset),
+                    rng,
+                    sys_pids,
+                )
+
+            # Use Hawkes process for bursty syslog timing instead of uniform spread
+            from evidenceforge.utils.timing import hawkes_timestamps
+
+            _syslog_mu = max(0.001, num_events / 3600.0 * 0.7)
+            _syslog_offsets, _ = hawkes_timestamps(
+                num_events=num_events,
+                duration=3600.0,
+                mu=_syslog_mu,
+                alpha=0.3,
+                beta=0.8,
+                rng=rng,
+            )
+            for offset in _syslog_offsets:
+                ts = current_hour + timedelta(seconds=offset)
+                kernel_uptime = _kernel_uptime_stamp(boot_uptime, scenario_start, ts)
+
+                source_roll = rng.random()
+                if source_roll < 0.25:
+                    if is_dmz and rng.random() < 0.85:
+                        inbound_dst_ip = system.ip
+                        if hasattr(self, "dispatcher") and self.dispatcher.visibility_engine:
+                            public_target = (
+                                self.dispatcher.visibility_engine.get_public_inbound_address(
+                                    system.ip
+                                )
+                            )
+                            if public_target is None:
+                                continue
+                            inbound_dst_ip = public_target
+                        src_ip = rng.choices(
+                            self._external_scanner_ips,
+                            weights=self._external_scanner_weights,
+                            k=1,
+                        )[0]
+                        spt = rng.randint(1024, 65535)
+                        dpt = external_scanner_port_for_source(src_ip, rng)
+                        packet_len = _ufw_block_syn_packet_len(src_ip)
+                        ttl = _ufw_block_ttl(src_ip)
+                        msg = (
+                            f"[{kernel_uptime}] [UFW BLOCK] "
+                            f"IN={primary_interface} OUT= SRC={src_ip} DST={system.ip} "
+                            f"LEN={packet_len} TOS=0x00 PREC=0x00 TTL={ttl} "
+                            f"ID={rng.randint(1, 65535)} PROTO=TCP SPT={spt} DPT={dpt} "
+                            f"WINDOW={rng.choice([1024, 14600, 65535])} RES=0x00 SYN URGP=0"
+                        )
+                        # UFW block: connection (→ Zeek conn S0) + syslog (→ kernel UFW)
+                        # Both on the same SecurityEvent for cross-source correlation
+
+                        self.activity_generator.generate_connection(
+                            src_ip=src_ip,
+                            dst_ip=inbound_dst_ip,
+                            time=ts,
+                            dst_port=dpt,
+                            proto="tcp",
+                            conn_state="S0",
+                            src_port=spt,
+                            packet_overhead_bytes=packet_len,
+                        )
+                        # Paired syslog via canonical dispatch
+                        self.activity_generator.generate_syslog_event(
+                            system=system,
+                            time=ts,
+                            app_name="kernel",
+                            message=msg,
+                            pid=None,
+                            facility=0,
+                            severity=5,
+                        )
+                    else:
+                        # AppArmor audit: only on hosts running MySQL (DB role)
+                        has_db = "db" in system.hostname.lower() or "database" in (
+                            system.roles or []
+                        )
+                        if has_db and not is_rhel_like:
+                            self._audit_serials[system.hostname] = self._audit_serials.get(
+                                system.hostname, 1000
+                            ) + rng.randint(1, 5)
+                            audit_serial = self._audit_serials[system.hostname]
+                            msg = (
+                                f"[{kernel_uptime}] audit: type=1400 "
+                                f"audit({int(ts.timestamp())}.{ts.microsecond // 1000:03d}:{audit_serial}): "
+                                f'apparmor="ALLOWED" operation="open" profile="usr.sbin.mysqld"'
+                            )
+                            self.activity_generator.generate_syslog_event(
+                                system=system,
+                                time=ts,
+                                app_name="kernel",
+                                message=msg,
+                                pid=None,
+                                facility=0,
+                                severity=5,
+                            )
+                elif source_roll < 0.32:
+                    if rng.random() >= _linux_ambient_logind_probability(sys_type):
+                        continue
+                    # Sequential session IDs per host (systemd-logind increments from boot)
+                    sid = self.state_manager.next_linux_logind_session_id(system.hostname, rng, ts)
+                    # Use OS-appropriate usernames
+                    if sys_type == "server":
+                        session_users = ["admin", "root"]
+                        session_weights = [24, 2]
+                        if not is_rhel_like:
+                            session_users.append("ubuntu")
+                            session_weights.append(1)
+                        user = rng.choices(session_users, weights=session_weights, k=1)[0]
+                    else:
+                        session_users = ["root", "admin"]
+                        if not is_rhel_like:
+                            session_users.append("ubuntu")
+                        user = rng.choice(session_users)
+                    pam_app, pam_service, pam_open = _linux_baseline_session_initiator(
+                        user,
+                        rng=rng,
+                        system_type=sys_type,
+                    )
+                    pam_open_time = ts - _linux_baseline_pam_open_lead(rng)
+                    pam_pid = _linux_transient_syslog_pid(
+                        self.state_manager,
+                        system.hostname,
+                        pam_open_time,
+                        rng,
+                    )
+                    self.activity_generator.generate_syslog_event(
+                        system=system,
+                        time=pam_open_time,
+                        app_name=pam_app,
+                        message=pam_open,
+                        pid=pam_pid,
+                        facility=10,
+                    )
+                    self.activity_generator.generate_syslog_event(
+                        system=system,
+                        time=ts,
+                        app_name="systemd-logind",
+                        message=f"New session {sid} of user {user}.",
+                        pid=sys_pids.get("logind", rng.randint(400, 800)),
+                        facility=10,
+                    )
+                    if rng.random() < 0.65:
+                        remove_time = ts + timedelta(seconds=rng.randint(120, 5400))
+                        self.activity_generator.generate_syslog_event(
+                            system=system,
+                            time=remove_time - _linux_baseline_pam_close_lead(rng),
+                            app_name=pam_app,
+                            message=f"pam_unix({pam_service}:session): session closed for user {user}",
+                            pid=pam_pid,
+                            facility=10,
+                        )
+                        self.activity_generator.generate_syslog_event(
+                            system=system,
+                            time=remove_time,
+                            app_name="systemd-logind",
+                            message=f"Removed session {sid}.",
+                            pid=sys_pids.get("logind", rng.randint(400, 800)),
+                            facility=10,
+                        )
+                elif source_roll < 0.32 + _LINUX_AMBIENT_SSH_NOISE_BAND and sys_type == "server":
+                    ssh_identity = self._pick_baseline_ssh_identity(system, rng)
+                    if ssh_identity is None:
+                        continue
+                    ssh_user_model, src_sys_obj = ssh_identity
+                    ip = src_sys_obj.ip
+                    # Resolve source system for WFP 5156 emission and OS-aware port
+                    from evidenceforge.generation.activity.generator import _ephemeral_port
+
+                    _src_os = _get_os_category(src_sys_obj.os) if src_sys_obj else "linux"
+                    port = self.activity_generator.reserve_ssh_source_port(
+                        ip,
+                        system.ip,
+                        _ephemeral_port(rng, _src_os),
+                        rng,
+                        _src_os,
+                        time=ts,
+                    )
+                    ssh_duration = rng.uniform(30.0, 1800.0)
+                    ssh_user = ssh_user_model.username
+                    _key_rng = random.Random(
+                        _stable_seed(f"ssh_client_key:{ip}:{system.hostname}:{ssh_user}")
+                    )
+                    key_type = _key_rng.choice(["RSA", "ED25519", "ECDSA"])
+                    key_hash = f"SHA256:{''.join(_key_rng.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/', k=43))}"
+                    auth_method = "publickey" if rng.random() < 0.7 else "password"
+                    disconnect_time = ts + timedelta(seconds=max(1.0, ssh_duration))
+                    # Baseline remote-admin SSH is a modeled session, not loose
+                    # syslog churn. The bundle owns transport, auth/PAM/logind,
+                    # endpoint session evidence, and optional close ordering.
+                    self.activity_generator.generate_ssh_session(
+                        user=ssh_user_model,
+                        target_system=system,
+                        time=ts,
+                        source_ip=ip,
+                        source_system=src_sys_obj,
+                        source_port=port,
+                        duration=ssh_duration,
+                        orig_bytes=rng.randint(2000, 50000),
+                        resp_bytes=rng.randint(5000, 200000),
+                        auth_method=auth_method,
+                        public_key_type=key_type if auth_method == "publickey" else "",
+                        public_key_hash=key_hash if auth_method == "publickey" else "",
+                        emit_session_close=disconnect_time < self.end_time,
+                        source="baseline_ssh_noise",
+                    )
+                elif source_roll < 0.35:
+                    if is_rhel_like:
+                        continue  # RHEL doesn't have snapd
+                    snap_name = rng.choice(
+                        [
+                            "core20",
+                            "core22",
+                            "lxd",
+                            "microk8s",
+                            "snapd-desktop-integration",
+                        ]
+                    )
+                    change_id = 1000 + (_stable_seed(f"snapd_change:{system.hostname}") % 8000)
+                    task_id = rng.randint(1, 9)
+                    self.activity_generator.generate_syslog_event(
+                        system=system,
+                        time=ts,
+                        app_name="snapd",
+                        message=rng.choice(
+                            [
+                                f"autorefresh.go:540: auto-refresh for {snap_name}: no updates found",
+                                f"daemon.go:460: gracefully waiting for hook {snap_name}.configure",
+                                f"stateengine.go:150: state ensure starting change {change_id + task_id}",
+                                f"taskrunner.go:271: change {change_id} task {task_id} done for {snap_name}",
+                                f"snapmgr.go:523: refresh candidates checked for {snap_name}",
+                            ]
+                        ),
+                        pid=sys_pids.get("snapd", rng.randint(500, 2000)),
+                    )
+                elif source_roll < 0.45:
+                    if not has_ntp_client:
+                        continue
+                    if is_rhel_like:
+                        continue  # RHEL uses chronyd, not systemd-timesyncd
+                    # Use the same deterministic NTP source as network-level NTP
+                    ntp_candidates = [
+                        ip
+                        for ip in self._infra_ips.get("ntp", ["91.189.89.198"])
+                        if ip != system.ip
+                    ]
+                    if not ntp_candidates:
+                        continue  # This host IS the NTP server; skip timesyncd messages
+                    ntp_ip = ntp_candidates[
+                        _stable_seed(f"ntp_src_{system.hostname}") % len(ntp_candidates)
+                    ]
+                    if not hasattr(self, "_timesyncd_first_seen"):
+                        self._timesyncd_first_seen = set()
+                    if not hasattr(self, "_timesyncd_last_state"):
+                        self._timesyncd_last_state = {}
+                    previous_timesync_state = self._timesyncd_last_state.get(system.hostname)
+                    if previous_timesync_state is not None and ts - previous_timesync_state[
+                        1
+                    ] < timedelta(minutes=5):
+                        continue
+                    if system.hostname not in self._timesyncd_first_seen:
+                        msg = f"Synchronized to time server for the first time {ntp_ip}:123."
+                        timesync_state = "sync"
+                        self._timesyncd_first_seen.add(system.hostname)
+                    else:
+                        step = f"{-1 if rng.random() < 0.5 else 1}.{rng.randint(1, 999999):06d}"
+                        candidates = [
+                            (
+                                "config",
+                                f"Network configuration changed, trying to establish synchronization with {ntp_ip}:123.",
+                                8,
+                            ),
+                            ("sync", f"System clock synchronized to {ntp_ip}:123.", 45),
+                            ("step", f"Time has been changed by {step} seconds.", 8),
+                            ("timeout", f"Timed out waiting for reply from {ntp_ip}:123.", 4),
+                            ("selected", f"Selected time server {ntp_ip}:123.", 35),
+                        ]
+                        weighted: list[tuple[str, str, float]] = []
+                        for candidate_state, candidate_msg, weight in candidates:
+                            adjusted_weight = float(weight)
+                            if previous_timesync_state is not None:
+                                previous_state, previous_time = previous_timesync_state
+                                recent = ts - previous_time
+                                if recent < timedelta(minutes=10):
+                                    if (
+                                        previous_state in {"sync", "step"}
+                                        and candidate_state == "timeout"
+                                    ):
+                                        adjusted_weight = 0.0
+                                    elif previous_state == "timeout" and candidate_state in {
+                                        "sync",
+                                        "step",
+                                    }:
+                                        adjusted_weight = 0.0
+                                if (
+                                    recent < timedelta(minutes=2)
+                                    and candidate_state == previous_state
+                                ):
+                                    adjusted_weight *= 0.15
+                            weighted.append((candidate_state, candidate_msg, adjusted_weight))
+                        if not any(weight for _state, _msg, weight in weighted):
+                            weighted = [
+                                ("selected", f"Selected time server {ntp_ip}:123.", 1.0),
+                            ]
+                        selected_idx = rng.choices(
+                            range(len(weighted)),
+                            weights=[weight for _state, _msg, weight in weighted],
+                            k=1,
+                        )[0]
+                        timesync_state, msg, _weight = weighted[selected_idx]
+                    self._timesyncd_last_state[system.hostname] = (timesync_state, ts)
+                    self.activity_generator.generate_syslog_event(
+                        system=system,
+                        time=ts,
+                        app_name="systemd-timesyncd",
+                        message=msg,
+                        pid=sys_pids.get("timesyncd", rng.randint(400, 800)),
+                    )
+                else:
+                    # Additional diverse syslog programs — loaded from YAML with
+                    # role/distro tags for data-driven filtering.
+                    from evidenceforge.generation.activity.extra_syslog import (
+                        filter_syslog_message_entries,
+                        get_positive_syslog_weight,
+                        load_extra_syslog_messages,
+                        render_extra_syslog_message,
+                    )
+
+                    _all_programs = load_extra_syslog_messages()
+                    filtered = filter_syslog_message_entries(
+                        _all_programs,
+                        is_rhel_like,
+                        system.roles,
+                        sys_type,
+                    )
+                    weighted_entries = [
+                        (candidate, weight)
+                        for candidate in filtered
+                        if (weight := get_positive_syslog_weight(candidate)) is not None
+                    ]
+                    if not weighted_entries:
+                        continue
+                    entry = rng.choices(
+                        [candidate for candidate, _weight in weighted_entries],
+                        weights=[weight for _candidate, weight in weighted_entries],
+                        k=1,
+                    )[0]
+                    app = entry["app"]
+                    limit = entry.get("max_per_host_window")
+                    limit_key = ""
+                    if isinstance(limit, int) and limit > 0:
+                        if not hasattr(self, "_extra_syslog_entry_counts"):
+                            self._extra_syslog_entry_counts = {}
+                        limit_key = _extra_syslog_limit_key(system.hostname, entry)
+                        if self._extra_syslog_entry_counts.get(limit_key, 0) >= limit:
+                            continue
+                    # Format placeholders vary by daemon
+                    if app == "dhclient":
+                        # DHCP syslog must be tied to the canonical lease
+                        # transaction; generic noise can contradict Zeek DHCP.
+                        continue
+                    elif app == "NetworkManager":
+                        # NetworkManager logs an epoch-style timestamp in [brackets].
+                        msg = render_extra_syslog_message(
+                            entry,
+                            rng,
+                            positional_value=_networkmanager_message_timestamp(ts),
+                            system_services=system.services,
+                            values={"interface": primary_interface},
+                        )
+                    elif app == "systemd-resolved":
+                        dns_server = rng.choice(dns_ips) if dns_ips else "10.0.0.1"
+                        scope = "global" if rng.random() < 0.35 else primary_interface
+                        msg = render_extra_syslog_message(
+                            entry,
+                            rng,
+                            positional_value=rng.randint(100000, 999999),
+                            system_services=system.services,
+                            values={
+                                "dns_server": dns_server,
+                                "interface": primary_interface,
+                                "scope": scope,
+                            },
+                        )
+                    elif app == "anacron":
+                        self._emit_anacron_lifecycle(system, ts, rng, sys_pids)
+                        continue
+                    elif app == "polkitd":
+                        msg = self._render_polkit_syslog_message(
+                            entry,
+                            rng,
+                            system=system,
+                            timestamp=ts,
+                            sys_pids=sys_pids,
+                        )
+                    elif app == "rsyslogd":
+                        msg = render_extra_syslog_message(
+                            entry,
+                            rng,
+                            positional_value=rng.randint(1000, 99999),
+                            system_services=system.services,
+                            values={"fd": self._next_rsyslog_fd(system.hostname, rng)},
+                        )
+                    elif app == "sudo":
+                        values = {"interface": primary_interface}
+                        sudo_command = self._choose_extra_syslog_sudo_command(entry, rng, system)
+                        if sudo_command is not None:
+                            values["sudo_command"] = sudo_command
+                        msg = render_extra_syslog_message(
+                            entry,
+                            rng,
+                            positional_value=rng.randint(100000, 999999),
+                            system_services=system.services,
+                            values=values,
+                        )
+                    elif app == "dbus-daemon":
+                        msg = render_extra_syslog_message(
+                            entry,
+                            rng,
+                            positional_value=self._next_dbus_bus_id(system.hostname, rng),
+                            system_services=system.services,
+                        )
+                    else:
+                        msg = render_extra_syslog_message(
+                            entry,
+                            rng,
+                            positional_value=rng.randint(100000, 999999),
+                            system_services=system.services,
+                            values={"interface": primary_interface},
+                        )
+                    # Map syslog app names to sys_pids keys for persistent daemons.
+                    # Only map to sys_pids entries that are the SAME daemon.
+                    _APP_TO_PID_KEY = {
+                        "NetworkManager": "networkmanager",
+                        "dbus-daemon": "dbus",
+                        "rsyslogd": "rsyslogd",
+                        "systemd-logind": "logind",
+                        "systemd-resolved": "systemd_resolved",
+                        "cron": "cron",
+                        "snapd": "snapd",
+                    }
+                    # Transient processes (forked per invocation) get random PIDs;
+                    # persistent daemons get stable PIDs.
+                    _TRANSIENT_APPS = {"sudo", "cron"}
+                    if app in _TRANSIENT_APPS:
+                        pid = self.state_manager.allocate_transient_linux_pid(
+                            system.hostname,
+                            ts,
+                            os_category=_get_os_category(system.os),
+                        )
+                    else:
+                        pid_key = _APP_TO_PID_KEY.get(app)
+                        if pid_key and pid_key in sys_pids:
+                            pid = sys_pids[pid_key]
+                        else:
+                            # Derive a stable per-host PID for persistent daemons not in sys_pids.
+                            import hashlib as _hl
+
+                            _h = int(
+                                _hl.md5(
+                                    f"{system.hostname}:{app}".encode(),
+                                    usedforsecurity=False,
+                                ).hexdigest(),
+                                16,
+                            )
+                            pid = 500 + (_h % 59500)  # range 500-59999
+                    facility = 10 if app == "sudo" else 3
+                    severity = 5 if app == "sudo" else 6
+                    sudo_has_session = (
+                        app == "sudo" and "COMMAND=" in msg and "command not allowed" not in msg
+                    )
+                    if sudo_has_session:
+                        sudo_user = (msg.split(" : ", 1)[0] or "admin").strip()
+                        uid = _linux_uid_for_user(sudo_user)
+                        sudo_command = msg.split("COMMAND=", 1)[1].strip()
+                        sudo_runtime = _linux_sudo_command_runtime(sudo_command, rng)
+                        self.activity_generator.generate_syslog_event(
+                            system=system,
+                            time=ts - timedelta(milliseconds=rng.randint(80, 420)),
+                            app_name="sudo",
+                            message=(
+                                "pam_unix(sudo:session): session opened for user "
+                                f"root(uid=0) by {sudo_user}(uid={uid})"
+                            ),
+                            pid=pid,
+                            facility=10,
+                            severity=6,
+                        )
+                    self.activity_generator.generate_syslog_event(
+                        system=system,
+                        time=ts,
+                        app_name=app,
+                        message=msg,
+                        pid=pid,
+                        facility=facility,
+                        severity=severity,
+                    )
+                    if sudo_has_session:
+                        self.activity_generator.generate_syslog_event(
+                            system=system,
+                            time=ts + sudo_runtime + timedelta(milliseconds=rng.randint(120, 950)),
+                            app_name="sudo",
+                            message="pam_unix(sudo:session): session closed for user root",
+                            pid=pid,
+                            facility=10,
+                            severity=6,
+                        )
+                    if limit_key and ts >= self.start_time:
+                        self._extra_syslog_entry_counts[limit_key] = (
+                            self._extra_syslog_entry_counts.get(limit_key, 0) + 1
+                        )
+
+        # ICMP ping between systems on same subnet
+        systems = self.scenario.environment.systems
+        if len(systems) >= 2:
+            avg_multiplier = sum(
+                self._activity_multiplier(system, "icmp_monitoring") for system in systems
+            ) / len(systems)
+            ping_lo, ping_hi = scale_count_range(1, 3, avg_multiplier)
+            num_pings = rng.randint(ping_lo, ping_hi)
+            base_interval = 3600 / (num_pings + 1)
+            for i in range(num_pings):
+                src_sys = rng.choice(systems)
+                dst_sys = rng.choice(systems)
+                if src_sys.ip == dst_sys.ip:
+                    continue
+                if src_sys.ip.rsplit(".", 1)[0] != dst_sys.ip.rsplit(".", 1)[0]:
+                    continue
+                offset = base_interval * (i + 1) + rng.gauss(0, base_interval * 0.1)
+                offset = max(0, min(3599, offset))
+                ts = current_hour + timedelta(seconds=offset)
+                self.state_manager.set_current_time(ts)
+                self.activity_generator.generate_connection(
+                    src_ip=src_sys.ip,
+                    dst_ip=dst_sys.ip,
+                    time=ts,
+                    dst_port=0,
+                    proto="icmp",
+                    duration=rng.uniform(0.0005, 0.005),
+                    orig_bytes=64,
+                    resp_bytes=64,
+                )
+
+        # IDS false-positive alerts
+        if "snort_alert" in self.emitters and self.scenario.environment.network:
+            _all_sigs = load_ids_signatures().get("signatures", [])
+            _FP_SIGS_BY_PROTO: dict[str, list[dict]] = {"tcp": [], "udp": [], "icmp": []}
+            for sig in _all_sigs:
+                proto = sig.get("proto", "tcp")
+                if proto in _FP_SIGS_BY_PROTO:
+                    _FP_SIGS_BY_PROTO[proto].append(sig)
+
+            from evidenceforge.events.dispatcher import expand_formats
+
+            segment_systems: dict[str, list] = {}
+            segment_cidrs = {}
+            for seg in self.scenario.environment.network.segments:
+                import ipaddress
+
+                try:
+                    segment_cidrs[seg.name] = ipaddress.ip_network(seg.cidr, strict=False)
+                except ValueError:
+                    pass
+                seg_sys = [s for s in systems if s.hostname in (seg.systems or [])]
+                if not seg_sys:
+                    net = ipaddress.ip_network(seg.cidr, strict=False)
+                    seg_sys = [s for s in systems if ipaddress.ip_address(s.ip) in net]
+                segment_systems[seg.name] = seg_sys
+            fw_sensor = next(
+                (
+                    candidate
+                    for candidate in self.scenario.environment.network.sensors
+                    if candidate.type == "firewall" and "cisco_asa" in candidate.log_formats
+                ),
+                None,
+            )
+            deny_conn_state = (
+                "REJ"
+                if fw_sensor is not None and getattr(fw_sensor, "drop_mode", "") == "reject"
+                else "S0"
+            )
+
+            for sensor in self.scenario.environment.network.sensors:
+                if "snort_alert" not in expand_formats(sensor.log_formats):
+                    continue
+                inbound_vips = {}
+                if hasattr(self, "dispatcher") and self.dispatcher.visibility_engine:
+                    inbound_vips = self.dispatcher.visibility_engine._real_ip_to_vip
+                monitored_systems = []
+                for seg_name in sensor.monitoring_segments:
+                    monitored_systems.extend(segment_systems.get(seg_name, []))
+                if not monitored_systems:
+                    continue
+                avg_multiplier = sum(
+                    self._activity_multiplier(system, "ids_alert") for system in monitored_systems
+                ) / len(monitored_systems)
+                alerts_lo, alerts_hi = scale_count_range(5, 15, avg_multiplier)
+                num_alerts = rng.randint(alerts_lo, alerts_hi)
+                # For IDS sensors (typically perimeter), generate alerts with
+                # external source IPs targeting monitored systems. Outbound
+                # false-positive destinations use a separate public-IP role
+                # pool so scanner identities do not double as benign services.
+                _EXTERNAL_SCAN_IPS = getattr(
+                    self,
+                    "_external_scanner_ips",
+                    [
+                        "45.33.32.156",
+                        "185.220.101.34",
+                        "91.240.118.172",
+                        "194.26.192.77",
+                        "162.247.74.27",
+                        "198.98.51.189",
+                    ],
+                )
+                for _ in range(num_alerts):
+                    offset = rng.uniform(0, 3599)
+                    ts = current_hour + timedelta(seconds=offset)
+                    # Pick protocol first, then choose a matching signature
+                    alert_proto = rng.choice(["tcp", "udp", "icmp"])
+                    local_sys = rng.choice(monitored_systems)
+                    _os_cat = (
+                        _get_os_category(local_sys.os) if hasattr(local_sys, "os") else "unknown"
+                    )
+                    _sys_services = set(getattr(local_sys, "services", None) or [])
+
+                    # Filter signatures by target system compatibility
+                    _pool = _FP_SIGS_BY_PROTO[alert_proto]
+                    _filtered = [
+                        s
+                        for s in _pool
+                        if (not s.get("target_os") or _os_cat in s["target_os"])
+                        and (
+                            not s.get("target_services")
+                            or _sys_services & set(s["target_services"])
+                        )
+                    ]
+                    if not _filtered:
+                        _filtered = _pool
+                    _filtered = [s for s in _filtered if s.get("baseline_fp_allowed", True)]
+                    _filtered = [
+                        s
+                        for s in _filtered
+                        if not (
+                            s.get("direction") == "in"
+                            and "response" in str(s.get("message", "")).lower()
+                        )
+                    ]
+                    if not _filtered:
+                        continue
+                    sig = rng.choice(_filtered)
+                    alert_dst_port = sig["dst_port"]
+                    sig_direction = sig["direction"]
+                    if sig_direction == "out":
+                        src_ip = local_sys.ip
+                        if alert_proto in {"udp", "tcp"} and alert_dst_port == 53:
+                            dns_ips = getattr(
+                                self.activity_generator,
+                                "_dns_server_ips",
+                                ["10.0.0.1"],
+                            )
+                            dst_ip = rng.choice(dns_ips)
+                        else:
+                            dst_ip = self._choose_external_outbound_destination_ip(rng)
+                        source_system = local_sys
+                    else:
+                        _weights = getattr(self, "_external_scanner_weights", None)
+                        if _weights:
+                            ext_ip = rng.choices(_EXTERNAL_SCAN_IPS, weights=_weights, k=1)[0]
+                        else:
+                            ext_ip = rng.choice(_EXTERNAL_SCAN_IPS)
+                        if hasattr(self, "dispatcher") and self.dispatcher.visibility_engine:
+                            public_target = (
+                                self.dispatcher.visibility_engine.get_public_inbound_address(
+                                    local_sys.ip
+                                )
+                            )
+                            if public_target is None:
+                                continue
+                        else:
+                            public_target = inbound_vips.get(local_sys.ip, local_sys.ip)
+                        src_ip = ext_ip
+                        dst_ip = public_target
+                        source_system = None
+                    ids_result = IdsAlertActionBundle(
+                        IdsAlertRequest(
+                            signature=sig,
+                            time=ts,
+                            src_ip=src_ip,
+                            dst_ip=dst_ip,
+                            dst_port=alert_dst_port,
+                            proto=alert_proto,
+                            rng=rng,
+                            source="baseline_ids_false_positive",
+                            direction=sig_direction,
+                            ad_domain=self.scenario.environment.domain or "corp.local",
+                            dns_server_ip=dst_ip,
+                            include_dns_payload=(
+                                alert_proto in {"udp", "tcp"}
+                                and alert_dst_port == 53
+                                and sig_direction == "out"
+                            ),
+                            dns_context_factory=_dns_context_for_ids_signature,
+                        )
+                    ).execute_with_result()
+
+                    firewall = None
+                    ids_conn_state = None
+                    if sig_direction == "in":
+                        policy_denied = False
+                        if fw_sensor is not None and alert_proto == "tcp":
+                            policy_denied = (
+                                self._evaluate_firewall_policy(
+                                    src_ip,
+                                    local_sys.ip,
+                                    alert_dst_port,
+                                    fw_sensor,
+                                    segment_cidrs,
+                                )
+                                == "deny"
+                            )
+                        service, ids_conn_state, duration, orig_bytes, resp_bytes = (
+                            _baseline_inbound_ids_probe_profile(
+                                rng=rng,
+                                proto=alert_proto,
+                                dst_port=alert_dst_port,
+                                target_system=local_sys,
+                                policy_denied=policy_denied,
+                                deny_conn_state=deny_conn_state,
+                            )
+                        )
+                        if policy_denied:
+                            from evidenceforge.events.contexts import FirewallContext
+
+                            resolve_iface = getattr(self, "_resolve_firewall_interface", None)
+                            src_interface = (
+                                resolve_iface(src_ip) if callable(resolve_iface) else "outside"
+                            )
+                            dst_interface = (
+                                resolve_iface(local_sys.ip) if callable(resolve_iface) else "dmz"
+                            )
+                            firewall = FirewallContext(
+                                action="deny",
+                                msg_id=106023,
+                                connection_id=0,
+                                src_interface=src_interface,
+                                dst_interface=dst_interface,
+                                access_group=f"{src_interface}_access_in",
+                            )
+                    else:
+                        service = {22: "ssh", 80: "http", 443: "ssl", 53: "dns"}.get(
+                            alert_dst_port, ""
+                        )
+                        duration = rng.uniform(0.001, 5.0)
+                        orig_bytes = rng.randint(40, 2000)
+                        resp_bytes = rng.randint(0, 1000)
+
+                    self.activity_generator.generate_connection(
+                        src_ip=src_ip,
+                        dst_ip=dst_ip,
+                        time=ts,
+                        dst_port=alert_dst_port,
+                        proto=alert_proto,
+                        service=service,
+                        duration=duration,
+                        orig_bytes=orig_bytes,
+                        resp_bytes=resp_bytes,
+                        conn_state=ids_conn_state,
+                        source_system=source_system,
+                        dns=ids_result.dns,
+                        ids=ids_result.ids,
+                        firewall=firewall,
+                    )
+
+        # Web access logs
+        if "web_access" in self.emitters:
+            for sys_obj in systems:
+                self._emit_web_server_access(sys_obj, systems, rng, current_hour)
+
+    def _emit_web_server_access(
+        self,
+        sys_obj: Any,
+        systems: list[Any],
+        rng: random.Random,
+        current_hour: datetime,
+    ) -> None:
+        """Emit inbound web server traffic as sessions and source-native tool requests."""
+        if "web_server" not in (sys_obj.roles or []):
+            return
+
+        from evidenceforge.events.contexts import HttpContext
+        from evidenceforge.generation.activity.http_content import (
+            apply_transfer_size_variance,
+            is_stable_resource_path,
+            normalize_mime_type_for_path,
+            response_mime_types_for_status,
+            response_size_for_mime,
+            response_size_for_status,
+        )
+        from evidenceforge.generation.activity.timing_profiles import get_timing_window
+        from evidenceforge.generation.activity.web_session_profiles import (
+            pick_profile_request,
+            pick_web_visitor_profile,
+            request_count_bounds,
+        )
+
+        web_lo, web_hi = self._resolve_traffic_rate("web")
+        scale_method = getattr(self, "_scaled_count_range", None)
+        if callable(scale_method):
+            scaled_range: tuple[int, int] | None = None
+            try:
+                candidate = scale_method(sys_obj, "web", web_lo, web_hi)
+            except (AttributeError, TypeError, ValueError):
+                candidate = None
+            if isinstance(candidate, (tuple, list)) and len(candidate) == 2:
+                scaled_range = (int(candidate[0]), int(candidate[1]))
+            if scaled_range is not None:
+                web_lo, web_hi = scaled_range
+        top_level_budget = rng.randint(web_lo, web_hi)
+        if top_level_budget <= 0:
+            return
+
+        internal_client_systems = [s for s in systems if s.ip != sys_obj.ip]
+        internal_ips = [s.ip for s in internal_client_systems]
+        segment = self._get_segment_for_system(sys_obj)
+        exposure = segment.exposure if segment else self._get_system_exposure(sys_obj)
+        ext_ratio = (
+            segment.external_ratio
+            if segment is not None and segment.external_ratio is not None
+            else 0.6
+        )
+
+        ext_pool_size = min(200, max(10, top_level_budget // 10))
+        ext_ip_pool = [self._generate_external_web_client_ip(rng) for _ in range(ext_pool_size)]
+        ext_ip_weights = [1.0 / (i + 1) for i in range(ext_pool_size)]
+        int_ip_weights = [1.0 / (i + 1) for i in range(len(internal_ips))]
+        public_hosts = getattr(sys_obj, "public_hostnames", None) or []
+        ip_map = getattr(self.activity_generator, "_ip_to_system", {})
+
+        def _choose_client_ip() -> str:
+            if exposure == "external":
+                return rng.choices(ext_ip_pool, weights=ext_ip_weights, k=1)[0]
+            if exposure == "both" and rng.random() < ext_ratio:
+                return rng.choices(ext_ip_pool, weights=ext_ip_weights, k=1)[0]
+            if internal_ips:
+                return rng.choices(internal_ips, weights=int_ip_weights, k=1)[0]
+            return "10.0.0.1"
+
+        def _profile_restricted_internal_pool(
+            profile_name: str,
+            profile: dict[str, Any],
+        ) -> tuple[list[str], list[float]] | None:
+            raw_types = profile.get("source_type_any")
+            raw_roles = profile.get("source_role_any")
+            type_filter = (
+                {str(value).lower() for value in raw_types}
+                if isinstance(raw_types, list)
+                else set()
+            )
+            role_filter = (
+                {str(value).lower() for value in raw_roles}
+                if isinstance(raw_roles, list)
+                else set()
+            )
+            if (
+                not type_filter
+                and not role_filter
+                and (profile_name == "human_browser" or profile.get("kind") == "session")
+            ):
+                type_filter = {"workstation"}
+            if not type_filter and not role_filter:
+                return None
+
+            candidates = []
+            for candidate in internal_client_systems:
+                candidate_type = str(getattr(candidate, "type", "")).lower()
+                candidate_roles = {
+                    str(role).lower() for role in (getattr(candidate, "roles", None) or [])
+                }
+                if candidate_type in type_filter or candidate_roles & role_filter:
+                    candidates.append(candidate)
+            if not candidates:
+                return [], []
+            ips = [candidate.ip for candidate in candidates]
+            weights = [1.0 / (i + 1) for i in range(len(ips))]
+            return ips, weights
+
+        def _effective_dst_ip(is_external_client: bool) -> str:
+            dispatcher = getattr(self, "dispatcher", None)
+            if is_external_client and dispatcher is not None:
+                visibility = getattr(dispatcher, "visibility_engine", None)
+                real_to_vip = getattr(visibility, "_real_ip_to_vip", None) if visibility else None
+                vip = real_to_vip.get(sys_obj.ip) if isinstance(real_to_vip, dict) else None
+                if vip:
+                    return vip
+            return sys_obj.ip
+
+        def _status_message(status: int) -> str:
+            return {
+                200: "OK",
+                204: "No Content",
+                206: "Partial Content",
+                301: "Moved Permanently",
+                302: "Found",
+                304: "Not Modified",
+                400: "Bad Request",
+                401: "Unauthorized",
+                403: "Forbidden",
+                404: "Not Found",
+                405: "Method Not Allowed",
+                500: "Internal Server Error",
+                503: "Service Unavailable",
+            }.get(status, "OK")
+
+        tool_gap = get_timing_window(
+            "web.tool_request_gap",
+            default_min_ms=120,
+            default_max_ms=1500,
+            default_position="after",
+            default_class="burst_fanout",
+        )
+
+        def _tool_gap_ms() -> int:
+            if tool_gap.max_ms <= tool_gap.min_ms:
+                return tool_gap.min_ms
+            return rng.randint(tool_gap.min_ms, tool_gap.max_ms)
+
+        top_level_emitted = 0
+        attempts = 0
+        while top_level_emitted < top_level_budget and attempts < top_level_budget * 4:
+            attempts += 1
+            client_ip = _choose_client_ip()
+            is_external_client = not _is_private_ip(client_ip)
+            profile_name, profile = self._web_visitor_profile_for_client(
+                client_ip,
+                is_external=is_external_client,
+                rng=rng,
+                pick_profile=pick_web_visitor_profile,
+            )
+
+            restricted_pool = None
+            if not is_external_client:
+                restricted_pool = _profile_restricted_internal_pool(profile_name, profile)
+            if restricted_pool is not None:
+                restricted_ips, restricted_weights = restricted_pool
+                if not restricted_ips:
+                    continue
+                client_ip = rng.choices(restricted_ips, weights=restricted_weights, k=1)[0]
+                is_external_client = False
+
+            dst_port = 443 if is_external_client and rng.random() < 0.85 else 80
+            dst_service = "ssl" if dst_port == 443 else "http"
+            http_host = (
+                rng.choice(public_hosts)
+                if is_external_client and public_hosts
+                else sys_obj.hostname
+            )
+            client_sys = ip_map.get(client_ip)
+            source_os = _get_os_category(client_sys.os) if client_sys is not None else None
+            client_os_category = source_os or ("external" if is_external_client else "windows")
+            ua_rng = random.Random(
+                _stable_seed(
+                    f"web_client_ua:{client_ip}:{http_host}:{profile_name}:{client_os_category}"
+                )
+            )
+            chosen_ua = self._source_sticky_browser_user_agent(
+                source_system=client_sys,
+                src_ip=client_ip,
+                os_cat=client_os_category,
+                rng=ua_rng,
+                profile=profile,
+                hostname=http_host,
+                domain_tags=("web",),
+            )
+            base_ts = current_hour + timedelta(seconds=rng.uniform(0, 3599))
+            effective_dst_ip = _effective_dst_ip(is_external_client)
+
+            if profile.get("kind") == "session":
+                cache_seen = getattr(self, "_web_static_cache_seen", None)
+                if not isinstance(cache_seen, dict):
+                    cache_seen = self._web_static_cache_seen = {}
+                result = BrowserSessionActionBundle(
+                    request=BrowserSessionRequest(
+                        src_ip=client_ip,
+                        dst_ip=effective_dst_ip,
+                        time=base_ts,
+                        hostname=http_host,
+                        dst_port=dst_port,
+                        proto="tcp",
+                        service=dst_service,
+                        source_system=client_sys,
+                        domain_tags=("web",),
+                        source_os=client_os_category,
+                        browsing_intensity=str(profile.get("browsing_intensity", "normal")),
+                        require_browser_like_domain=False,
+                        transfer_variant_key=f"{client_ip}:{chosen_ua}:{base_ts.isoformat()}",
+                        user_agent=chosen_ua,
+                        same_host_only=True,
+                        page_load_budget=top_level_budget - top_level_emitted,
+                        request_body_floor=200,
+                        secondary_duration_min=0.03,
+                        set_current_time=False,
+                        source="baseline_web_server_access",
+                    ),
+                    executor=self.activity_generator,
+                    rng=rng,
+                    static_cache_seen=cache_seen,
+                ).execute_with_result()
+                top_level_emitted += result.page_load_count
+                continue
+
+            lo, hi = request_count_bounds(profile)
+            count = min(top_level_budget - top_level_emitted, rng.randint(lo, hi))
+            elapsed_ms = 0
+            for request_index in range(count):
+                request = pick_profile_request(rng, profile)
+                path = str(request.get("path", "/"))
+                method = str(request.get("method", "GET"))
+                status = int(request.get("status", 200))
+                mime = normalize_mime_type_for_path(path, str(request.get("type", "text/html")))
+                resp_bytes = (
+                    apply_transfer_size_variance(
+                        response_size_for_status(status, http_host, path),
+                        status_code=status,
+                        host=http_host,
+                        uri=path,
+                        content_type=mime,
+                        variant_key=f"{client_ip}:{chosen_ua}",
+                    )
+                    if status != 200 or is_stable_resource_path(path)
+                    else response_size_for_mime(rng, mime)
+                )
+                request_body_len = rng.randint(100, 5_000) if method == "POST" else 0
+                referrer = ""
+                if profile.get("referrer_mode") == "same_origin" and rng.random() < 0.35:
+                    referrer = f"{'https' if dst_port == 443 else 'http'}://{http_host}/"
+                req_ts = base_ts + timedelta(milliseconds=elapsed_ms)
+                if request_index < count - 1:
+                    elapsed_ms += _tool_gap_ms()
+                self.activity_generator.generate_connection(
+                    src_ip=client_ip,
+                    dst_ip=effective_dst_ip,
+                    time=req_ts,
+                    dst_port=dst_port,
+                    proto="tcp",
+                    service=dst_service,
+                    duration=rng.uniform(0.01, 1.5),
+                    orig_bytes=max(200, request_body_len),
+                    resp_bytes=resp_bytes,
+                    source_system=client_sys,
+                    http=HttpContext(
+                        method=method,
+                        host=http_host,
+                        uri=path,
+                        version="1.1",
+                        user_agent=chosen_ua,
+                        request_body_len=request_body_len,
+                        response_body_len=resp_bytes,
+                        status_code=status,
+                        status_msg=_status_message(status),
+                        referrer=referrer,
+                        resp_mime_types=response_mime_types_for_status(
+                            status,
+                            mime,
+                            resp_bytes,
+                            method=method,
+                        ),
+                        tags=[],
+                    ),
+                    hostname=http_host,
+                )
+                top_level_emitted += 1
+
+    def _reserved_external_web_client_ips(self) -> set[str]:
+        """Return external IPs already claimed by scanner or authored activity."""
+        reserved: set[str] = set()
+        scanner_ips = getattr(self, "_external_scanner_ips", [])
+        if isinstance(scanner_ips, (list, tuple, set)):
+            reserved.update(
+                str(ip) for ip in scanner_ips if isinstance(ip, str) and not _is_private_ip(ip)
+            )
+
+        reserved.update(self._external_story_source_ips())
+        return reserved
+
+    def _external_story_source_ips(self) -> set[str]:
+        """Return explicit external source IPs authored by the scenario."""
+        reserved: set[str] = set()
+        scenario = getattr(self, "scenario", None)
+        for group_name in ("storyline", "red_herrings"):
+            group = getattr(scenario, group_name, None)
+            if not isinstance(group, list):
+                continue
+            for event in group:
+                specs = getattr(event, "events", None)
+                if not isinstance(specs, list):
+                    continue
+                for spec in specs:
+                    source_ip = getattr(spec, "source_ip", None)
+                    if isinstance(source_ip, str) and source_ip and not _is_private_ip(source_ip):
+                        reserved.add(source_ip)
+        return reserved
+
+    def _generate_external_web_client_ip(self, rng: random.Random) -> str:
+        """Generate an external web-client IP that does not reuse scanner identities."""
+        reserved = self._reserved_external_web_client_ips()
+        fallback = ""
+        for _ in range(1000):
+            candidate = self._generate_external_client_ip(rng)
+            fallback = candidate
+            if candidate not in reserved:
+                return candidate
+        return fallback
+
+    def _reserved_external_outbound_destination_ips(self) -> set[str]:
+        """Return public IPs that should not be reused as benign outbound destinations."""
+        reserved: set[str] = set()
+        scanner_ips = getattr(self, "_external_scanner_ips", [])
+        if isinstance(scanner_ips, (list, tuple, set)):
+            reserved.update(
+                str(ip) for ip in scanner_ips if isinstance(ip, str) and not _is_private_ip(ip)
+            )
+        reserved.update(self._external_story_source_ips())
+
+        try:
+            from evidenceforge.generation.activity.network_params import public_ntp_ips
+        except ImportError:
+            ntp_ips: list[str] = []
+        else:
+            ntp_ips = public_ntp_ips()
+        reserved.update(str(ip) for ip in ntp_ips if ip and not _is_private_ip(str(ip)))
+        return reserved
+
+    def _external_outbound_destination_pool(self) -> tuple[list[str], list[float]]:
+        """Return a stable public destination pool disjoint from scanner identities."""
+        pool = getattr(self, "_external_outbound_destination_ips", None)
+        weights = getattr(self, "_external_outbound_destination_weights", None)
+        if isinstance(pool, list) and isinstance(weights, list) and len(pool) == len(weights) > 0:
+            return pool, weights
+
+        reserved = self._reserved_external_outbound_destination_ips()
+        pool_rng = random.Random(_stable_seed("external_outbound_destination_pool"))
+        generated: list[str] = []
+        seen: set[str] = set()
+        for _ in range(3000):
+            candidate = self._generate_external_client_ip(pool_rng)
+            if candidate in reserved or candidate in seen:
+                continue
+            seen.add(candidate)
+            generated.append(candidate)
+            if len(generated) >= 96:
+                break
+
+        if not generated:
+            generated = [
+                ip
+                for ip in (
+                    "13.236.8.128",
+                    "20.205.243.166",
+                    "104.16.0.35",
+                    "151.101.0.63",
+                    "34.104.35.123",
+                )
+                if ip not in reserved
+            ]
+        if not generated:
+            generated = ["13.236.8.128"]
+
+        generated_weights = [1.0 / (index + 1) for index in range(len(generated))]
+        self._external_outbound_destination_ips = generated
+        self._external_outbound_destination_weights = generated_weights
+        return generated, generated_weights
+
+    def _choose_external_outbound_destination_ip(self, rng: random.Random) -> str:
+        """Choose a role-safe external destination for outbound false-positive alerts."""
+        ips, weights = self._external_outbound_destination_pool()
+        return rng.choices(ips, weights=weights, k=1)[0]
+
+    def _web_visitor_profile_for_client(
+        self,
+        client_ip: str,
+        *,
+        is_external: bool,
+        rng: random.Random,
+        pick_profile: Any,
+    ) -> tuple[str, dict[str, Any]]:
+        """Return a source-sticky web visitor profile for external clients."""
+        if not is_external:
+            return pick_profile(rng, is_external=False)
+
+        cache = getattr(self, "_web_external_client_profiles", None)
+        if not isinstance(cache, dict):
+            cache = {}
+            self._web_external_client_profiles = cache
+
+        cached = cache.get(client_ip)
+        if cached is None:
+            profile_rng = random.Random(_stable_seed(f"web_external_client_profile:{client_ip}"))
+            cached = pick_profile(profile_rng, is_external=True)
+            cache[client_ip] = cached
+        return cached
+
+    def _generate_rsat_sessions(self, current_hour: datetime, rng, local_dt) -> None:
+        """Generate correlated RSAT sessions from admin workstations to DCs.
+
+        Produces a temporally-correlated multi-host event sequence for each
+        session: mmc.exe + DLL loads on the workstation, type 3 logon + LDAP/RPC
+        connections on the DC — all within a tight time window.
+        """
+        from evidenceforge.generation.activity import _get_os_category
+        from evidenceforge.generation.activity.rsat_tools import load_rsat_tools, pick_rsat_tool
+
+        systems = self.scenario.environment.systems
+        dcs = [s for s in systems if s.type == "domain_controller"]
+        if not dcs:
+            return
+
+        workstations = [
+            s for s in systems if s.type == "workstation" and _get_os_category(s.os) == "windows"
+        ]
+        if not workstations:
+            return
+
+        if not load_rsat_tools():
+            return
+
+        admin_personas = {"sysadmin", "help_desk"}
+        admin_users = [
+            u
+            for u in self.scenario.environment.users
+            if u.enabled and (u.persona or "").lower() in admin_personas
+        ]
+        if not admin_users:
+            return
+
+        local_hour = local_dt.hour
+        is_business_hours = 8 <= local_hour <= 18
+        base_prob = 0.50 if is_business_hours else 0.10
+        if rng.random() > base_prob:
+            return
+
+        num_sessions = rng.randint(1, 3) if is_business_hours else 1
+
+        for _ in range(num_sessions):
+            admin = rng.choice(admin_users)
+            dc = rng.choice(dcs)
+            tool = pick_rsat_tool(rng)
+
+            ws = self._resolve_rsat_workstation(admin, workstations, rng)
+            if ws is None:
+                continue
+
+            offset = rng.uniform(0, 3599)
+            base_time = current_hour + timedelta(seconds=offset)
+            aligned_time = self._align_rsat_with_future_workstation_session(
+                admin,
+                ws,
+                base_time,
+                current_hour + timedelta(hours=1),
+                rng,
+            )
+            if aligned_time is None:
+                continue
+            base_time = aligned_time
+            self.state_manager.set_current_time(base_time)
+
+            logon_id = self._ensure_session_on_system(admin, ws, base_time, rng)
+
+            sessions = self.state_manager.get_sessions_for_user(admin.username)
+            ws_session = next(
+                (s for s in sessions if s.system == ws.hostname and s.logon_id == logon_id),
+                None,
+            )
+            parent_pid = ws_session.explorer_pid if ws_session and ws_session.explorer_pid else 4
+
+            mmc_time = base_time
+            mmc_pid = self.activity_generator.generate_process(
+                user=admin,
+                system=ws,
+                time=mmc_time,
+                logon_id=logon_id,
+                process_name=r"C:\Windows\System32\mmc.exe",
+                command_line=tool["command_line"],
+                parent_pid=parent_pid,
+            )
+
+            for module in tool.get("loaded_modules", []):
+                dll_time = mmc_time + timedelta(seconds=rng.uniform(0.1, 1.5))
+                self.state_manager.set_current_time(dll_time)
+                self.activity_generator.generate_image_load(
+                    user=admin,
+                    system=ws,
+                    time=dll_time,
+                    pid=mmc_pid,
+                    image=r"C:\Windows\System32\mmc.exe",
+                    dll_path=module["path"],
+                    signed=True,
+                    signature=module.get("signature", "Microsoft Corporation"),
+                    signature_status="Valid",
+                )
+
+            dc_logon_time = mmc_time + timedelta(seconds=rng.uniform(0.5, 2.0))
+            self.state_manager.set_current_time(dc_logon_time)
+            self.activity_generator.generate_logon(
+                user=admin,
+                system=dc,
+                time=dc_logon_time,
+                logon_type=3,
+                source_ip=ws.ip,
+            )
+
+            for port_info in tool["target_ports"]:
+                conn_time = mmc_time + timedelta(seconds=rng.uniform(1.0, 5.0))
+                self.state_manager.set_current_time(conn_time)
+                self.activity_generator.generate_connection(
+                    src_ip=ws.ip,
+                    dst_ip=dc.ip,
+                    time=conn_time,
+                    dst_port=port_info["port"],
+                    proto="tcp",
+                    service=port_info.get("service"),
+                    duration=rng.uniform(0.5, 30.0),
+                    orig_bytes=rng.randint(500, 5000),
+                    resp_bytes=rng.randint(1000, 50000),
+                    pid=mmc_pid,
+                    source_system=ws,
+                )
+
+    def _align_rsat_with_future_workstation_session(
+        self,
+        user: User,
+        system: System,
+        base_time: datetime,
+        hour_end: datetime,
+        rng: random.Random,
+    ) -> datetime | None:
+        """Move foreground admin work after an already-planned workstation session."""
+        if _get_os_category(system.os) != "windows":
+            return base_time
+
+        def _as_utc(value: datetime) -> datetime:
+            return value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+
+        base_utc = _as_utc(base_time)
+        hour_end_utc = _as_utc(hour_end)
+        future_sessions = [
+            session
+            for session in self.state_manager.get_sessions_for_user(user.username)
+            if session.system == system.hostname
+            and session.logon_type in {2, 10, 11}
+            and session.session_kind not in {"network", "service"}
+            and base_utc < _as_utc(session.start_time) < hour_end_utc
+        ]
+        if not future_sessions:
+            return base_time
+
+        next_session = min(future_sessions, key=lambda session: _as_utc(session.start_time))
+        aligned = _as_utc(next_session.start_time) + timedelta(seconds=rng.uniform(20.0, 90.0))
+        if aligned >= hour_end_utc:
+            return None
+        return aligned
+
+    def _resolve_rsat_workstation(self, admin, workstations, rng):
+        """Find the admin's Windows workstation for RSAT sessions."""
+        if hasattr(admin, "primary_system") and admin.primary_system:
+            match = [s for s in workstations if s.hostname == admin.primary_system]
+            if match:
+                return match[0]
+        assigned = [s for s in workstations if getattr(s, "assigned_user", None) == admin.username]
+        if assigned:
+            return assigned[0]
+        return rng.choice(workstations) if workstations else None

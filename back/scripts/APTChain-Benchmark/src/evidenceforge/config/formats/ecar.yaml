@@ -1,0 +1,297 @@
+# ecar format definition — eCAR (extended Cyber Analytics Repository) - EDR/XDR host telemetry
+#
+# Category: host
+# Standalone: yes (no cross-file dependencies)
+# Note: Field names may be referenced by evaluation rules in config/evaluation/
+#
+# Full schema: see commands/eforge/references/config-formats.md
+
+name: ecar
+version: "1.0"
+description: "eCAR (extended Cyber Analytics Repository) - EDR/XDR host telemetry"
+category: host
+
+fields:
+  # Core metadata
+  - name: timestamp_ms
+    type: integer
+    required: true
+    description: "Timestamp in milliseconds since epoch"
+
+  - name: id
+    type: string
+    required: true
+    description: "UUID for this event record"
+
+  - name: hostname
+    type: string
+    required: true
+    description: "Target system hostname"
+
+  # Event definition (object/action model)
+  - name: object
+    type: string
+    required: true
+    description: "Entity type (PROCESS, FILE, FLOW, REGISTRY, etc.)"
+    constraints:
+      allowed_values: [PROCESS, FILE, FLOW, REGISTRY, MODULE, THREAD, USER_SESSION, SOCKET, DRIVER, SERVICE]
+
+  - name: action
+    type: string
+    required: true
+    description: "Operation performed (CREATE, OPEN, MODIFY, DELETE, etc.)"
+    constraints:
+      allowed_values: [CREATE, TERMINATE, OPEN, CLOSE, MODIFY, DELETE, WRITE, READ, CONNECT, ACCEPT, SEND, RECEIVE, LOAD, UNLOAD, START, STOP, LOGIN, LOGOUT, REMOTE_CREATE]
+
+  - name: objectID
+    type: string
+    required: true
+    description: "UUID of the affected entity"
+
+  # Actor information
+  - name: actorID
+    type: string
+    required: false
+    description: "UUID of entity performing the action"
+
+  - name: pid
+    type: integer
+    required: false
+    description: "Process ID (-1 if unavailable)"
+
+  - name: tid
+    type: integer
+    required: false
+    description: "Thread ID (-1 if unavailable)"
+
+  - name: ppid
+    type: integer
+    required: false
+    description: "Parent process ID (-1 if unavailable)"
+
+  - name: principal
+    type: string
+    required: false
+    description: "User account executing the action"
+
+  # Properties (flexible key-value pairs)
+  - name: command_line
+    type: string
+    required: false
+    description: "Command line for PROCESS events"
+
+  - name: image_path
+    type: string
+    required: false
+    description: "Executable path for PROCESS events"
+
+  - name: parent_image_path
+    type: string
+    required: false
+    description: "Parent executable path for PROCESS/CREATE events"
+
+  - name: file_path
+    type: string
+    required: false
+    description: "File path for FILE events"
+
+  - name: src_ip
+    type: ip_address
+    required: false
+    description: "Source IP for FLOW/SOCKET events"
+
+  - name: src_port
+    type: string
+    required: false
+    description: "Source port for FLOW/SOCKET events (string in properties)"
+
+  - name: dst_ip
+    type: ip_address
+    required: false
+    description: "Destination IP for FLOW/SOCKET events"
+
+  - name: dst_port
+    type: string
+    required: false
+    description: "Destination port for FLOW/SOCKET events (string in properties)"
+
+  - name: protocol
+    type: string
+    required: false
+    description: "Protocol for network events"
+
+  - name: icmp_type
+    type: string
+    required: false
+    description: "ICMP message type for ICMP FLOW events"
+
+  - name: icmp_code
+    type: string
+    required: false
+    description: "ICMP message code for ICMP FLOW events"
+
+  - name: direction
+    type: string
+    required: false
+    description: "Connection direction for FLOW events (INBOUND or OUTBOUND)"
+    constraints:
+      allowed_values: [INBOUND, OUTBOUND]
+
+  - name: md5
+    type: string
+    required: false
+    description: "MD5 hash for FILE events"
+
+  - name: sha256
+    type: string
+    required: false
+    description: "SHA256 hash for FILE events"
+
+  - name: registry_key
+    type: string
+    required: false
+    description: "Registry key path for REGISTRY events"
+
+  - name: registry_value
+    type: string
+    required: false
+    description: "Registry value name for REGISTRY events"
+
+  - name: failure_reason
+    type: string
+    required: false
+    description: "Reason for failure on USER_SESSION/LOGIN events (e.g., bad_password)"
+
+  - name: outcome
+    type: string
+    required: false
+    description: "Logon outcome for USER_SESSION/LOGIN events (success or failure)"
+    constraints:
+      allowed_values: [success, failure]
+
+  - name: logon_id
+    type: string
+    required: false
+    description: "Source-native session/logon identifier for USER_SESSION events"
+
+  - name: logon_type
+    type: string
+    required: false
+    description: "Windows-style logon type for USER_SESSION events, string in properties"
+
+  - name: session_id
+    type: string
+    required: false
+    description: "OS/source session identifier for USER_SESSION events, string in properties"
+
+  - name: logon_guid
+    type: string
+    required: false
+    description: "Windows LogonGuid for USER_SESSION events when available"
+
+  - name: session_type
+    type: string
+    required: false
+    description: "OS-native session type for non-Windows USER_SESSION events"
+
+  - name: session_lifecycle
+    type: string
+    required: false
+    description: "Session lifecycle qualifier for attempts that do not create a durable session"
+    constraints:
+      allowed_values: [attempt_failed]
+
+  - name: status_code
+    type: string
+    required: false
+    description: "Windows status hex (e.g., 0xC000006D) on USER_SESSION/LOGIN failures"
+
+  - name: sub_status
+    type: string
+    required: false
+    description: "Windows sub-status hex (e.g., 0xC0000064) on USER_SESSION/LOGIN failures"
+
+  # Cross-process event properties (THREAD/REMOTE_CREATE, PROCESS/OPEN)
+  - name: src_pid
+    type: string
+    required: false
+    description: "Source process ID (string in properties per eCAR spec)"
+
+  - name: src_tid
+    type: string
+    required: false
+    description: "Source thread ID"
+
+  - name: target_pid
+    type: string
+    required: false
+    description: "Target process ID (THREAD/REMOTE_CREATE, PROCESS/OPEN)"
+
+  - name: tgt_tid
+    type: string
+    required: false
+    description: "Target thread ID (new thread for REMOTE_CREATE)"
+
+  - name: target_process_uuid
+    type: string
+    required: false
+    description: "Target process objectID UUID for cross-reference"
+
+  - name: target_image_path
+    type: string
+    required: false
+    description: "Target executable path for PROCESS/OPEN events"
+
+  - name: start_address
+    type: string
+    required: false
+    description: "Thread start address (hex) for THREAD events"
+
+  - name: stack_base
+    type: string
+    required: false
+    description: "Kernel stack base address for THREAD events"
+
+  - name: stack_limit
+    type: string
+    required: false
+    description: "Kernel stack limit address for THREAD events"
+
+  - name: user_stack_base
+    type: string
+    required: false
+    description: "User-mode stack base address for THREAD events"
+
+  - name: user_stack_limit
+    type: string
+    required: false
+    description: "User-mode stack limit address for THREAD events"
+
+  - name: granted_access
+    type: string
+    required: false
+    description: "Access mask for PROCESS/OPEN events (e.g., 0x1410)"
+
+  - name: call_trace
+    type: string
+    required: false
+    description: "Source-owned call trace for PROCESS/OPEN events"
+
+  # SERVICE/CREATE properties
+  - name: service_name
+    type: string
+    required: false
+    description: "Service name for SERVICE/CREATE events"
+
+  - name: service_account
+    type: string
+    required: false
+    description: "Account running the service for SERVICE/CREATE events"
+
+output:
+  format: json
+  file_extension: ".json"
+  encoding: utf-8
+  # Template not used — EcarEmitter builds JSON directly in Python.
+  # Kept as an empty placeholder for format loader compatibility.
+  template: "{}"

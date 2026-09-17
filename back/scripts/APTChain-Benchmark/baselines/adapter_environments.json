@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "methods": [
+    {
+      "id": "velox",
+      "python_version": "3.11",
+      "environment": "velox",
+      "requirements": "requirements-velox.txt",
+      "module": "baselines.velox_adapter",
+      "sources": ["pidsmaker"],
+      "patches": [],
+      "probe": "import baselines.velox_adapter"
+    },
+    {
+      "id": "nodlink",
+      "python_version": "3.11",
+      "environment": "nodlink",
+      "requirements": "compat_requirements/nodlink.txt",
+      "module": "baselines.nodlink_adapter",
+      "sources": ["nodlink"],
+      "patches": [],
+      "probe": "from baselines.nodlink_adapter import load_official_vae_module; load_official_vae_module()"
+    },
+    {
+      "id": "magic",
+      "python_version": "3.11",
+      "environment": "magic_adapter",
+      "requirements": "compat_requirements/magic_adapter.txt",
+      "module": "baselines.magic_adapter",
+      "sources": ["magic"],
+      "patches": ["patches/magic-small-graph-sampling.patch"],
+      "probe": "from baselines.magic_adapter import load_build_model; load_build_model()"
+    },
+    {
+      "id": "threatrace",
+      "python_version": "3.11",
+      "environment": "threatrace_adapter",
+      "requirements": "compat_requirements/threatrace_adapter.txt",
+      "module": "baselines.threatrace_adapter",
+      "sources": ["threatrace"],
+      "patches": [],
+      "probe": "import baselines.threatrace_adapter"
+    },
+    {
+      "id": "shadewatcher",
+      "python_version": "3.11",
+      "environment": "shadewatcher_adapter",
+      "requirements": "compat_requirements/shadewatcher_adapter.txt",
+      "module": "baselines.shadewatcher_adapter",
+      "sources": ["shadewatcher"],
+      "patches": [],
+      "probe": "import baselines.shadewatcher_adapter"
+    },
+    {
+      "id": "kairos",
+      "python_version": "3.11",
+      "environment": "kairos_adapter",
+      "requirements": "compat_requirements/kairos_adapter.txt",
+      "module": "baselines.kairos_adapter",
+      "sources": ["kairos"],
+      "patches": [],
+      "probe": "from baselines.kairos_adapter import load_source_models; load_source_models()"
+    },
+    {
+      "id": "orthrus",
+      "python_version": "3.11",
+      "environment": "orthrus_adapter",
+      "requirements": "compat_requirements/orthrus_adapter.txt",
+      "module": "baselines.orthrus_adapter",
+      "sources": ["orthrus"],
+      "patches": [],
+      "probe": "from baselines.orthrus_adapter import load_source_stack; load_source_stack()"
+    },
+    {
+      "id": "tapas",
+      "python_version": "3.11",
+      "environment": "tapas_adapter",
+      "requirements": "compat_requirements/tapas_adapter.txt",
+      "module": "baselines.tapas_adapter",
+      "sources": [],
+      "patches": [],
+      "probe": "from baselines.tapas_adapter import DEFAULT_SOURCE, load_official_source; load_official_source(DEFAULT_SOURCE)",
+      "artifacts": [
+        {
+          "path": "artifacts/tapas-inspection/TAPAS-artifact/darpa.py",
+          "sha256": "721aa5e57ca50a6c95141b6ab25fb6062bbdb6bc4c3da02b83984aa1d328df7e"
+        },
+        {
+          "path": "artifacts/tapas-inspection/TAPAS-artifact/model/stackedlstm_tc.pt",
+          "sha256": "8d394dda14156ae1d7406b3bb6f6c50ca182ff3f9da9316a3db61c658e94deec"
+        }
+      ]
+    }
+  ]
+}
